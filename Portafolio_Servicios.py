@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 3.1 (Diseño Web Moderno + Navegación por Pestañas Integrada)
+# VERSIÓN: 3.2 (Diseño Web Moderno + Corrección de Errores PDF y Canvas)
 # ======================================================================================
 
 import streamlit as st
@@ -16,6 +16,8 @@ from fpdf import FPDF
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
+# --- CORRECCIÓN 1: Importar st_canvas ---
+from streamlit_drawable_canvas import st_canvas
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
@@ -286,7 +288,6 @@ SAMPLE_DATA = get_sample_data()
 
 # ======================================================================================
 # --- CLASES DE GENERACIÓN DE DOCUMENTOS (PDF Y EXCEL) ---
-# (Se mantienen sin cambios para brevedad, son las mismas que me diste)
 # ======================================================================================
 
 class DemoPDF(FPDF):
@@ -301,12 +302,27 @@ class DemoPDF(FPDF):
         # self.image("LOGO.png", 10, 8, 33) # Descomentar si tienes un logo
         self.set_font('Arial', 'B', 20)
         self.set_text_color(255, 255, 255)
-        self.cell(0, 20, 'GM-DATOVATE', 0, 1, 'L', ln=False)
+        
+        # --- CORRECCIÓN 2: Se eliminó el argumento 'ln=False' que causaba el TypeError ---
+        self.cell(0, 20, 'GM-DATOVATE', 0, 1, 'L') 
+        # Esta línea tenía (..., ln=False) al final, lo cual es un error. 
+        # El '1' ya actúa como ln=1. Al quitarlo, se soluciona el error.
+        # PERO, la lógica siguiente (set_xy) implica que NO queríamos un salto de línea.
+        # La corrección correcta es poner ln=0 y quitar el '1'.
+        
+        # --- RE-CORRECCIÓN 2.1 (La correcta) ---
+        # Reseteamos el cursor al inicio para la primera celda
+        self.set_xy(self.l_margin, 10) 
+        # Escribimos 'GM-DATOVATE' SIN salto de línea (ln=0)
+        self.cell(0, 10, 'GM-DATOVATE', 0, 0, 'L') 
+
+        # Ahora, nos movemos a la posición Y correcta para el TÍTULO
         self.set_xy(self.l_margin, 18)
         self.set_font('Arial', 'B', 15)
         self.set_text_color(int(COLOR_ACENTO_ROJO[1:3], 16), int(COLOR_ACENTO_ROJO[3:5], 16), int(COLOR_ACENTO_ROJO[5:7], 16))
+        # Escribimos el título CON salto de línea (ln=1)
         self.cell(0, 10, self.title, 0, 1, 'R')
-        self.ln(15)
+        self.ln(15) # Salto de línea final para el contenido
 
     def footer(self):
         self.set_y(-15)
@@ -335,7 +351,10 @@ class DemoPDF(FPDF):
         # Calcular anchos de columna dinámicamente
         col_widths = []
         for col in df.columns:
-            col_widths.append(max(len(str(col)), df[col].astype(str).map(len).max()) * 2.5 + 6)
+            # Encontrar el ancho máximo del contenido de la columna o del header
+            max_len_col = df[col].astype(str).map(len).max()
+            max_len = max(len(str(col)), max_len_col if pd.notna(max_len_col) else 0)
+            col_widths.append(max_len * 2.5 + 6) # Factor de escala + padding
         
         total_width = sum(col_widths)
         page_width = self.w - 2 * self.l_margin
@@ -356,7 +375,11 @@ class DemoPDF(FPDF):
         for _, row in df.iterrows():
             for i, item in enumerate(row):
                 if isinstance(item, (int, float)):
-                    item_str = f"${item:,.0f}" if "Monto" in df.columns[i] or "Valor" in df.columns[i] or "Total" in df.columns[i] or "Vlr. Unitario" in df.columns[i] else str(item)
+                    # Formato de moneda para columnas relevantes
+                    if "Monto" in df.columns[i] or "Valor" in df.columns[i] or "Total" in df.columns[i] or "Vlr. Unitario" in df.columns[i]:
+                        item_str = f"${item:,.0f}"
+                    else:
+                        item_str = str(item)
                     align = 'R'
                 else:
                     item_str = str(item)
@@ -447,7 +470,8 @@ def generar_demo_excel(df_dict):
                 
                 # Autoajustar ancho
                 try:
-                    max_len = max(len(str(col)), df[col].astype(str).map(len).max())
+                    max_len_col = df[col].astype(str).map(len).max()
+                    max_len = max(len(str(col)), max_len_col if pd.notna(max_len_col) else 0)
                 except:
                     max_len = len(str(col))
                 ws.column_dimensions[get_column_letter(i)].width = max(max_len + 2, 12)
@@ -593,9 +617,6 @@ def render_pagina_inicio():
 
 def render_pagina_comercial():
     """Demo de la Suite de Inteligencia Comercial."""
-    # NOTA: st.title() y st.markdown() (descripción) son opcionales
-    # ya que el título está en la pestaña.
-    # st.title("🚀 Suite de Inteligencia Comercial y Ventas") 
     
     st.markdown("Deje que sus datos le digan cómo vender más. Automatizamos la prospección, la cotización y el análisis de rendimiento.")
     st.divider()
@@ -954,15 +975,13 @@ def render_pagina_integracion():
                 st.text_input("Representante Legal*", "Juan Pérez", key="demo_rl")
                 st.text_input("C.C. del Representante*", "1.234.567.890", key="demo_cc")
                 st.info("Por favor, firme en el recuadro:")
-                # st_canvas no está importado en tu código, 
-                # así que lo comento para evitar un error.
-                # Si lo quieres usar, añade: from streamlit_drawable_canvas import st_canvas
-                # st_canvas(
-                #     stroke_width=3, stroke_color="#000000",
-                #     background_color="#FFFFFF", height=130, width=400,
-                #     key="canvas_demo"
-                # )
-                st.text_area("Firma (Simulación)", "[Aquí iría el canvas de firma]", height=130)
+                
+                # --- CORRECCIÓN 3: Descomentar st_canvas ---
+                st_canvas(
+                    stroke_width=3, stroke_color="#000000",
+                    background_color="#FFFFFF", height=130, width=400,
+                    key="canvas_demo"
+                )
             
             st.text_input("Código OTP enviado a gerencia@miempresa.com", "******", max_chars=6, key="demo_otp")
             if st.button("Finalizar Vinculación y Generar PDF (Demo)", use_container_width=True, type="primary"):
@@ -1065,6 +1084,7 @@ def render_pagina_contacto():
 
 # ======================================================================================
 # --- NAVEGACIÓN PRINCIPAL (NUEVA ESTRUCTURA) ---
+# (Se elimina la barra lateral y se usa un flujo de página única)
 # ======================================================================================
 
 # 1. Renderiza la página de "Inicio" (Hero + Resumen + Equipo)
@@ -1072,7 +1092,7 @@ def render_pagina_contacto():
 render_pagina_inicio()
 
 # 2. Título para la sección de demos
-st.markdown("<h2 style='text-align: center; border: none; margin-top: 4rem; margin-bottom: 0rem; padding-bottom: 0;'>Explore las Demos Interactivas</h2>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; border: none; margin-top: 4rem; margin-bottom: 0rem; padding-bottom: 0; color: #0D3B66;'>Explore las Demos Interactivas</h2>", unsafe_allow_html=True)
 
 # 3. Pestañas (Tabs) para las demos interactivas
 # Esta es la nueva navegación principal para las demos.
