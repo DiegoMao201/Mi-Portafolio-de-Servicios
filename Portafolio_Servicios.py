@@ -51,15 +51,15 @@ COLOR_ACENTO_VERDE = "#43AA8B"    # Para éxito (se mantiene)
 st.markdown(f"""
 <style>
     /* --- Animación de Brillo (de la referencia) --- */
-    @keyframes glow {
-        from {{ text-shadow: 0 0 10px rgba(0, 212, 255, 0.5); }}
-        to {{ text-shadow: 0 0 30px rgba(0, 212, 255, 0.9); }}
-    }
+    @keyframes glow {{
+        from {{ text-shadow: 0 0 10px rgba(0, 212, 255, 0.5); }} /* <-- CORREGIDO */
+        to {{ text-shadow: 0 0 30px rgba(0, 212, 255, 0.9); }}   /* <-- CORREGIDO */
+    }}
     
-    @keyframes fadeIn {
-        from {{ opacity: 0; transform: translateY(20px); }}
-        to {{ opacity: 1; transform: translateY(0); }}
-    }
+    @keyframes fadeIn {{
+        from {{ opacity: 0; transform: translateY(20px); }}      /* <-- CORREGIDO */
+        to {{ opacity: 1; transform: translateY(0); }}        /* <-- CORREGIDO */
+    }}
 
     /* --- Contenedor Principal --- */
     .main .block-container {{
