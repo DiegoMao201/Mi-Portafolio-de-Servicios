@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 2.0 (Demo Interactiva de Ecosistema Empresarial)
+# VERSIÓN: 3.0 (Demo Interactiva de Ecosistema Empresarial - Visual Rework)
 #
 # DESCRIPCIÓN: Este portafolio interactivo simula un ecosistema empresarial
 # completo (BI, Ventas, Operaciones, Finanzas, IA) para demostrar el
 # valor y la capacidad técnica de GM-DATOVATE.
+#
+# INSPIRACIÓN: Fusión de la funcionalidad de la app Streamlit v2.0 con
+# el impacto visual de una landing page moderna (HTML/CSS/JS).
 # ======================================================================================
 
 import streamlit as st
@@ -32,142 +35,305 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- PALETA DE COLORES Y ESTILOS ---
-COLOR_PRIMARIO = "#0D3B66"  # Azul profundo (Confianza, Inteligencia)
-COLOR_SECUNDARIO = "#1A73E8" # Azul brillante (Tecnología, Innovación)
-COLOR_ACENTO_ROJO = "#F94144"   # Rojo vivo (Acción, Alerta)
-COLOR_ACENTO_VERDE = "#43AA8B"  # Verde (Finanzas, Crecimiento)
-COLOR_FONDO = "#F7F9FC"    # Fondo gris muy claro
-COLOR_FONDO_SIDEBAR = "#FFFFFF" # Sidebar clara
-COLOR_TEXTO = "#2F2F2F"
-COLOR_TEXTO_SIDEBAR = "#0D3B66"
+# ======================================================================================
+# --- NUEVA PALETA DE COLORES Y ESTILOS (Inspirada en la Referencia HTML) ---
+# ======================================================================================
+
+# Paleta de colores "Tech Dark"
+COLOR_PRIMARIO_BG = "#0a0e27"     # Fondo principal oscuro
+COLOR_SECUNDARIO_BG = "#1a1f3a"    # Fondo de contenedores y sidebar
+COLOR_ACENTO_CYAN = "#00d4ff"    # Acento brillante
+COLOR_TEXTO_PRIMARIO = "#ffffff"  # Texto principal
+COLOR_TEXTO_SECUNDARIO = "#a0a9c0" # Texto grisáceo
+COLOR_ACENTO_ROJO = "#F94144"     # Para alertas (se mantiene)
+COLOR_ACENTO_VERDE = "#43AA8B"    # Para éxito (se mantiene)
 
 st.markdown(f"""
 <style>
+    /* --- Animación de Brillo (de la referencia) --- */
+    @keyframes glow {
+        from {{ text-shadow: 0 0 10px rgba(0, 212, 255, 0.5); }}
+        to {{ text-shadow: 0 0 30px rgba(0, 212, 255, 0.9); }}
+    }
+    
+    @keyframes fadeIn {
+        from {{ opacity: 0; transform: translateY(20px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }
+
     /* --- Contenedor Principal --- */
     .main .block-container {{
         padding-top: 2rem;
         padding-bottom: 2rem;
     }}
     .stApp {{
-        background-color: {COLOR_FONDO};
-        color: {COLOR_TEXTO};
+        background: linear-gradient(135deg, {COLOR_PRIMARIO_BG} 0%, {COLOR_SECUNDARIO_BG} 100%);
+        color: {COLOR_TEXTO_SECUNDARIO};
     }}
 
     /* --- Títulos y Texto --- */
-    h1, h2, h3 {{
-        color: {COLOR_PRIMARIO};
+    h1, h2, h3, h4, h5 {{
+        color: {COLOR_TEXTO_PRIMARIO};
         font-weight: 700;
+        animation: fadeIn 0.5s ease-out forwards;
     }}
-    h1 {{
-        font-size: 2.5rem;
-    }}
+    h1 {{ font-size: 2.8rem; }}
     h2 {{
-        font-size: 2rem;
-        border-bottom: 3px solid {COLOR_ACENTO_ROJO};
-        padding-bottom: 5px;
-        margin-top: 2rem;
+        font-size: 2.2rem;
+        border-bottom: 3px solid {COLOR_ACENTO_CYAN};
+        padding-bottom: 8px;
+        margin-top: 2.5rem;
     }}
     h3 {{
-        font-size: 1.5rem;
-        color: {COLOR_SECUNDARIO};
-        margin-top: 1.5rem;
+        font-size: 1.7rem;
+        color: {COLOR_ACENTO_CYAN};
+        margin-top: 2rem;
     }}
-
-    /* --- Barra Lateral --- */
+    
+    /* --- Barra Lateral (Sidebar) --- */
     [data-testid="stSidebar"] {{
-        background-color: {COLOR_FONDO_SIDEBAR};
-        border-right: 1px solid #E0E0E0;
+        background-color: {COLOR_SECUNDARIO_BG};
+        border-right: 1px solid rgba(0, 212, 255, 0.2);
+    }}
+    [data-testid="stSidebar"] h1 {{
+        animation: glow 1.5s ease-in-out infinite alternate;
     }}
     [data-testid="stSidebar"] .stRadio > label {{
+        /* Oculta el radio-button nativo */
+        display: none;
+    }}
+    [data-testid="stSidebar"] .stRadio [data-baseweb="radio"] {{
+        display: none;
+    }}
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] > div {{
+        /* Estiliza cada opción como una pestaña */
+        display: block;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        margin-bottom: 8px;
         font-size: 1.1rem;
         font-weight: 600;
-        color: {COLOR_TEXTO_SIDEBAR};
-        padding-top: 10px;
-        padding-bottom: 10px;
+        color: {COLOR_TEXTO_SECUNDARIO};
+        background: transparent;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }}
-    [data-testid="stSidebar"] .stRadio [data-baseweb="radio"] span {{
-        background-color: #DDEEFE;
-        border-color: {COLOR_PRIMARIO};
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] > div:hover {{
+        color: {COLOR_TEXTO_PRIMARIO};
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid rgba(0, 212, 255, 0.3);
     }}
-    [data-testid="stSidebar"] .stRadio [data-baseweb="radio"] span[data-checked="true"] {{
-        background-color: {COLOR_ACENTO_ROJO};
-        border-color: {COLOR_ACENTO_ROJO};
+    [data-testid="stSidebar"] .stRadio [data-checked="true"] div[role="radiogroup"] > div {{
+        /* Estilo para la opción SELECCIONADA */
+        color: {COLOR_TEXTO_PRIMARIO};
+        background: linear-gradient(45deg, {COLOR_ACENTO_CYAN}, #0099cc);
+        box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
+        transform: scale(1.02);
     }}
-    [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {{
-        color: {COLOR_PRIMARIO};
+    [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p {{
+        color: {COLOR_TEXTO_PRIMARIO};
+    }}
+    [data-testid="stSidebar"] .sidebar-info-box {{
+        background: {COLOR_SECUNDARIO_BG};
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        border-radius: 10px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        color: {COLOR_TEXTO_SECUNDARIO};
     }}
 
     /* --- Botones --- */
     .stButton>button {{
-        border-radius: 8px;
-        border: 2px solid {COLOR_PRIMARIO};
-        background-color: {COLOR_PRIMARIO};
-        color: white;
+        border-radius: 50px;
+        border: none;
+        background: linear-gradient(45deg, {COLOR_ACENTO_CYAN}, #0099cc);
+        color: {COLOR_PRIMARIO_BG};
         font-weight: bold;
-        transition: all 0.3s;
-        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+        padding: 0.6rem 1.5rem;
+        font-size: 1rem;
     }}
     .stButton>button:hover {{
-        background-color: {COLOR_SECUNDARIO};
-        border-color: {COLOR_SECUNDARIO};
-        transform: scale(1.02);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        background: linear-gradient(45deg, #0099cc, {COLOR_ACENTO_CYAN});
+        color: {COLOR_PRIMARIO_BG};
+        border: none;
     }}
+    .stButton>button:active {{
+        transform: translateY(0);
+        box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+    }}
+    /* Botón Secundario (Descargas) */
     .stButton>button[kind="secondary"] {{
-        background-color: transparent;
-        color: {COLOR_PRIMARIO};
-        border-color: {COLOR_PRIMARIO};
+        background: transparent;
+        color: {COLOR_ACENTO_CYAN};
+        border: 2px solid {COLOR_ACENTO_CYAN};
     }}
     .stButton>button[kind="secondary"]:hover {{
-        background-color: {COLOR_FONDO};
-        color: {COLOR_ACENTO_ROJO};
-        border-color: {COLOR_ACENTO_ROJO};
+        background: rgba(0, 212, 255, 0.1);
+        color: {COLOR_TEXTO_PRIMARIO};
+        border-color: {COLOR_ACENTO_CYAN};
+        box-shadow: none;
+        transform: none;
     }}
-    /* Botón especial de WhatsApp */
+    /* Botones especiales (PDF, WhatsApp) */
     .stButton>button.whatsapp-button {{
-        background-color: {COLOR_ACENTO_VERDE};
+        background: {COLOR_ACENTO_VERDE};
         border-color: {COLOR_ACENTO_VERDE};
+        color: {COLOR_TEXTO_PRIMARIO};
     }}
     .stButton>button.whatsapp-button:hover {{
-        background-color: #368a73;
+        background: #368a73;
         border-color: #368a73;
+        box-shadow: 0 10px 30px rgba(67, 170, 139, 0.4);
     }}
-    /* Botón especial de PDF */
     .stButton>button.pdf-button {{
-        background-color: {COLOR_ACENTO_ROJO};
+        background: {COLOR_ACENTO_ROJO};
         border-color: {COLOR_ACENTO_ROJO};
+        color: {COLOR_TEXTO_PRIMARIO};
     }}
     .stButton>button.pdf-button:hover {{
-        background-color: #c23335;
+        background: #c23335;
         border-color: #c23335;
+        box-shadow: 0 10px 30px rgba(249, 65, 68, 0.4);
     }}
 
-    /* --- Contenedores y Métricas --- */
+    /* --- Contenedores, Métricas y Pestañas --- */
     .stMetric {{
-        background-color: #FFFFFF;
-        border-radius: 10px;
-        padding: 15px;
-        border: 1px solid #E0E0E0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        background: {COLOR_SECUNDARIO_BG};
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        color: {COLOR_TEXTO_PRIMARIO};
     }}
+    .stMetric > div:nth-child(2) {{
+        color: {COLOR_TEXTO_PRIMARIO};
+    }}
+    .stMetric p {{
+        color: {COLOR_TEXTO_SECUNDARIO};
+    }}
+
+    [data-testid="stContainer"] {{
+        background: {COLOR_SECUNDARIO_BG};
+        border-radius: 15px;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        padding: 1.5rem;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        animation: fadeIn 0.5s ease-out forwards;
+    }}
+
     .stTabs [data-baseweb="tab-list"] {{
         gap: 24px;
+        border-bottom: 2px solid rgba(0, 212, 255, 0.2);
     }}
     .stTabs [data-baseweb="tab"] {{
         height: 50px;
         background-color: transparent;
-        border-bottom: 3px solid #C0C0C0;
+        border-bottom: 3px solid transparent;
+        color: {COLOR_TEXTO_SECUNDARIO};
     }}
     .stTabs [aria-selected="true"] {{
-        border-bottom: 3px solid {COLOR_ACENTO_ROJO};
-        color: {COLOR_ACENTO_ROJO};
+        border-bottom: 3px solid {COLOR_ACENTO_CYAN};
+        color: {COLOR_ACENTO_CYAN};
         font-weight: bold;
     }}
     [data-testid="stExpander"] {{
-        background-color: #FFFFFF;
+        background: {COLOR_SECUNDARIO_BG};
         border-radius: 10px;
-        border: 1px solid #E0E0E0;
+        border: 1px solid rgba(0, 212, 255, 0.2);
     }}
+    [data-testid="stExpander"] summary {{
+        color: {COLOR_ACENTO_CYAN};
+        font-weight: 600;
+    }}
+    
+    /* --- Estilos Formularios --- */
+    .stTextInput input, .stTextArea textarea, .stDateInput input, .stNumberInput input {{
+        background: rgba(10, 14, 39, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 10px;
+        padding: 15px;
+        color: {COLOR_TEXTO_PRIMARIO};
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }}
+    .stTextInput input:focus, .stTextArea textarea:focus, .stDateInput input:focus, .stNumberInput input:focus {{
+        outline: none;
+        border-color: {COLOR_ACENTO_CYAN};
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+    }}
+    .stForm {{
+        background: {COLOR_SECUNDARIO_BG};
+        border-radius: 15px;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        padding: 2rem;
+    }}
+    
+    /* --- Estilos Específicos de la Página de Inicio --- */
+    .hero-container {{
+        text-align: center;
+        padding: 4rem 1rem;
+        border-radius: 20px;
+        background: linear-gradient(145deg, rgba(26, 31, 58, 0.8), rgba(10, 14, 39, 0.8));
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        margin-bottom: 3rem;
+    }}
+    .hero-logo {{
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: {COLOR_ACENTO_CYAN};
+        margin-bottom: 20px;
+        animation: glow 2s ease-in-out infinite alternate;
+    }}
+    .hero-title {{
+        font-size: 3rem;
+        font-weight: 700;
+        color: {COLOR_TEXTO_PRIMARIO};
+        margin-bottom: 20px;
+    }}
+    .hero-subtitle {{
+        font-size: 1.3rem;
+        color: {COLOR_TEXTO_SECUNDARIO};
+        margin-bottom: 40px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }}
+    
+    .service-card {{
+        background: {COLOR_SECUNDARIO_BG};
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }}
+    .service-card:hover {{
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+        border: 1px solid rgba(0, 212, 255, 0.5);
+    }}
+    .service-icon {{
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+    }}
+    .service-title {{
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: {COLOR_TEXTO_PRIMARIO};
+        margin-bottom: 1rem;
+    }}
+    .service-description {{
+        color: {COLOR_TEXTO_SECUNDARIO};
+        line-height: 1.6;
+        flex-grow: 1;
+    }}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -204,7 +370,8 @@ def get_sample_data():
     data['cartera_antiguedad'] = pd.DataFrame({
         'Rango': ['Al día', '1-15 días', '16-30 días', '31-60 días', 'Más de 60 días'],
         'Valor ($)': [250_000_000, 80_000_000, 45_000_000, 25_000_000, 70_000_000],
-        'Color': [COLOR_ACENTO_VERDE, '#FBC02D', '#F57C00', COLOR_ACENTO_ROJO, '#a71919']
+        # Colores actualizados para un tema oscuro (más brillantes)
+        'Color': ['#28a745', '#ffc107', '#fd7e14', '#dc3545', '#a71919']
     })
     
     data['cartera_detalle'] = pd.DataFrame({
@@ -240,13 +407,13 @@ SAMPLE_DATA = get_sample_data()
 
 # ======================================================================================
 # --- CLASES DE GENERACIÓN DE DOCUMENTOS (PDF Y EXCEL) ---
+# (Se mantienen sin cambios lógicos, pero se ajustan colores)
 # ======================================================================================
 
 class DemoPDF(FPDF):
     """Crea un PDF profesional de ejemplo para las demos."""
     def header(self):
         try:
-            # Simula la carga de un logo (puedes reemplazar "LOGO.png" si tienes uno)
             # self.image("LOGO.png", 10, 8, 33) 
             pass
         except:
@@ -254,7 +421,8 @@ class DemoPDF(FPDF):
             self.cell(0, 10, 'GM-DATOVATE (Logo)', 0, 1, 'L')
             
         self.set_font('Arial', 'B', 15)
-        self.set_text_color(int(COLOR_PRIMARIO[1:3], 16), int(COLOR_PRIMARIO[3:5], 16), int(COLOR_PRIMARIO[5:7], 16))
+        # Color del título (usaremos el nuevo acento cian)
+        self.set_text_color(0, 212, 255) 
         self.cell(0, 10, self.title, 0, 1, 'R')
         self.set_font('Arial', 'I', 8)
         self.set_text_color(128, 128, 128)
@@ -269,7 +437,8 @@ class DemoPDF(FPDF):
 
     def chapter_title(self, title):
         self.set_font('Arial', 'B', 12)
-        self.set_fill_color(int(COLOR_PRIMARIO[1:3], 16), int(COLOR_PRIMARIO[3:5], 16), int(COLOR_PRIMARIO[5:7], 16))
+        # Color del header (azul oscuro original, se ve bien)
+        self.set_fill_color(13, 59, 102) 
         self.set_text_color(255, 255, 255)
         self.cell(0, 10, title, 0, 1, 'L', fill=True)
         self.ln(4)
@@ -281,9 +450,10 @@ class DemoPDF(FPDF):
         self.ln()
         
     def add_table(self, df):
-        # Header
+        # Header de la tabla
         self.set_font('Arial', 'B', 9)
-        self.set_fill_color(int(COLOR_SECUNDARIO[1:3], 16), int(COLOR_SECUNDARIO[3:5], 16), int(COLOR_SECUNDARIO[5:7], 16))
+        # Usamos el azul brillante como color de header de tabla
+        self.set_fill_color(26, 115, 232)
         self.set_text_color(255, 255, 255)
         col_widths = [self.w / 1.5 / len(df.columns)] * len(df.columns)
         
@@ -291,7 +461,7 @@ class DemoPDF(FPDF):
             self.cell(col_widths[i], 7, str(header), 1, 0, 'C', fill=True)
         self.ln()
 
-        # Body
+        # Cuerpo
         self.set_font('Arial', '', 9)
         self.set_text_color(0, 0, 0)
         self.set_fill_color(245, 245, 245)
@@ -323,9 +493,9 @@ def generar_demo_excel(df_dict):
             # --- Formato Profesional ---
             ws = writer.sheets[sheet_name]
             
-            # Estilos
+            # Estilos (Usando la paleta original que es buena para Excel)
             header_font = Font(bold=True, color="FFFFFF")
-            header_fill = PatternFill(start_color=COLOR_PRIMARIO.replace("#",""), fill_type="solid")
+            header_fill = PatternFill(start_color="0D3B66", fill_type="solid")
             total_font = Font(bold=True)
             total_fill = PatternFill(start_color="E0E0E0", fill_type="solid")
             currency_format = '$ #,##0'
@@ -355,7 +525,7 @@ def generar_demo_excel(df_dict):
             ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(df.columns))
             title_cell = ws.cell(row=1, column=1)
             title_cell.value = sheet_name
-            title_cell.font = Font(size=16, bold=True, color=COLOR_PRIMARIO.replace("#",""))
+            title_cell.font = Font(size=16, bold=True, color="0D3B66")
             title_cell.alignment = Alignment(horizontal='center')
     
     return output.getvalue()
@@ -366,93 +536,76 @@ def generar_demo_excel(df_dict):
 # ======================================================================================
 
 def render_pagina_inicio():
-    """Renderiza la página de bienvenida y el pitch de valor."""
-    st.title("De Datos Aislados a un Ecosistema de Negocios Inteligente.")
-    st.markdown("### Su socio estratégico para la transformación digital y la inteligencia de negocios.")
+    """Renderiza la nueva página de bienvenida "Hero" y las tarjetas de servicio."""
     
+    # --- Hero Section ---
     st.markdown(f"""
-        En el entorno actual, la data no es solo un reporte; es el activo más valioso de su empresa.
-        El problema es que, en la mayoría de las compañías, este activo está fragmentado:
-        
-        * Las **Ventas** están en un CRM o en Excels.
-        * El **Inventario** está en el ERP.
-        * Las **Finanzas** están en un software contable.
-        * La **Operación** está en cuadernos, planillas y grupos de WhatsApp.
-        
-        **GM-DATOVATE** no solo construye 'apps' o 'dashboards'. Diseñamos y ejecutamos su **Sistema Operativo Central**: 
-        un ecosistema digital que unifica este caos. 
-        
-        Conectamos cada pilar de su negocio en un solo cerebro digital
-        inteligente, automatizado y accesible, que no solo le muestra lo que pasó, sino que le dice
-        **qué hacer a continuación**.
-    """)
-
-    st.markdown("---")
-
-    # Diagrama del Ecosistema
-    st.graphviz_chart(f"""
-        digraph "Ecosistema Digital GM-DATOVATE" {{
-            node [shape=box, style="filled,rounded", fontname="Arial", fontsize=12];
-            graph [bgcolor="transparent"];
-
-            subgraph cluster_input {{
-                label = "FUENTES DE DATOS";
-                style = "rounded";
-                color = "{COLOR_PRIMARIO}";
-                fontcolor = "{COLOR_PRIMARIO}";
-                
-                erp [label="ERP / Archivos CSV\n(Dropbox, FTP, etc.)", shape=cylinder, fillcolor="#E3F2FD"];
-                sheets [label="Bases de Datos en la Nube\n(Google Sheets)", shape=cylinder, fillcolor="#E3F2FD"];
-                manual [label="Entrada Manual\n(Apps de Campo)", shape=cylinder, fillcolor="#E3F2FD"];
-            }}
-
-            subgraph cluster_core {{
-                label = "ECOSISTEMA CENTRALIZADO (by GM-DATOVATE)";
-                style = "rounded";
-                color = "{COLOR_PRIMARIO}";
-                fontcolor = "{COLOR_PRIMARIO}";
-
-                node [fillcolor="#BBDEFB"];
-                ventas [label="Módulo de Ventas\n(Cotizador, Catálogo)"];
-                operaciones [label="Módulo de Operaciones\n(Inventario, Abastecimiento)"];
-                finanzas [label="Módulo Financiero\n(Cartera, Tesorería, Integración)"];
-                legal [label="Módulo Legal\n(Vinculación Digital, OTP, Firma)"];
-            }}
-
-            subgraph cluster_output {{
-                label = "INTELIGENCIA ACCIONABLE";
-                style = "rounded";
-                color = "{COLOR_ACENTO_ROJO}";
-                fontcolor = "{COLOR_ACENTO_ROJO}";
-
-                node [fillcolor="#FFEBEE", shape=diamond, style="filled,rounded"];
-                bi [label="Dashboards de BI\n(Gerencia, Ventas)"];
-                ia [label="Agente IA\n(Chatbot WhatsApp)"];
-                alertas [label="Recomendaciones Proactivas\n(Email, App)"];
-            }}
-            
-            erp -> operaciones;
-            erp -> finanzas;
-            sheets -> ventas;
-            sheets -> operaciones;
-            manual -> operaciones;
-            manual -> finanzas;
-            legal -> ventas;
-
-            ventas -> bi;
-            operaciones -> bi;
-            finanzas -> bi;
-            
-            bi -> alertas;
-            ventas -> ia;
-            operaciones -> ia;
-            finanzas -> ia;
-            alertas -> ia;
-        }}
-    """)
+    <div class="hero-container">
+        <h1 class="hero-logo">GM-DATOVATE</h1>
+        <h2 class="hero-title">De Datos Aislados a un Ecosistema de Negocios Inteligente.</h2>
+        <p class="hero-subtitle">
+            Diseñamos su **Sistema Operativo Central**: un cerebro digital que unifica Ventas,
+            Operaciones y Finanzas para entregar inteligencia accionable, no solo reportes.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    st.markdown("---")
-    st.subheader("Explore las demostraciones en el menú para ver este ecosistema en acción.")
+    st.markdown("## Explore el Ecosistema")
+    st.markdown("Navegue por las soluciones que transforman cada pilar de su negocio.")
+
+    # --- Tarjetas de Servicio ---
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"""
+        <div class="service-card">
+            <div class="service-icon">🧠</div>
+            <h3 class="service-title">Inteligencia Comercial</h3>
+            <p class="service-description">
+                Desde catálogos interactivos y cotizadores PDF hasta dashboards de BI en tiempo real
+                y análisis RFM proactivo que le dice a sus vendedores a quién llamar.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown(f"""
+        <div class="service-card">
+            <div class="service-icon">🏭</div>
+            <h3 class="service-title">Operaciones y Logística</h3>
+            <p class="service-description">
+                Sincronización maestra de inventario (ETL) desde su ERP, sugerencias de
+                abastecimiento inteligente (traslado vs. compra) y apps móviles para conteo físico.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.write("---") # Pequeño separador visual
+
+    col3, col4 = st.columns(2)
+    with col3:
+        st.markdown(f"""
+        <div class="service-card">
+            <div class="service-icon">🏦</div>
+            <h3 class="service-title">Finanzas y Tesorería</h3>
+            <p class="service-description">
+                Automatización de cuadres de caja y recibos (generando TXT para el ERP),
+                gestión de cartera accionable (con envío de WhatsApp/Email) e integración con agencias de riesgo.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col4:
+        st.markdown(f"""
+        <div class="service-card">
+            <div class="service-icon">🤖</div>
+            <h3 class="service-title">Integración y Futuro (IA)</h3>
+            <p class="service-description">
+                Portales de vinculación digital con firma y OTP, y el Agente IA (Chatbot de WhatsApp)
+                que conecta todos sus datos para dar respuestas 24/7 sobre cartera e inventario.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
 
 def render_pagina_comercial():
     """Demo de la Suite de Inteligencia Comercial."""
@@ -463,18 +616,18 @@ def render_pagina_comercial():
     st.header("Demo 1: Catálogo Interactivo y Cotizador Profesional")
     st.markdown("Transformamos sus listas de precios estáticas en una herramienta de ventas interactiva. El vendedor puede navegar, ver imágenes, consultar stock *real* de todas las bodegas y generar un PDF profesional en segundos.")
     
-    with st.container(border=True):
+    with st.container(): # Usando el nuevo estilo de [data-testid="stContainer"]
         col1, col2 = st.columns([1.5, 1])
         with col1:
             st.subheader("Catálogo de Productos")
-            # Simulación de una tarjeta de producto
+            # Simulación de una tarjeta de producto (HTML con nuevos estilos)
             st.markdown(f"""
-            <div style="background: #FFF; border: 1px solid #EEE; border-radius: 10px; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <h4 style="color: {COLOR_PRIMARIO}; margin-top: 0;">Disco de Corte 4-1/2" Inox</h4>
-                <p style="font-size: 0.9rem; color: {COLOR_TEXTO};">Ref: A-101</p>
+            <div style="background: {COLOR_PRIMARIO_BG}; border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <h4 style="color: {COLOR_TEXTO_PRIMARIO}; margin-top: 0;">Disco de Corte 4-1/2" Inox</h4>
+                <p style="font-size: 0.9rem; color: {COLOR_TEXTO_SECUNDARIO};">Ref: A-101</p>
                 <img src="https://i.imgur.com/gY5aM5A.png" style="width: 100%; border-radius: 5px; border: 1px solid #EEE;">
-                <h5 style="color: {COLOR_SECUNDARIO}; margin-top: 1rem;">Stock en Tiendas (Simulación):</h5>
-                <ul style="font-size: 0.9rem;">
+                <h5 style="color: {COLOR_ACENTO_CYAN}; margin-top: 1rem;">Stock en Tiendas (Simulación):</h5>
+                <ul style="font-size: 0.9rem; color: {COLOR_TEXTO_SECUNDARIO};">
                     <li><b>Bodega CEDI:</b> 5,200 uds</li>
                     <li><b>Tienda Armenia:</b> <span style="color: {COLOR_ACENTO_ROJO};">30 uds (Stock Bajo)</span></li>
                     <li><b>Tienda Pereira:</b> 450 uds</li>
@@ -484,7 +637,6 @@ def render_pagina_comercial():
         
         with col2:
             st.subheader("Cotización en Proceso")
-            # Simulación del carrito
             st.info("🛒 Carrito de Cotización")
             st.dataframe(pd.DataFrame({
                 'Referencia': ['A-101', 'B-202'],
@@ -504,14 +656,15 @@ def render_pagina_comercial():
                 data=pdf_data,
                 file_name="Demo_Cotizacion_GM-DATOVATE.pdf",
                 mime="application/pdf",
-                use_container_width=True
+                use_container_width=True,
+                type="secondary" # Usando el nuevo estilo de botón secundario
             )
 
     # --- Demo 2: BI Gerencial ---
     st.header("Demo 2: Dashboard de BI Gerencial (En Tiempo Real)")
     st.markdown("Agregamos los datos de ventas de todas las fuentes y los presentamos en un dashboard de alto nivel para la toma de decisiones. Mida el rendimiento vs. metas, identifique a sus mejores vendedores y entienda la salud de su venta.")
 
-    with st.container(border=True):
+    with st.container():
         df_ventas = SAMPLE_DATA['ventas_vendedor']
         total_ventas = df_ventas['Ventas ($)'].sum()
         total_meta = df_ventas['Meta ($)'].sum()
@@ -525,15 +678,17 @@ def render_pagina_comercial():
         fig = px.bar(
             df_ventas, x='Vendedor', y=['Ventas ($)', 'Meta ($)'], barmode='group',
             title='Rendimiento de Ventas vs. Meta por Vendedor',
-            color_discrete_map={'Ventas ($)': COLOR_SECUNDARIO, 'Meta ($)': COLOR_ACENTO_ROJO}
+            color_discrete_map={'Ventas ($)': COLOR_ACENTO_CYAN, 'Meta ($)': COLOR_ACENTO_ROJO},
+            template="plotly_dark" # <-- NUEVO: Tema oscuro para el gráfico
         )
+        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
 
     # --- Demo 3: Asistente Proactivo (IA) ---
     st.header("Demo 3: Asistente Proactivo (Análisis RFM y Venta Cruzada)")
     st.markdown("Esto es inteligencia de negocios en acción. El sistema analiza el historial de compras y genera un plan de acción *automático* para el vendedor, diciéndole exactamente a quién llamar.")
     
-    with st.container(border=True):
+    with st.container():
         st.subheader("Plan de Acción para: DIEGO GARCIA (Demo)")
         st.info(
             "**🎯 Oportunidad de Venta Cruzada (Demo):**\n"
@@ -560,15 +715,17 @@ def render_pagina_operaciones():
     st.header("Demo 1: Sincronización Maestra de Inventario (ETL)")
     st.markdown("Desarrollamos un proceso que se conecta a su ERP (vía Dropbox, FTP, etc.), lee los archivos de inventario y costos, los transforma, y actualiza la base de datos central en la nube. **Detecta productos nuevos** y actualiza el stock de **todas las tiendas**.")
     
+    # Gráfico actualizado para modo oscuro
     st.graphviz_chart(f"""
         digraph "ETL Process" {{
-            node [shape=box, style="filled,rounded", fontname="Arial", fontsize=12];
             graph [bgcolor="transparent"];
+            node [shape=box, style="filled,rounded", fontname="Arial", fontsize=12, fontcolor="{COLOR_TEXTO_PRIMARIO}", color="{COLOR_ACENTO_CYAN}"];
+            edge [fontcolor="{COLOR_TEXTO_SECUNDARIO}", color="{COLOR_TEXTO_SECUNDARIO}"];
 
-            erp [label="1. ERP Exporta CSV/XLSX\n(Ej: 'Rotacion.csv')", shape=cylinder, fillcolor="#E3F2FD"];
-            script [label="2. Script de Sincronización\n(Python + Pandas)", shape=component, fillcolor="#D1C4E9"];
-            nube [label="3. Base de Datos Maestra\n(Google Sheets)", shape=cylinder, fillcolor="#C8E6C9"];
-            apps [label="4. Todo el Ecosistema\n(Cotizador, BI, App Móvil)", shape=display, fillcolor="#FFF9C4"];
+            erp [label="1. ERP Exporta CSV/XLSX\n(Ej: 'Rotacion.csv')", shape=cylinder, fillcolor="#33415C"];
+            script [label="2. Script de Sincronización\n(Python + Pandas)", shape=component, fillcolor="#512DA8"];
+            nube [label="3. Base de Datos Maestra\n(Google Sheets)", shape=cylinder, fillcolor="#1E88E5"];
+            apps [label="4. Todo el Ecosistema\n(Cotizador, BI, App Móvil)", shape=display, fillcolor="#FFB300", fontcolor="#000000"];
 
             erp -> script [label=" Lee y Transforma"];
             script -> nube [label=" Actualiza y Añade Nuevos"];
@@ -580,25 +737,27 @@ def render_pagina_operaciones():
     st.header("Demo 2: Tablero de Abastecimiento Inteligente")
     st.markdown("Este módulo va más allá de mostrar el stock. Calcula la **Necesidad Real** (descontando lo que ya está en tránsito) y genera un **Plan de Traslados Inteligente** para ahorrar capital de trabajo antes de sugerir una compra.")
     
-    with st.container(border=True):
+    with st.container():
         st.subheader("Sugerencias de Abastecimiento (Demo)")
         st.dataframe(
             SAMPLE_DATA['sugerencia_abastecimiento'].style
                 .applymap(lambda x: f'background-color: {COLOR_ACENTO_VERDE}; color: white; font-weight: bold;' if x > 0 else '', subset=['Sugerencia Traslado'])
                 .applymap(lambda x: f'background-color: {COLOR_ACENTO_ROJO}; color: white; font-weight: bold;' if x > 0 else '', subset=['Sugerencia Compra'])
-                .format({"Stock Actual (Total)": "{:,.0f}", "Stock en Tránsito": "{:,.0f}", "Necesidad Real": "{:,.0f}", "Sugerencia Traslado": "{:,.0f}", "Sugerencia Compra": "{:,.0f}"}),
+                .format({"{:,.0f}": ['Stock (Total)', 'Stock Tránsito', 'Necesidad Real', 'Sugerencia Traslado', 'Sugerencia Compra']}),
             use_container_width=True, hide_index=True
         )
-        st.markdown("""
-            * **Fila 2 (Tornillo):** El sistema ve que la necesidad (10,000) es cubierta por lo que hay en tránsito (5,000) y el stock (15,000). **Acción: No hacer nada.**
-            * **Fila 3 (Electrodo):** El sistema detecta una necesidad de 500. Antes de comprar, encuentra 300 en otra tienda y sugiere un **Traslado (Ahorro)**. Solo pide comprar los 200 restantes.
-        """)
+        st.markdown(f"""
+            <ul style="color: {COLOR_TEXTO_SECUNDARIO};">
+                <li><b>Fila 2 (Tornillo):</b> El sistema ve que la necesidad (10,000) es cubierta por lo que hay en tránsito (5,000) y el stock (15,000). <span style="color: {COLOR_ACENTO_CYAN};">Acción: No hacer nada.</span></li>
+                <li><b>Fila 3 (Electrodo):</b> El sistema detecta una necesidad de 500. Antes de comprar, encuentra 300 en otra tienda y sugiere un <span style="color: {COLOR_ACENTO_VERDE};">Traslado (Ahorro)</span>. Solo pide comprar los 200 restantes.</li>
+            </ul>
+            """, unsafe_allow_html=True)
 
     # --- Demo 3: Control de Inventario Móvil ---
     st.header("Demo 3: Aplicación Móvil de Conteo Físico")
     st.markdown("Digitalizamos el conteo en bodega. El gerente asigna tareas (basadas en datos o manualmente) y el operario las ejecuta en una app móvil con escáner, conteo parcial y manejo de sobrantes.")
     
-    with st.container(border=True):
+    with st.container():
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("Vista del Operario (Móvil)")
@@ -619,7 +778,7 @@ def render_pagina_operaciones():
                 'Historial Conteo': ["+50, +50, +10, +8", "+500, +5"],
                 'Diferencia': [-2, 5]
             }), use_container_width=True, hide_index=True)
-            st.button("Enviar Conteo Final para Revisión", use_container_width=True, help="En la app real, esto guarda en GSheets y notifica al gerente.")
+            st.button("Enviar Conteo Final para Revisión", use_container_width=True, type="secondary", help="En la app real, esto guarda en GSheets y notifica al gerente.")
 
 def render_pagina_finanzas():
     """Demo de la Suite Financiera y de Tesorería."""
@@ -630,14 +789,11 @@ def render_pagina_finanzas():
     st.header("Demo 1: Automatización Contable (Cuadres y Recibos)")
     st.markdown("Eliminamos la digitación manual y los errores. Las tiendas llenan un formulario digital (`Cuadre de Caja`) o procesan un Excel (`Recibos de Caja`). El sistema valida, asigna cuentas contables y genera el archivo `.txt` listo para el ERP.")
 
-    with st.container(border=True):
+    with st.container():
         st.subheader("Simulación de Cuadre de Caja Digital")
         c1, c2 = st.columns(2)
         c1.text_input("Tienda", "Armenia", disabled=True, key="demo_tienda")
-        # --- CORRECCIÓN DEL ERROR ---
-        # Importar datetime al inicio del archivo: from datetime import datetime
         c2.date_input("Fecha", datetime.now().date(), disabled=True, key="demo_fecha")
-        # --- FIN DE LA CORRECCIÓN ---
         st.number_input("Venta Total (Sistema)", 5_000_000, disabled=True, key="demo_venta_total")
         
         # Simulación de desglose
@@ -652,18 +808,19 @@ def render_pagina_finanzas():
         # --- Botón de descarga de TXT (Funcional) ---
         demo_txt = "FECHA|CONSECUTIVO|CUENTA|...|DEBITO|CREDITO\n2025-11-05|1001|111005|...|2500000|0\n2025-11-05|1001|413501|...|0|2500000\n"
         st.download_button(
-            label="1. 💾 Descargar .TXT para ERP (Demo)",
+            label="💾 Descargar .TXT para ERP (Demo)",
             data=demo_txt,
             file_name="Demo_Contable_GM-DATOVATE.txt",
             mime="text/plain",
-            use_container_width=True
+            use_container_width=True,
+            type="secondary"
         )
 
     # --- Demo 2: Dashboard de Cartera y Cobranzas ---
     st.header("Demo 2: Dashboard de Gestión de Cartera (AR)")
     st.markdown("Visibilidad total de su cartera. KPIs en tiempo real (DSO, CER, Morosidad), análisis de Pareto y **herramientas de gestión (Email/WhatsApp/PDF) para cada cliente.**")
 
-    with st.container(border=True):
+    with st.container():
         df_cartera = SAMPLE_DATA['cartera_antiguedad']
         total_cartera = df_cartera['Valor ($)'].sum()
         total_vencido = df_cartera[df_cartera['Rango'] != 'Al día']['Valor ($)'].sum()
@@ -675,8 +832,11 @@ def render_pagina_finanzas():
 
         fig = px.pie(
             df_cartera, values='Valor ($)', names='Rango', title='Deuda por Antigüedad',
-            hole=0.4, color='Rango', color_discrete_map=dict(zip(df_cartera['Rango'], df_cartera['Color']))
+            hole=0.4, color='Rango', 
+            color_discrete_map=dict(zip(df_cartera['Rango'], df_cartera['Color'])),
+            template="plotly_dark" # <-- NUEVO: Tema oscuro
         )
+        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
         
         # --- Demostración de Gestión de Cliente ---
@@ -705,28 +865,41 @@ def render_pagina_finanzas():
         c1.download_button(
             label="📄 Descargar PDF (Demo)", data=pdf_cartera,
             file_name=f"Cartera_{cliente_demo['Cliente']}.pdf", mime="application/pdf",
-            use_container_width=True
+            use_container_width=True,
+            type="secondary"
         )
         # Botón Email (Simulado)
-        c2.button("✉️ Enviar Email (Demo)", use_container_width=True)
-        # Botón WhatsApp (Funcional)
-        st.markdown(f"""
-        <style> .st-emotion-cache-s4p1ri {{ width: 100%; }} </style>
-        <div class="st-emotion-cache-1jicfl2 e19lei0e1">
+        c2.button("✉️ Enviar Email (Demo)", use_container_width=True, type="secondary")
+        
+        # Botón WhatsApp (Simplificado y estilizado con CSS)
+        # Reemplazamos el HTML complejo por un st.link_button, que es la forma moderna
+        # y que será estilizado por nuestra clase CSS personalizada.
+        # Nota: st.link_button es para navegación. Para mantener la estética,
+        # mantenemos tu HTML pero lo simplificamos y confiamos en el CSS.
+        
+        # Usamos tu HTML original, pero el CSS ahora lo apunta correctamente
+        with c3:
+            st.markdown(f"""
+            <style>
+                /* Asegura que el contenedor del botón ocupe todo el ancho */
+                .st-emotion-cache-s4p1ri {{ width: 100%; }} 
+                div[data-testid="stVerticalBlock"] div[data-testid="stButton"] {{
+                    width: 100%;
+                }}
+            </style>
             <a href="{url_wa}" target="_blank" style="text-decoration: none;">
-                <button class="st-emotion-cache-7ym5gk e19lei0e0 whatsapp-button" style="width: 100%;">
-                    📲 Enviar WhatsApp (Demo)
+                <button class="stButton>button whatsapp-button" style="width: 100%; border-radius: 50px; border: none; background: {COLOR_ACENTO_VERDE}; color: {COLOR_TEXTO_PRIMARIO}; font-weight: bold; transition: all 0.3s ease; padding: 0.6rem 1.5rem; font-size: 1rem;">
+                    📲 Enviar WhatsApp
                 </button>
             </a>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
 
     # --- Demo 3: Integración de Riesgo (Covinoc) ---
     st.header("Demo 3: Automatización de Cobranza Legal (Integración)")
     st.markdown("El sistema cruza automáticamente nuestra cartera con reportes de agencias externas (como Covinoc). Identifica discrepancias y genera los archivos de acción masiva, automatizando la gestión de riesgo.")
     
-    with st.container(border=True):
+    with st.container():
         st.subheader("Resultados del Cruce Automático con Covinoc (Demo)")
         tab1, tab2 = st.tabs(["Facturas a Subir (Nuevas en Cartera)", "Facturas a Exonerar (Pagadas)"])
         
@@ -744,7 +917,8 @@ def render_pagina_finanzas():
                 excel_demo_data, 
                 file_name="Demo_Reporte_Covinoc_GM-DATOVATE.xlsx", 
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-                use_container_width=True
+                use_container_width=True,
+                type="secondary"
             )
         with tab2:
             st.success("Acción: Estas facturas ya fueron pagadas (no están en cartera) pero siguen activas en Covinoc. Deben exonerarse.")
@@ -754,7 +928,8 @@ def render_pagina_finanzas():
                 excel_demo_data, 
                 file_name="Demo_Reporte_Covinoc_GM-DATOVATE.xlsx", 
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-                use_container_width=True
+                use_container_width=True,
+                type="secondary"
             )
 
 def render_pagina_integracion():
@@ -766,7 +941,7 @@ def render_pagina_integracion():
     st.header("Demo 1: Portal de Vinculación Digital de Clientes")
     st.markdown("Un portal público para que sus nuevos clientes se registren. El sistema captura sus datos, obtiene su **firma digital**, valida su identidad con un **código OTP** por email, genera el **PDF legal** (Habeas Data) y lo archiva automáticamente en Google Drive y Google Sheets.")
     
-    with st.container(border=True):
+    with st.container():
         col1, col2 = st.columns(2)
         with col1:
             st.text_input("Razón Social*", "Mi Empresa S.A.S.", key="demo_rs")
@@ -779,7 +954,8 @@ def render_pagina_integracion():
             st.info("Por favor, firme en el recuadro:")
             st_canvas(
                 stroke_width=3, stroke_color="#000000",
-                background_color="#FFFFFF", height=130, width=400,
+                background_color="#EEEEEE", # Fondo claro para que la firma sea visible
+                height=130, width=400,
                 key="canvas_demo"
             )
         
@@ -792,12 +968,12 @@ def render_pagina_integracion():
     st.header("Demo 2: El Agente IA (Chatbot de WhatsApp)")
     st.markdown("Esta es la pieza que lo une todo. Un Chatbot con **Inteligencia Artificial (Gemini de Google)** conectado en tiempo real a su ecosistema de datos. Sus clientes y vendedores pueden auto-gestionar consultas 24/7.")
     
-    with st.container(border=True):
+    with st.container():
         st.subheader("Simulación de Chat (WhatsApp)")
         
-        st.chat_message("user").write("Hola, ¿cuál es mi deuda y tienen stock de 'Disco de Corte Inox'?")
+        st.chat_message("user", avatar="👤").write("Hola, ¿cuál es mi deuda y tienen stock de 'Disco de Corte Inox'?")
         
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar="🤖"):
             st.write("¡Hola! Soy **DATO**, tu asistente de IA en **GM-DATOVATE**. Claro, estoy consultando tu información... 🕵️‍♂️")
             st.spinner("Consultando Base de Clientes, Cartera e Inventario...")
             
@@ -843,9 +1019,6 @@ def render_pagina_contacto():
     un sistema nervioso digital que conecta todas las áreas de su empresa, automatiza tareas críticas
     y le entrega la inteligencia que necesita para tomar decisiones ganadoras.
     
-    Lo que ha visto en este portafolio no es una teoría; es una **demostración de sistemas reales, funcionales y probados**
-    que ya están generando un valor incalculable.
-    
     ¿Está listo para dejar de "administrar" su negocio y empezar a "dirigirlo"?
     """)
     
@@ -870,7 +1043,7 @@ def render_pagina_contacto():
             if not all([nombre, empresa, email, desafio]):
                 st.warning("Por favor, complete todos los campos marcados con *.")
             else:
-                # Aquí iría tu lógica de envío de correo (usando yagmail, smtplib, o una API como Formspree)
+                # Aquí iría tu lógica de envío de correo
                 st.success(f"¡Gracias, {nombre}! He recibido su solicitud. Me pondré en contacto con usted en {email} muy pronto.")
                 st.balloons()
 
@@ -881,8 +1054,8 @@ def render_pagina_contacto():
 # --- Encabezado de la Barra Lateral ---
 st.sidebar.markdown(f"""
 <div style="text-align: center; padding: 1rem 0;">
-    <h1 style="color: {COLOR_PRIMARIO}; font-size: 2.8rem; margin: 0; padding: 0;">GM-DATOVATE</h1>
-    <p style="color: {COLOR_ACENTO_ROJO}; font-size: 1rem; margin: 0; padding: 0; font-weight: 700;">ECOSISTEMAS DE DATOS</p>
+    <h1 style="color: {COLOR_ACENTO_CYAN}; font-size: 2.8rem; margin: 0; padding: 0;">GM-DATOVATE</h1>
+    <p style="color: {COLOR_TEXTO_SECUNDARIO}; font-size: 1rem; margin: 0; padding: 0; font-weight: 500;">ECOSISTEMAS DE DATOS</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -902,21 +1075,24 @@ paginas = {
 
 seleccion = st.sidebar.radio(
     "Explore nuestro ecosistema:",
-    list(paginas.keys())
+    list(paginas.keys()),
+    label_visibility="collapsed" # Oculta la etiqueta "Explore..."
 )
 
 st.sidebar.markdown("---")
 
-# --- NUEVA SECCIÓN: SOBRE NOSOTROS ---
+# --- NUEVA SECCIÓN: SOBRE NOSOTROS (Estilizada) ---
 st.sidebar.header("Sobre Nosotros")
 st.sidebar.markdown(f"""
-<p style="color: {COLOR_TEXTO}; font-size: 0.9rem;">
-    En **GM-DATOVATE**, transformamos datos en decisiones.
-</p>
-<ul style="color: {COLOR_TEXTO_SIDEBAR}; font-size: 0.9rem; padding-left: 20px;">
-    <li><b>Diego Mauricio García</b><br><i>Arquitecto de Datos y Desarrollador Principal</i></li>
-    <li style="margin-top: 10px;"><b>Pablo Cesar Mafla</b><br><i>Estratega Comercial y de Negocios</i></li>
-</ul>
+<div class="sidebar-info-box">
+    <p>
+        En **GM-DATOVATE**, transformamos datos en decisiones.
+    </p>
+    <ul style="color: {COLOR_TEXTO_SECUNDARIO}; font-size: 0.9rem; padding-left: 20px;">
+        <li><b>Diego Mauricio García</b><br><i>Arquitecto de Datos y Desarrollador Principal</i></li>
+        <li style="margin-top: 10px;"><b>Pablo Cesar Mafla</b><br><i>Estratega Comercial y de Negocios</i></li>
+    </ul>
+</div>
 """, unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
