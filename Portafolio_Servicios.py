@@ -1,0 +1,670 @@
+# -*- coding: utf-8 -*-
+# ======================================================================================
+# APLICACIÓN DE PORTAFOLIO DE SERVICIOS - [PON TU NOMBRE/NOMBRE DE EMPRESA AQUÍ]
+# DESCRIPCIÓN: Este es un portafolio interactivo de Streamlit que demuestra un
+# ecosistema empresarial completo, simulando las funcionalidades de las 12+
+# aplicaciones de nivel empresarial que has construido.
+# ======================================================================================
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+from streamlit_drawable_canvas import st_canvas
+from PIL import Image
+import io
+import base64
+
+# --- CONFIGURACIÓN DE LA PÁGINA ---
+st.set_page_config(
+    page_title="Sinergia Digital | Tu Ecosistema de Datos",
+    page_icon="🚀",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# --- PALETA DE COLORES Y ESTILOS ---
+# (Basado en el estilo profesional de tus aplicaciones)
+COLOR_PRIMARIO = "#0b2f6a"  # Azul oscuro (Ferreinox)
+COLOR_SECUNDARIO = "#0058A7" # Azul medio
+COLOR_ACENTO_ROJO = "#d92323"   # Rojo (Ferreinox)
+COLOR_ACENTO_VERDE = "#25D366"  # Verde (WhatsApp)
+COLOR_FONDO = "#F0F2F6"
+COLOR_TEXTO = "#31333F"
+
+st.markdown(f"""
+<style>
+    /* --- Contenedor Principal --- */
+    .main .block-container {{
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }}
+    .stApp {{
+        background-color: {COLOR_FONDO};
+    }}
+
+    /* --- Títulos y Texto --- */
+    h1, h2, h3 {{
+        color: {COLOR_PRIMARIO};
+        font-weight: 700;
+    }}
+    h1 {{
+        font-size: 2.5rem;
+    }}
+    h2 {{
+        font-size: 2rem;
+        border-bottom: 3px solid {COLOR_ACENTO_ROJO};
+        padding-bottom: 5px;
+        margin-top: 2rem;
+    }}
+    h3 {{
+        font-size: 1.5rem;
+        color: {COLOR_SECUNDARIO};
+        margin-top: 1.5rem;
+    }}
+
+    /* --- Barra Lateral --- */
+    [data-testid="stSidebar"] {{
+        background-color: {COLOR_PRIMARIO};
+        padding: 1rem;
+    }}
+    [data-testid="stSidebar"] .stRadio > label {{
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }}
+    [data-testid="stSidebar"] .stRadio [data-baseweb="radio"] span {{
+        background-color: {COLOR_SECUNDARIO};
+        border-color: white;
+    }}
+    [data-testid="stSidebar"] .stRadio [data-baseweb="radio"] span[data-checked="true"] {{
+        background-color: {COLOR_ACENTO_ROJO};
+    }}
+
+    /* --- Botones --- */
+    .stButton>button {{
+        border-radius: 8px;
+        border: 2px solid {COLOR_PRIMARIO};
+        background-color: {COLOR_ACENTO_ROJO};
+        color: white;
+        font-weight: bold;
+        transition: all 0.3s;
+        padding: 0.5rem 1rem;
+    }}
+    .stButton>button:hover {{
+        background-color: #a71919;
+        border-color: #a71919;
+        transform: scale(1.02);
+    }}
+    .stButton>button[kind="secondary"] {{
+        background-color: transparent;
+        color: {COLOR_PRIMARIO};
+        border-color: {COLOR_PRIMARIO};
+    }}
+    .stButton>button[kind="secondary"]:hover {{
+        background-color: {COLOR_FONDO};
+        color: {COLOR_ACENTO_ROJO};
+        border-color: {COLOR_ACENTO_ROJO};
+    }}
+
+    /* --- Contenedores y Métricas --- */
+    .stMetric {{
+        background-color: #FFFFFF;
+        border-radius: 10px;
+        padding: 15px;
+        border: 1px solid #E0E0E0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }}
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 24px;
+    }}
+    .stTabs [data-baseweb="tab"] {{
+        height: 50px;
+        background-color: transparent;
+        border-bottom: 3px solid #C0C0C0;
+    }}
+    .stTabs [aria-selected="true"] {{
+        border-bottom: 3px solid {COLOR_ACENTO_ROJO};
+        color: {COLOR_ACENTO_ROJO};
+        font-weight: bold;
+    }}
+    [data-testid="stExpander"] {{
+        background-color: #FFFFFF;
+        border-radius: 10px;
+        border: 1px solid #E0E0E0;
+    }}
+</style>
+""", unsafe_allow_html=True)
+
+
+# ======================================================================================
+# --- DATOS DE EJEMPLO PARA LAS DEMOSTRACIONES ---
+# ======================================================================================
+
+@st.cache_data
+def get_sample_data():
+    """Crea y cachea todos los DataFrames de ejemplo para las demos."""
+    data = {}
+
+    # Para Demo 1: Inteligencia Comercial (BI Gerencial)
+    data['ventas_vendedor'] = pd.DataFrame({
+        'Vendedor': ['Hugo Zapata', 'Tania Restrepo', 'Pablo Mafla', 'Diego Garcia', 'Carlos Castrillón'],
+        'Ventas ($)': [120_000_000, 95_000_000, 88_000_000, 75_000_000, 50_000_000],
+        'Meta ($)': [110_000_000, 100_000_000, 90_000_000, 80_000_000, 55_000_000],
+    })
+    data['ventas_vendedor']['Avance (%)'] = (data['ventas_vendedor']['Ventas ($)'] / data['ventas_vendedor']['Meta ($)']) * 100
+
+    # Para Demo 2: Operaciones (Sugerencia de Abastecimiento)
+    data['sugerencia_abastecimiento'] = pd.DataFrame({
+        'SKU': ['A-101', 'B-202', 'C-303', 'D-404'],
+        'Producto': ['Disco Corte 4-1/2"', 'Tornillo Drywall 6x1', 'Electrodo 6013', 'Gafa de Seguridad'],
+        'Stock Actual (Total)': [500, 15000, 800, 120],
+        'Stock en Tránsito': [0, 5000, 0, 100],
+        'Necesidad Real': [200, 10000, 500, 150],
+        'Sugerencia Traslado': [0, 0, 300, 0],
+        'Sugerencia Compra': [0, 0, 200, 50]
+    })
+
+    # Para Demo 3: Finanzas (Cartera por Antigüedad)
+    data['cartera_antiguedad'] = pd.DataFrame({
+        'Rango': ['Al día', '1-15 días', '16-30 días', '31-60 días', 'Más de 60 días'],
+        'Valor ($)': [250_000_000, 80_000_000, 45_000_000, 25_000_000, 70_000_000],
+        'Color': ['#388E3C', '#FBC02D', '#F57C00', '#D32F2F', '#a71919']
+    })
+
+    # Para Demo 4: Integración (Simulación de Covinoc)
+    data['covinoc_subir'] = pd.DataFrame({
+        'Factura': ['FV-1001', 'FV-1002', 'FV-1003'],
+        'Cliente': ['Cliente A', 'Cliente B', 'Cliente C'],
+        'Días Vencido': [35, 40, 28],
+        'Monto': [1_200_000, 850_000, 2_100_000]
+    })
+    data['covinoc_exonerar'] = pd.DataFrame({
+        'Factura': ['FV-901', 'FV-902'],
+        'Cliente': ['Cliente D', 'Cliente E'],
+        'Estado Covinoc': ['Pendiente', 'Pendiente'],
+        'Estado Cartera': ['PAGADA', 'PAGADA']
+    })
+
+    return data
+
+SAMPLE_DATA = get_sample_data()
+
+# ======================================================================================
+# --- FUNCIONES DE RENDERIZADO DE PÁGINAS ---
+# ======================================================================================
+
+def render_pagina_inicio():
+    """Renderiza la página de bienvenida y el pitch de valor."""
+    st.title("De Datos Aislados a un Ecosistema de Negocios Inteligente.")
+    st.markdown(f"""
+        ### Mi nombre es **[Tu Nombre Aquí]**. No construyo solo 'apps' o 'dashboards'.
+        ### Construyo el **Sistema Operativo Central** de su compañía.
+        
+        En el entorno actual, la data no es solo un reporte; es el activo más valioso de su empresa.
+        El problema es que, en la mayoría de las compañías, este activo está fragmentado:
+        
+        * Las **Ventas** están en un CRM o en Excels.
+        * El **Inventario** está en el ERP.
+        * Las **Finanzas** están en un software contable.
+        * La **Operación** está en cuadernos, planillas y grupos de WhatsApp.
+        
+        Mi trabajo es unificar este caos. Conecto cada pilar de su negocio en un único ecosistema digital
+        inteligente, automatizado y accesible, que no solo le muestra lo que pasó, sino que le dice
+        **qué hacer a continuación**.
+    """)
+
+    st.markdown("---")
+
+    # Diagrama del Ecosistema
+    st.graphviz_chart(f"""
+        digraph "Ecosistema Digital" {{
+            node [shape=box, style="filled,rounded", fontname="Arial", fontsize=12];
+            graph [bgcolor="transparent"];
+
+            subgraph cluster_input {{
+                label = "FUENTES DE DATOS";
+                style = "rounded";
+                color = "{COLOR_PRIMARIO}";
+                fontcolor = "{COLOR_PRIMARIO}";
+                
+                erp [label="ERP / Archivos CSV\n(Dropbox, etc.)", shape=cylinder, fillcolor="#E3F2FD"];
+                sheets [label="Bases de Datos en la Nube\n(Google Sheets)", shape=cylinder, fillcolor="#E3F2FD"];
+                manual [label="Entrada Manual\n(Apps de Campo)", shape=cylinder, fillcolor="#E3F2FD"];
+            }}
+
+            subgraph cluster_core {{
+                label = "ECOSISTEMA CENTRALIZADO";
+                style = "rounded";
+                color = "{COLOR_PRIMARIO}";
+                fontcolor = "{COLOR_PRIMARIO}";
+
+                node [fillcolor="#BBDEFB"];
+                ventas [label="Módulo de Ventas\n(Cotizador, Catálogo)"];
+                operaciones [label="Módulo de Operaciones\n(Inventario, Abastecimiento)"];
+                finanzas [label="Módulo Financiero\n(Cartera, Tesorería, Covinoc)"];
+                legal [label="Módulo Legal\n(Vinculación Digital, OTP, Firma)"];
+            }}
+
+            subgraph cluster_output {{
+                label = "INTELIGENCIA ACCIONABLE";
+                style = "rounded";
+                color = "{COLOR_ACENTO_ROJO}";
+                fontcolor = "{COLOR_ACENTO_ROJO}";
+
+                node [fillcolor="#FFEBEE", shape=diamond, style="filled,rounded"];
+                bi [label="Dashboards de BI\n(Gerencia, Ventas)"];
+                ia [label="Agente IA\n(Chatbot WhatsApp)"];
+                alertas [label="Recomendaciones Proactivas\n(Email, App)"];
+            }}
+            
+            erp -> operaciones;
+            erp -> finanzas;
+            sheets -> ventas;
+            sheets -> operaciones;
+            manual -> operaciones;
+            manual -> finanzas;
+            legal -> ventas;
+
+            ventas -> bi;
+            operaciones -> bi;
+            finanzas -> bi;
+            
+            bi -> alertas;
+            ventas -> ia;
+            operaciones -> ia;
+            finanzas -> ia;
+            alertas -> ia;
+        }}
+    """)
+    
+    st.markdown("---")
+    st.subheader("Explore las demostraciones en el menú de la izquierda para ver este ecosistema en acción.")
+
+
+def render_pagina_comercial():
+    """Demo de la Suite de Inteligencia Comercial."""
+    st.title("🚀 Suite de Inteligencia Comercial")
+    st.markdown("Deje que sus datos le digan cómo vender más. Automatizamos la prospección, la cotización y el análisis de rendimiento.")
+    
+    # --- Demo 1: Cotizador y Catálogo Interactivo ---
+    st.header("Demo 1: Catálogo Interactivo y Cotizador Profesional")
+    st.markdown("Transformamos sus listas de precios estáticas en una herramienta de ventas interactiva. El vendedor puede navegar, ver imágenes, consultar stock *real* de todas las bodegas y generar un PDF profesional en segundos.")
+    
+    with st.container(border=True):
+        col1, col2 = st.columns([1.5, 1])
+        with col1:
+            st.subheader("Catálogo de Productos")
+            # Simulación de una tarjeta de producto
+            st.markdown(f"""
+            <div style="background: #FFF; border: 1px solid #EEE; border-radius: 10px; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <h4 style="color: {COLOR_PRIMARIO}; margin-top: 0;">Disco de Corte 4-1/2" Inox</h4>
+                <p style="font-size: 0.9rem; color: {COLOR_TEXTO};">Ref: A-101</p>
+                <img src="https://via.placeholder.com/300x200.png?text=Imagen+del+Producto" style="width: 100%; border-radius: 5px;">
+                <h5 style="color: {COLOR_SECUNDARIO}; margin-top: 1rem;">Stock en Tiendas:</h5>
+                <ul style="font-size: 0.9rem;">
+                    <li><b>Bodega CEDI:</b> 5,200 uds</li>
+                    <li><b>Tienda Armenia:</b> <span style="color: {COLOR_ACENTO_ROJO};">30 uds (Stock Bajo)</span></li>
+                    <li><b>Tienda Pereira:</b> 450 uds</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.subheader("Cotización en Proceso")
+            # Simulación del carrito
+            st.info("🛒 Carrito de Cotización")
+            st.dataframe(pd.DataFrame({
+                'Referencia': ['A-101', 'B-202'],
+                'Producto': ['Disco de Corte 4-1/2"', 'Tornillo Drywall 6x1'],
+                'Cantidad': [50, 2000],
+                'Vlr. Unitario': [1800, 150]
+            }), use_container_width=True, hide_index=True)
+            st.button("Generar PDF Profesional", use_container_width=True)
+
+    # --- Demo 2: BI Gerencial ---
+    st.header("Demo 2: Dashboard de BI Gerencial (En Tiempo Real)")
+    st.markdown("Agregamos los datos de ventas de todas las fuentes y los presentamos en un dashboard de alto nivel para la toma de decisiones. Mida el rendimiento vs. metas, identifique a sus mejores vendedores y entienda la salud de su venta.")
+
+    with st.container(border=True):
+        df_ventas = SAMPLE_DATA['ventas_vendedor']
+        total_ventas = df_ventas['Ventas ($)'].sum()
+        total_meta = df_ventas['Meta ($)'].sum()
+        avg_avance = (total_ventas / total_meta) * 100 if total_meta > 0 else 0
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Ventas Totales del Mes", f"${total_ventas/1_000_000:.1f} M", f"{avg_avance - 100:.1f}% vs Meta")
+        col2.metric("Meta del Mes", f"${total_meta/1_000_000:.1f} M")
+        col3.metric("Avance General", f"{avg_avance:.1f}%")
+        
+        fig = px.bar(
+            df_ventas, x='Vendedor', y=['Ventas ($)', 'Meta ($)'], barmode='group',
+            title='Rendimiento de Ventas vs. Meta por Vendedor',
+            color_discrete_map={'Ventas ($)': COLOR_SECUNDARIO, 'Meta ($)': COLOR_ACENTO_ROJO}
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    # --- Demo 3: Asistente Proactivo (IA) ---
+    st.header("Demo 3: Asistente Proactivo (Análisis RFM y Venta Cruzada)")
+    st.markdown("Esto es inteligencia de negocios en acción. El sistema analiza el historial de compras y genera un plan de acción *automático* para el vendedor, diciéndole exactamente a quién llamar.")
+    
+    with st.container(border=True):
+        st.subheader("Plan de Acción para: [Tu Vendedor]")
+        st.info(
+            "**🎯 Oportunidad de Venta Cruzada:**\n"
+            "Tus clientes **'Ferretería El Tornillo'** y **'Depósito Central'** compran 'Discos de Corte' (A-101) pero "
+            "nunca han comprado 'Gafas de Seguridad' (D-404). ¡Ofréceles en su próximo pedido!"
+        )
+        st.warning(
+            "**🔥 Cliente en Riesgo (Análisis RFM):**\n"
+            "Tu cliente **'Construcciones Andinas'** no ha comprado en 62 días (Segmento: 'En Riesgo'). "
+            "Su frecuencia de compra habitual es de 30 días. **¡Acción: Llama hoy!**"
+        )
+        st.success(
+            "**💎 Cliente Campeón (Análisis RFM):**\n"
+            "Tu cliente **'Maestro SAS'** es un 'Campeón' (Compra reciente, frecuente y de alto valor). "
+            "**Acción: Agradécele** y ofrécele un producto nuevo de nicho."
+        )
+
+def render_pagina_operaciones():
+    """Demo de la Suite de Operaciones y Logística."""
+    st.title("🏭 Suite de Operaciones y Logística")
+    st.markdown("Automatización de la cadena de suministro, desde el proveedor hasta la bodega.")
+    
+    # --- Demo 1: Sincronización de Inventario (ETL) ---
+    st.header("Demo 1: Sincronización Maestra de Inventario (ETL)")
+    st.markdown("Desarrollamos un proceso que se conecta a su ERP (vía Dropbox, FTP, etc.), lee los archivos de inventario y costos, los transforma, y actualiza la base de datos central en la nube. **Detecta productos nuevos** y actualiza el stock de **todas las tiendas**.")
+    
+    st.graphviz_chart(f"""
+        digraph "ETL Process" {{
+            node [shape=box, style="filled,rounded", fontname="Arial", fontsize=12];
+            graph [bgcolor="transparent"];
+
+            erp [label="1. ERP Exporta CSV/XLSX\n(Ej: 'Rotacion.csv')", shape=cylinder, fillcolor="#E3F2FD"];
+            script [label="2. Script de Sincronización\n(Python + Pandas)", shape=component, fillcolor="#D1C4E9"];
+            nube [label="3. Base de Datos Maestra\n(Google Sheets)", shape=cylinder, fillcolor="#C8E6C9"];
+            apps [label="4. Todo el Ecosistema\n(Cotizador, BI, App Móvil)", shape=display, fillcolor="#FFF9C4"];
+
+            erp -> script [label=" Lee y Transforma"];
+            script -> nube [label=" Actualiza y Añade Nuevos"];
+            nube -> apps [label=" Alimenta Datos Vivos"];
+        }}
+    """)
+
+    # --- Demo 2: Abastecimiento Inteligente ---
+    st.header("Demo 2: Tablero de Abastecimiento Inteligente")
+    st.markdown("Este módulo va más allá de mostrar el stock. Calcula la **Necesidad Real** (descontando lo que ya está en tránsito) y genera un **Plan de Traslados Inteligente** para ahorrar capital de trabajo antes de sugerir una compra.")
+    
+    with st.container(border=True):
+        st.subheader("Sugerencias de Abastecimiento (Ejemplo)")
+        st.dataframe(
+            SAMPLE_DATA['sugerencia_abastecimiento'].style.applymap(
+                lambda x: 'background-color: #E8F5E9', subset=pd.IndexSlice[1, ['Sugerencia Traslado', 'Sugerencia Compra']]
+            ).applymap(
+                lambda x: 'background-color: #FFF3E0', subset=pd.IndexSlice[3, ['Sugerencia Traslado', 'Sugerencia Compra']]
+            ).applymap(
+                lambda x: 'background-color: #E8F5E9', subset=pd.IndexSlice[1, 'Sugerencia Traslado']
+            ),
+            use_container_width=True, hide_index=True
+        )
+        st.markdown("""
+            * **Fila 2 (Tornillo):** El sistema ve que la necesidad (10,000) es cubierta por lo que hay en tránsito (5,000) y el stock (15,000). No sugiere nada.
+            * **Fila 3 (Electrodo):** El sistema detecta una necesidad de 500. Antes de comprar, encuentra 300 en otra tienda y sugiere un **Traslado**. Solo pide comprar los 200 restantes.
+        """)
+
+    # --- Demo 3: Control de Inventario Móvil ---
+    st.header("Demo 3: Aplicación Móvil de Conteo Físico")
+    st.markdown("Digitalizamos el conteo en bodega. El gerente asigna tareas (basadas en datos o manualmente) y el operario las ejecuta en una app móvil con escáner, conteo parcial y manejo de sobrantes.")
+    
+    with st.container(border=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader("Vista del Operario (Móvil)")
+            st.text_input("Buscar por Escáner o Referencia:", "770123456789", key="demo_scan")
+            st.success("Producto Encontrado: 'Gafa de Seguridad'")
+            st.metric("Stock Teórico", 120)
+            
+            # Simulación de conteo parcial
+            st.markdown("**Conteo Parcial (Calculadora):**")
+            c1, c2, c3 = st.columns(3)
+            c1.button("+ 1")
+            c2.button("+ 10")
+            c3.button("+ 50")
+            qty = st.number_input("Añadir cantidad:", value=0, step=1, key="demo_qty")
+            st.button("Registrar Cantidad", type="primary", use_container_width=True)
+
+        with col2:
+            st.subheader("Resumen de Conteo del Operario")
+            st.dataframe(pd.DataFrame({
+                'Producto': ['Gafa de Seguridad', 'Disco de Corte'],
+                'Teórico': [120, 500],
+                'Contado': [118, 505],
+                'Historial Conteo': ["+50, +50, +10, +8", "+500, +5"],
+                'Diferencia': [-2, 5]
+            }), use_container_width=True, hide_index=True)
+            st.button("Enviar Conteo Final para Revisión", use_container_width=True)
+
+def render_pagina_finanzas():
+    """Demo de la Suite Financiera y de Tesorería."""
+    st.title("🏦 Suite Financiera y de Tesorería")
+    st.markdown("Controle el flujo de caja, automatice la contabilidad y gestione el riesgo de cartera como nunca antes.")
+    
+    # --- Demo 1: Automatización Contable ---
+    st.header("Demo 1: Automatización Contable (Cuadres y Recibos)")
+    st.markdown("Eliminamos la digitación manual y los errores. Las tiendas llenan un formulario digital (`Cuadre de Caja`) o procesan un Excel (`Recibos de Caja`). El sistema valida, asigna cuentas contables y genera el archivo `.txt` listo para el ERP.")
+
+    with st.container(border=True):
+        st.subheader("Simulación de Cuadre de Caja Digital")
+        c1, c2 = st.columns(2)
+        c1.text_input("Tienda", "Armenia", disabled=True)
+        c2.date_input("Fecha", datetime.now().date(), disabled=True)
+        st.number_input("Venta Total (Sistema)", 5_000_000, disabled=True)
+        
+        # Simulación de desglose
+        st.dataframe(pd.DataFrame({
+            'Tipo': ['Tarjetas', 'Consignaciones', 'Gastos', 'Efectivo Entregado'],
+            'Valor': [2_500_000, 1_500_000, 200_000, 800_000]
+        }), use_container_width=True, hide_index=True)
+
+        st.metric("Total Desglose", "$ 5,000,000")
+        st.metric("DIFERENCIA", "$ 0", delta="CUADRE PERFECTO", delta_color="off")
+        st.button("1. Guardar en Nube y Generar .TXT", type="primary", use_container_width=True)
+
+    # --- Demo 2: Dashboard de Cartera y Cobranzas ---
+    st.header("Demo 2: Dashboard de Gestión de Cartera (AR)")
+    st.markdown("Visibilidad total de su cartera. KPIs en tiempo real (DSO, CER, Morosidad), análisis de Pareto y herramientas de gestión (Email/WhatsApp/PDF) para cada cliente.")
+
+    with st.container(border=True):
+        df_cartera = SAMPLE_DATA['cartera_antiguedad']
+        total_cartera = df_cartera['Valor ($)'].sum()
+        total_vencido = df_cartera[df_cartera['Rango'] != 'Al día']['Valor ($)'].sum()
+
+        kpi1, kpi2, kpi3 = st.columns(3)
+        kpi1.metric("Cartera Total", f"${total_cartera/1_000_000:.1f} M")
+        kpi2.metric("Cartera Vencida", f"${total_vencido/1_000_000:.1f} M")
+        kpi3.metric("Índice de Morosidad", f"{total_vencido/total_cartera*100:.1f}%")
+
+        fig = px.pie(
+            df_cartera, values='Valor ($)', names='Rango', title='Deuda por Antigüedad',
+            hole=0.4, color='Rango', color_discrete_map={
+                'Al día': '#388E3C', '1-15 días': '#FBC02D', '16-30 días': '#F57C00',
+                '31-60 días': 'darkorange', 'Más de 60 días': '#D32F2F'
+            }
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    # --- Demo 3: Integración de Riesgo (Covinoc) ---
+    st.header("Demo 3: Automatización de Cobranza Legal (Integración)")
+    st.markdown("El sistema cruza automáticamente nuestra cartera con reportes de agencias externas (como Covinoc). Identifica discrepancias y genera los archivos de acción masiva, automatizando la gestión de riesgo.")
+    
+    with st.container(border=True):
+        st.subheader("Resultados del Cruce Automático con Covinoc")
+        tab1, tab2 = st.tabs(["Facturas a Subir (Nuevas en Cartera)", "Facturas a Exonerar (Pagadas)"])
+        with tab1:
+            st.warning("Acción: Estas facturas están en nuestra cartera pero no en Covinoc. Deben subirse.")
+            st.dataframe(SAMPLE_DATA['covinoc_subir'], use_container_width=True, hide_index=True)
+            st.download_button("Descargar Excel para Subida Masiva", "sample_data", file_name="subir.xlsx", use_container_width=True)
+        with tab2:
+            st.success("Acción: Estas facturas ya fueron pagadas (no están en cartera) pero siguen activas en Covinoc. Deben exonerarse.")
+            st.dataframe(SAMPLE_DATA['covinoc_exonerar'], use_container_width=True, hide_index=True)
+            st.download_button("Descargar Excel para Exoneración Masiva", "sample_data", file_name="exonerar.xlsx", use_container_width=True)
+
+def render_pagina_integracion():
+    """Demo de la Suite de Integración y Futuro (IA)."""
+    st.title("🤖 Integración Total y Futuro con IA")
+    st.markdown("Conectamos todos los procesos, desde la vinculación de un cliente hasta el servicio post-venta con IA.")
+
+    # --- Demo 1: Vinculación Digital de Clientes ---
+    st.header("Demo 1: Portal de Vinculación Digital de Clientes")
+    st.markdown("Un portal público para que sus nuevos clientes se registren. El sistema captura sus datos, obtiene su **firma digital**, valida su identidad con un **código OTP** por email, genera el **PDF legal** (Habeas Data) y lo archiva automáticamente en Google Drive y Google Sheets.")
+    
+    with st.container(border=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            st.text_input("Razón Social*", "Mi Empresa S.A.S.")
+            st.text_input("NIT*", "900.123.456-7")
+            st.text_input("Email de Facturación*", "pagos@miempresa.com")
+            st.text_input("Email de Notificaciones (para OTP)*", "gerencia@miempresa.com")
+        with col2:
+            st.text_input("Representante Legal*", "Juan Pérez")
+            st.text_input("C.C. del Representante*", "1.234.567.890")
+            st.info("Por favor, firme en el recuadro:")
+            st_canvas(
+                stroke_width=3, stroke_color="#000000",
+                background_color="#FFFFFF", height=130, width=400,
+                key="canvas_demo"
+            )
+        
+        st.text_input("Código OTP enviado a gerencia@miempresa.com", "******", max_chars=6)
+        st.button("Finalizar Vinculación y Generar PDF", use_container_width=True, type="primary")
+
+    # --- Demo 2: El Agente IA (Chatbot de WhatsApp) ---
+    st.header("Demo 2: El Proyecto Final - Agente IA en WhatsApp")
+    st.markdown("Esta es la pieza que lo une todo. Un Chatbot con **Inteligencia Artificial (Gemini de Google)** conectado en tiempo real a su ecosistema de datos. Sus clientes y vendedores pueden auto-gestionar consultas 24/7.")
+    
+    with st.container(border=True):
+        st.subheader("Simulación de Chat (WhatsApp)")
+        
+        st.chat_message("user").write("Hola, ¿cuál es mi deuda y tienen stock de 'Disco de Corte Inox'?")
+        
+        with st.chat_message("assistant"):
+            st.write("¡Hola! Claro, estoy consultando tu información... 🕵️‍♂️")
+            st.spinner("Consultando Base de Clientes, Cartera e Inventario...")
+            
+            # Simulación de la respuesta del bot
+            st.markdown(f"""
+                ¡Listo!
+                
+                1.  **Estado de Cartera:** Tienes una deuda vencida de **$1,250,000**. La factura más antigua tiene 45 días.
+                2.  **Stock de 'Disco de Corte Inox' (Ref: A-101):**
+                    * **Bodega CEDI:** 5,200 unidades
+                    * **Tienda Pereira:** 450 unidades
+                
+                ¿Te gustaría que te envíe el estado de cuenta a tu correo o te ayude a encontrar otro producto?
+            """)
+
+    with st.expander("Ver el 'Cerebro' del Bot (Fragmento de Lógica)"):
+        st.code("""
+# El "cerebro" del bot: un prompt de sistema que le dice quién es y qué herramientas puede usar.
+system_instruction = (
+    "Eres Ferreinox CRM AI, el asistente experto en servicio al cliente, inventarios y análisis de cartera para FERREINOX SAS BIC."
+    "Tu misión es ayudar a los clientes con sus consultas de forma amable, cercana y natural."
+    
+    "PROTOCOLO DE SEGURIDAD MÁXIMA:"
+    "Nunca entregues información financiera (deudas o historial) sin validar al cliente con NIT y Código de Cliente usando las herramientas seguras."
+    
+    "HERRAMIENTAS DISPONIBLES:"
+    "- verificar_cliente_existente(nit)"
+    "- consultar_estado_cliente_seguro(nit, codigo_cliente)"
+    "- consultar_stock_producto(nombre_producto)"
+    "- consultar_precio_producto(nombre_producto)"
+)
+        """, language="python")
+
+def render_pagina_contacto():
+    """Renderiza la página final de Contacto / CTA."""
+    st.title("Hablemos de su Transformación Digital 🚀")
+    
+    st.markdown(f"""
+    Mi nombre es **[Tu Nombre Aquí]** y soy un **Arquitecto de Soluciones de Datos** especializado en
+    la creación de ecosistemas empresariales integrales.
+    
+    A diferencia de otros, no ofrezco 'dashboards' aislados. Ofrezco una **transformación operativa completa**:
+    un sistema nervioso digital que conecta todas las áreas de su empresa, automatiza tareas críticas
+    y le entrega la inteligencia que necesita para tomar decisiones ganadoras.
+    
+    Lo que ha visto en este portafolio no es una teoría; es una **demostración de sistemas reales, funcionales y probados**
+    que ya están generando un valor incalculable.
+    
+    ¿Está listo para dejar de "administrar" su negocio y empezar a "dirigirlo"?
+    """)
+    
+    st.divider()
+    
+    with st.form(key="contact_form"):
+        st.subheader("Iniciemos la Conversación")
+        col1, col2 = st.columns(2)
+        nombre = col1.text_input("Su Nombre*")
+        empresa = col2.text_input("Su Empresa*")
+        email = col1.text_input("Su Correo Electrónico*")
+        telefono = col2.text_input("Su Teléfono/WhatsApp")
+        
+        desafio = st.text_area(
+            "¿Cuál es su mayor desafío operativo o de datos en este momento?*",
+            placeholder="Ej: 'Mi inventario nunca cuadra', 'Mi equipo de ventas es muy lento para cotizar', 'No tengo idea de mi cartera vencida en tiempo real'..."
+        )
+        
+        submit = st.form_submit_button("Solicitar Consulta Estratégica", use_container_width=True, type="primary")
+        
+        if submit:
+            if not all([nombre, empresa, email, desafio]):
+                st.warning("Por favor, complete todos los campos marcados con *.")
+            else:
+                # Aquí iría tu lógica de envío de correo (usando yagmail, smtplib, o una API como Formspree)
+                st.success(f"¡Gracias, {nombre}! He recibido su solicitud. Me pondré en contacto con usted en {email} muy pronto.")
+                st.balloons()
+
+
+# ======================================================================================
+# --- NAVEGACIÓN PRINCIPAL (BARRA LATERAL) ---
+# ======================================================================================
+
+# --- Encabezado de la Barra Lateral ---
+# Simular una imagen de logo para tu marca
+st.sidebar.markdown(f"""
+<div style="text-align: center; padding: 1rem 0;">
+    <h1 style="color: white; font-size: 2.5rem; margin: 0; padding: 0;">SINERGIA</h1>
+    <p style="color: {COLOR_ACENTO_ROJO}; font-size: 1rem; margin: 0; padding: 0; font-weight: 700;">DIGITAL</p>
+    <p style="color: white; font-size: 0.8rem; margin-top: 5px;">Por: [Tu Nombre Aquí]</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.sidebar.markdown("---")
+st.sidebar.header("Portafolio de Servicios")
+
+# Menú de navegación
+paginas = {
+    "🏠 Inicio": render_pagina_inicio,
+    "🧠 Inteligencia Comercial": render_pagina_comercial,
+    "🏭 Operaciones y Logística": render_pagina_operaciones,
+    "🏦 Finanzas y Tesorería": render_pagina_finanzas,
+    "🤖 Integración y Futuro (IA)": render_pagina_integracion,
+    "✉️ Contacto": render_pagina_contacto
+}
+
+seleccion = st.sidebar.radio(
+    "Seleccione una demo:",
+    list(paginas.keys())
+)
+
+st.sidebar.markdown("---")
+st.sidebar.info(
+    "Este portafolio es una **demostración interactiva**."
+    "Todos los datos son de ejemplo y simulan un ecosistema empresarial real."
+)
+
+# Renderiza la página seleccionada
+paginas[seleccion]()
