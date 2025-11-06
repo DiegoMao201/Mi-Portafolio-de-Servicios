@@ -1,3 +1,4 @@
+# Dependencias del Portafolio Interactivo v4.0
 streamlit
 pandas
 numpy
