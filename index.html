@@ -1,435 +1,295 @@
 <!doctype html>
 <html lang="es">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GM-DATOVATE - Transformamos Datos en Decisiones</title>
-  <script src="/_sdk/element_sdk.js"></script>
-  <style>
-         body {
-             box-sizing: border-box;
-         }
-         
-         * {
-             margin: 0;
-             padding: 0;
-             box-sizing: border-box;
-         }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GM-DATOVATE - De Datos Aislados a un Ecosistema Inteligente</title>
+  <meta name="description" content="Transformamos su operación con datos, automatización e Inteligencia Artificial. De Datos Aislados a un Ecosistema de Negocios Inteligente.">
+  <meta name="author" content="GM-DATOVATE">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="GM-DATOVATE - De Datos Aislados a un Ecosistema Inteligente">
+  <meta property="og:description" content="Transformamos su operación con datos, automatización e Inteligencia Artificial.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tusitio.netlify.app/">
+  <meta property="og:image" content="https://i.imgur.com/7bQyL4B.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.ico">
+</head>
+<body>
+  
+  <nav class="nav">
+   <div class="nav-container">
+    <a href="#inicio" class="nav-logo" id="nav-logo">
+      GM-DATOVATE
+    </a>
+    <ul class="nav-links">
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#servicios">Pilares</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+   </div>
+  </nav>
 
-         html, body {
-             height: 100%;
-             font-family: 'Inter', -webkit-system-font, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-             overflow-x: hidden;
-             scroll-behavior: smooth;
-         }
+  <section id="inicio" class="hero">
+   <div class="particle"></div>
+   <div class="particle"></div>
+   <div class="particle"></div>
+   <div class="particle"></div>
+   <div class="particle"></div>
+   <div class="hero-content">
+    <h1 class="company-logo" id="company-name">GM-DATOVATE</h1>
+    <h2 class="hero-title" id="hero-title">De Datos Aislados a un Ecosistema de Negocios Inteligente.</h2>
+    <p class="hero-subtitle" id="hero-subtitle">Transformamos su operación con datos, automatización e Inteligencia Artificial.</p>
+    
+    <a href="https://mi-portafolio-de-servicios-gm-datovate.streamlit.app" target="_blank" rel="noopener noreferrer" class="cta-button">
+      Probar la Demo Interactiva
+    </a>
 
-         /* Variables CSS para colores tecnológicos profesionales */
-         :root {
-             --primary-bg: #0B0D17;
-             --secondary-bg: #1A1D29;
-             --accent-color: #00F5FF;
-             --text-primary: #FFFFFF;
-             --text-secondary: #64FFDA;
-         }
+   </div>
+  </section>
 
-         /* Hero Section Ultra Moderno */
-         .hero {
-             height: 100vh;
-             background: 
-                 linear-gradient(135deg, var(--primary-bg) 0%, #0F1419 25%, var(--secondary-bg) 50%, #0B0D17 100%),
-                 radial-gradient(ellipse at top, rgba(0, 245, 255, 0.15) 0%, transparent 70%),
-                 radial-gradient(ellipse at bottom, rgba(100, 255, 218, 0.1) 0%, transparent 70%);
-             display: flex;
-             align-items: center;
-             justify-content: center;
-             position: relative;
-             overflow: hidden;
-         }
+  <section id="nosotros" class="about">
+    <div class="about-content section-box">
+      <h2 class="section-title fade-in">Más que Consultores, Somos sus Socios</h2>
+      <p class="about-text fade-in">
+        No construimos solo 'apps' o 'dashboards'. Construimos el <strong>Sistema Operativo Central</strong> de su compañía, conectando Ventas, Finanzas y Operaciones.
+        <br><br>
+        Entendemos que su operación es única. No vendemos software enlatado; co-creamos un sistema nervioso digital a la medida de sus desafíos, enfocado en resultados rápidos y tangibles.
+      </p>
+      <hr style="border: 0; height: 1px; background: rgba(0, 245, 255, 0.2); margin: 40px auto; width: 50%;">
+      <h3 class="fade-in" style="font-size: 2rem; color: var(--text-primary); text-align: center; margin-bottom: 60px;">Conozca a los Arquitectos</h3>
+      <div class="team-grid">
+        <div class="team-card fade-in" style="transition-delay: 0.2s;">
+        <div class="team-avatar">
+          <img src="https://i.imgur.com/7bQyL4B.png" alt="Foto de Diego Garcia">
+        </div>
+        <h3 class="team-name" id="diego-name">Diego Mauricio García</h3>
+        <p class="team-role" id="diego-title">Arquitecto de Datos y Desarrollador Líder</p>
+      </div>
+        <div class="team-card fade-in" style="transition-delay: 0.4s;">
+        <div class="team-avatar">
+          <img src="https://i.imgur.com/kF2bWpA.png" alt="Foto de Pablo Mafla">
+        </div>
+        <h3 class="team-name" id="pablo-name">Pablo Cesar Mafla</h3>
+        <p class="team-role" id="pablo-title">Estratega Comercial y de Negocios</p>
+      </div>
+    </div>
+    </div>
+  </section>
 
-         .hero::before {
-             content: '';
-             position: absolute;
-             top: 0;
-             left: 0;
-             right: 0;
-             bottom: 0;
-             background: 
-                 conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(0, 245, 255, 0.03) 60deg, transparent 120deg),
-                 radial-gradient(circle at 25% 25%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
-                 radial-gradient(circle at 75% 75%, rgba(100, 255, 218, 0.08) 0%, transparent 50%);
-             animation: heroGlow 8s ease-in-out infinite alternate;
-         }
+  <section id="servicios" class="section">
+    <div class="section-box">
+      <h2 class="section-title fade-in">Un Ecosistema, Cuatro Pilares de Valor</h2>
+      <div class="services-grid">
+    
+        <div class="service-card fade-in" style="transition-delay: 0.1s;">
+      <div class="service-icon">
+        🧠
+      </div>
+      <div class="service-card-content">
+        <h3 class="service-title">Inteligencia Comercial</h3>
+        <p class="service-pain"><strong>El Dolor:</strong> "Mi equipo de ventas trabaja a ciegas. No sabemos qué clientes están en riesgo o dónde hay oportunidades de venta cruzada."</p>
+        <p class="service-description"><strong>La Solución:</strong> Deje de adivinar. Usamos IA para decirle a quién llamar, qué producto ofrecer (venta cruzada) y qué clientes están en riesgo de irse.</p>
+      </div>
+    </div>
+    
+        <div class="service-card fade-in" style="transition-delay: 0.2s;">
+      <div class="service-icon">
+        🏭
+      </div>
+      <div class="service-card-content">
+        <h3 class="service-title">Operaciones y Logística</h3>
+        <p class="service-pain"><strong>El Dolor:</strong> "El inventario del ERP nunca coincide con la bodega. Perdemos ventas por quiebres de stock que no vimos venir."</p>
+        <p class="service-description"><strong>La Solución:</strong> Sincronización de inventario con el ERP, conteo físico en bodega con apps móviles y sugerencias de abastecimiento para no perder ventas.</p>
+      </div>
+    </div>
+    
+        <div class="service-card fade-in" style="transition-delay: 0.3s;">
+      <div class="service-icon">
+        🏦
+      </div>
+      <div class="service-card-content">
+        <h3 class="service-title">Finanzas y Tesorería</h3>
+        <p class="service-pain"><strong>El Dolor:</strong> "Me demoro días en hacer el cuadre de caja de las tiendas y mi cartera es un excel obsoleto. No sé quién me debe en tiempo real."</p>
+        <p class="service-description"><strong>La Solución:</strong> Digitalizamos su flujo de caja. Automatizamos cuadres, procesamiento de recibos y generamos los archivos .txt para su ERP.</p>
+      </div>
+    </div>
+    
+        <div class="service-card fade-in" style="transition-delay: 0.4s;">
+      <div class="service-icon">
+        🤖
+      </div>
+      <div class="service-card-content">
+        <h3 class="service-title">Integración y Automatización</h3>
+        <p class="service-pain"><strong>El Dolor:</strong> "Vinculamos clientes con papel. Mi equipo pierde tiempo respondiendo lo mismo en WhatsApp y no hay conexión con agencias de riesgo."</p>
+        <p class="service-description"><strong>La Solución:</strong> Unimos todo: vinculación de clientes con firma digital, gestión de riesgo con agencias (Covinoc) y un Agente IA en WhatsApp 24/7.</p>
+      </div>
+    </div>
+   </div>
+      <div style="text-align: center; margin-top: 80px;" class="fade-in" style="transition-delay: 0.5s;">
+       <h3 style="color: var(--text-primary); font-size: 1.8rem; margin-bottom: 25px;">¿Alguno de estos "dolores" le suena familiar?</h3>
+       <a href="https://mi-portafolio-de-servicios-gm-datovate.streamlit.app" target="_blank" rel="noopener noreferrer" class="cta-button">
+           Véalo en Acción (Demo)
+       </a>
+      </div>
+    </div>
+  </section>
 
-         .hero::after {
-             content: '';
-             position: absolute;
-             top: 0;
-             left: 0;
-             right: 0;
-             bottom: 0;
-             background: 
-                 linear-gradient(45deg, transparent 30%, rgba(0, 245, 255, 0.02) 50%, transparent 70%),
-                 linear-gradient(-45deg, transparent 30%, rgba(100, 255, 218, 0.02) 50%, transparent 70%);
-             animation: meshMove 12s linear infinite;
-         }
+  <section id="contacto" class="contact">
+    <div class="contact-content section-box">
+      <h2 class="section-title fade-in">"Mi inventario nunca cuadra..."</h2>
+      <p class="about-text fade-in" style="max-width: 600px; margin-bottom: 40px; font-size: 1.1rem; color: var(--text-secondary);">
+        ¿Cuál es esa frase que repite cada semana?
+        Cuéntenos su mayor desafío operativo. Dénos 30 minutos y le mostraremos un plan de acción.
+      </p>
+      <form 
+      class="contact-form fade-in" 
+      id="contact-form" 
+      name="contacto" 
+      data-netlify="true" 
+      method="POST" 
+      netlify-honeypot="bot-field"
+    >
+            <input type="hidden" name="form-name" value="contacto" />
+      
+      <p style="display:none">
+        <label>Si eres humano, deja este campo vacío: <input name="bot-field" /></label>
+      </p>
+      <div class="form-group">
+        <label for="name">Nombre Completo</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="company">Empresa</label>
+        <input type="text" id="company" name="company">
+      </div>
+      <div class="form-group">
+        <label for="message">¿Cuál es su mayor desafío operativo o de datos?</label>
+        <textarea id="message" name="message" rows="5" placeholder="Ej: 'Mi equipo de ventas es muy lento para cotizar', 'La cartera no está en tiempo real'..." required></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Solicitar Consulta Estratégica</button>
+    </form>
+    </div>
+  </section>
 
-         @keyframes heroGlow {
-             0% { 
-                 opacity: 0.6;
-                 transform: scale(1) rotate(0deg);
-             }
-             50% {
-                 opacity: 0.8;
-                 transform: scale(1.02) rotate(1deg);
-             }
-             100% { 
-                 opacity: 1;
-                 transform: scale(1.05) rotate(2deg);
-             }
-         }
+  <footer class="footer">
+   <div class="footer-content">
+    <p>© 2024 GM-DATOVATE. Todos los derechos reservados.</p>
+    <p>Transformando Datos en Decisiones Estratégicas</p>
+   </div>
+  </footer>
 
-         @keyframes meshMove {
-             0% { transform: translateX(-50px) translateY(-50px) rotate(0deg); }
-             25% { transform: translateX(50px) translateY(-25px) rotate(90deg); }
-             50% { transform: translateX(25px) translateY(50px) rotate(180deg); }
-             75% { transform: translateX(-25px) translateY(25px) rotate(270deg); }
-             100% { transform: translateX(-50px) translateY(-50px) rotate(360deg); }
-         }
+  <script>
+    // Scroll animations
+    function handleScrollAnimations() {
+        const elements = document.querySelectorAll('.fade-in');
+        
+        elements.forEach(element => {
+            const elementTop = element.getBoundingClientRect().top;
+            const elementVisible = 100; // Se activa un poco antes
+    section       
+            if (elementTop < window.innerHeight - elementVisible) {
+                element.classList.add('visible');
+            }
+        });
+    }
 
-         .hero-content {
-             text-align: center;
-             z-index: 2;
-             max-width: 800px;
-             padding: 0 20px;
-         }
+    // Smooth scrolling for navigation links
+    function handleSmoothScrolling() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+              e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const target = document.querySelector(targetId);
+                
+                if (target) {
+s                  // Calcula la posición del elemento, restando la altura del nav
+                    const navHeight = document.querySelector('.nav')?.offsetHeight || 0;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 10; // 10px de margen
+                s   
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    }
 
-         .company-logo {
-             font-size: 4rem;
-             font-weight: 900;
-             background: linear-gradient(135deg, var(--accent-color) 0%, var(--text-secondary) 50%, var(--accent-color) 100%);
-             background-size: 200% 200%;
-             -webkit-background-clip: text;
-             -webkit-text-fill-color: transparent;
-             background-clip: text;
-             margin-bottom: 30px;
-             position: relative;
-             animation: logoGlow 3s ease-in-out infinite alternate, gradientShift 4s ease-in-out infinite;
-             filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.4));
-         }
+    // Navigation background on scroll
+    function handleNavScroll() {
+        const nav = document.querySelector('.nav');
+  s     if (!nav) return; // Si no hay nav, no hacer nada
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) { // Se activa más rápido
+                nav.style.background = 'rgba(11, 13, 23, 0.95)';
+                nav.style.backdropFilter = 'blur(25px) saturate(180%)';
+T          } else {
+                nav.style.background = 'rgba(11, 13, 23, 0.85)';
+                nav.style.backdropFilter = 'blur(20px) saturate(180%)';
+            }
+        });
+    }
+    
+    // Form handling (para Netlify con AJAX)
+F   function handleContactForm() {
+        const form = document.getElementById('contact-form');
+        if (!form) return;
+        
+        const submitBtn = form.querySelector('.submit-btn');
+s        const originalBtnText = submitBtn.textContent;
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Muestra estado de carga
+service          submitBtn.textContent = 'Enviando...';
+            submitBtn.disabled = true;
 
-         .company-logo::before {
-             content: 'GM-DATOVATE';
-             position: absolute;
-             top: 0;
-             left: 0;
-             background: linear-gradient(135deg, rgba(0, 245, 255, 0.1) 0%, rgba(100, 255, 218, 0.1) 100%);
-             -webkit-background-clip: text;
-             -webkit-text-fill-color: transparent;
-             background-clip: text;
-             z-index: -1;
-             animation: logoShadow 2s ease-in-out infinite alternate;
-         }
+            const formData = new FormData(form);
+A          
+            // El 'action' del form es ahora '/'
+            fetch(form.getAttribute('action'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+note            body: new URLSearchParams(formData).toString()
+            })
+            .then(response => {
+                if (response.ok) {
+                D     // Muestra éxito
+                    form.innerHTML = `<h3 style='color: var(--text-primary); text-align: center;'>¡Gracias!</h3><p style='color: var(--text-secondary); text-align: center; margin-top: 1rem;'>Hemos recibido su mensaje. Nuestro equipo se pondrá en contacto con usted muy pronto.</p>`;
+                } else {
+                    // Muestra error
+  m               throw new Error('Hubo un problema al enviar el formulario.');
+s            }
+            })
+            .catch(error => {
+                alert(error.message);
+                // Restaura el botón en caso de error
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+s          });
+        });
+    }
 
-         @keyframes logoGlow {
-             from { 
-                 filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.4)) drop-shadow(0 0 40px rgba(0, 245, 255, 0.2));
-             }
-             to { 
-                 filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.6)) drop-shadow(0 0 60px rgba(100, 255, 218, 0.3));
-             }
-         }
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', function() {
+        // Se asegura que todo se ejecute solo si los elementos existen
+all      handleScrollAnimations();
+        handleSmoothScrolling();
+        handleNavScroll();
+        handleContactForm();
+        
+        // Add scroll event listener
+        window.addEventListener('scroll', handleScrollAnimations);
+    });
+  </script>
 
-         @keyframes gradientShift {
-             0% { background-position: 0% 50%; }
-             50% { background-position: 100% 50%; }
-             100% { background-position: 0% 50%; }
-         }
-
-         @keyframes logoShadow {
-             from { transform: translate(2px, 2px); opacity: 0.3; }
-             to { transform: translate(4px, 4px); opacity: 0.1; }
-         }
-
-         .hero-title {
-             font-size: 3rem;
-             font-weight: 700;
-             color: var(--text-primary);
-             margin-bottom: 20px;
-             opacity: 0;
-             animation: slideUp 1s ease-out 0.5s forwards;
-         }
-
-         .hero-subtitle {
-             font-size: 1.3rem;
-             color: var(--text-secondary);
-             margin-bottom: 40px;
-             opacity: 0;
-             animation: slideUp 1s ease-out 1s forwards;
-         }
-
-         @keyframes slideUp {
-             from {
-                 opacity: 0;
-                 transform: translateY(30px);
-             }
-             to {
-                 opacity: 1;
-                 transform: translateY(0);
-             }
-         }
-
-         .cta-button {
-             background: linear-gradient(135deg, var(--accent-color) 0%, var(--text-secondary) 50%, var(--accent-color) 100%);
-             background-size: 200% 200%;
-             color: var(--primary-bg);
-             padding: 18px 45px;
-             border: 2px solid transparent;
-             border-radius: 50px;
-             font-size: 1.2rem;
-             font-weight: 700;
-             cursor: pointer;
-             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-             opacity: 0;
-             animation: slideUp 1s ease-out 1.5s forwards, gradientShift 3s ease-in-out infinite;
-             text-decoration: none;
-             display: inline-block;
-             position: relative;
-             overflow: hidden;
-             text-transform: uppercase;
-             letter-spacing: 1px;
-             box-shadow: 
-                 0 0 20px rgba(0, 245, 255, 0.3),
-                 inset 0 0 20px rgba(255, 255, 255, 0.1);
-         }
-
-         .cta-button::before {
-             content: '';
-             position: absolute;
-             top: 0;
-             left: -100%;
-             width: 100%;
-             height: 100%;
-             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-             transition: left 0.5s ease;
-         }
-
-         .cta-button:hover::before {
-             left: 100%;
-         }
-
-         .cta-button:hover {
-             transform: translateY(-5px) scale(1.05);
-             box-shadow: 
-                 0 15px 40px rgba(0, 245, 255, 0.4),
-                 0 0 30px rgba(100, 255, 218, 0.3),
-                 inset 0 0 30px rgba(255, 255, 255, 0.2);
-             border-color: rgba(255, 255, 255, 0.3);
-         }
-
-         /* Advanced Floating Particles */
-         .particle {
-             position: absolute;
-             border-radius: 50%;
-             opacity: 0.8;
-             animation: advancedFloat 8s ease-in-out infinite;
-             filter: blur(0.5px);
-         }
-
-         .particle:nth-child(1) {
-             width: 6px;
-             height: 6px;
-             top: 15%;
-             left: 8%;
-             background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
-             animation-delay: 0s;
-             box-shadow: 0 0 10px var(--accent-color);
-         }
-
-         .particle:nth-child(2) {
-             width: 8px;
-             height: 8px;
-             top: 65%;
-             left: 85%;
-             background: radial-gradient(circle, var(--text-secondary) 0%, transparent 70%);
-             animation-delay: 2.5s;
-             box-shadow: 0 0 15px var(--text-secondary);
-         }
-
-         .particle:nth-child(3) {
-             width: 4px;
-             height: 4px;
-             top: 85%;
-             left: 15%;
-             background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
-             animation-delay: 5s;
-             box-shadow: 0 0 8px var(--accent-color);
-         }
-
-         .particle:nth-child(4) {
-             width: 5px;
-             height: 5px;
-             top: 25%;
-             left: 75%;
-             background: radial-gradient(circle, var(--text-secondary) 0%, transparent 70%);
-             animation-delay: 1.5s;
-             box-shadow: 0 0 12px var(--text-secondary);
-       _**...[Resto del CSS del archivo HTML, omitido por brevedad, va aquí]...**_
-         }
-     </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
- </head>
- <body><nav class="nav">
-   <div class="nav-container">
-    <div class="nav-logo" id="nav-logo">
-     GM-DATOVATE
-    </div>
-    <ul class="nav-links">
-     <li><a href="#inicio">Inicio</a></li>
-     <li><a href="#nosotros">Nosotros</a></li>
-     <li><a href="#servicios">Servicios</a></li>
-     <li><a href="#contacto">Contacto</a></li>
-    </ul>
-   </div>
-  </nav><section id="inicio" class="hero">
-   <div class="particle"></div>
-   <div class="particle"></div>
-   <div class="particle"></div>
-   <div class="particle"></div>
-   <div class="particle"></div>
-   <div class="hero-content">
-    <h1 class="company-logo" id="company-name">GM-DATOVATE</h1>
-    <h2 class="hero-title" id="hero-title">Transformamos datos en decisiones</h2>
-    <p class="hero-subtitle" id="hero-subtitle">Soluciones innovadoras en análisis de datos y desarrollo de software que impulsan el crecimiento de tu negocio</p>
-    
-    <a href="[https://mi-portafolio-de-servicios-gm-datovate.streamlit.app]" target="_blank" rel="noopener noreferrer" class="cta-button">
-      Probar la Demo Interactiva
-    </a>
-
-   </div>
-  </section><section id="nosotros" class="about">
-   <div class="about-content">
-    <h2 class="section-title fade-in">Sobre Nosotros</h2>
-    <p class="about-text fade-in">En <strong>GM-DATOVATE</strong>, transformamos datos en decisiones estratégicas que impulsan el éxito empresarial. Somos especialistas en análisis de datos avanzado y desarrollo de software personalizado, combinando experiencia técnica con visión comercial para entregar soluciones que realmente impactan.</p>
-    <div class="team-grid">
-     <div class="team-card fade-in">
-      <div class="team-avatar">
-       DG
-      </div>
-      <h3 class="team-name" id="diego-name">Diego Mauricio García</h3>
-      <p class="team-role" id="diego-title">Arquitecto de Datos y Desarrollador Principal</p>
-     </div>
-     <div class="team-card fade-in">
-      <div class="team-avatar">
-       PM
-      </div>
-      <h3 class="team-name" id="pablo-name">Pablo Cesar Mafla</h3>
-      <p class="team-role" id="pablo-title">Estratega Comercial y de Negocios</p>
-     </div>
-    </div>
-   </div>
-  </section><section id="servicios" class="section">
-   <h2 class="section-title fade-in">Nuestros Servicios</h2>
-   <div class="services-grid">
-    <div class="service-card fade-in">
-     <div class="service-icon">
-      📊
-     </div>
-     <h3 class="service-title">Análisis de Datos Avanzado</h3>
-     <p class="service-description">Transformamos datos complejos en insights accionables mediante técnicas de machine learning, visualización interactiva y modelado predictivo que impulsan la toma de decisiones estratégicas.</p>
-    </div>
-    <div class="service-card fade-in">
-     <div class="service-icon">
-      💻
-     </div>
-     <h3 class="service-title">Desarrollo de Software</h3>
-     <p class="service-description">Creamos aplicaciones web robustas y escalables con Python, Streamlit y tecnologías modernas. Desde dashboards interactivos hasta sistemas empresariales completos.</p>
-    </div>
-    <div class="service-card fade-in">
-     <div class="service-icon">
-      🚀
-     </div>
-     <h3 class="service-title">Automatización de Procesos</h3>
-     <p class="service-description">Optimizamos operaciones empresariales mediante la automatización inteligente de procesos, reduciendo costos y mejorando la eficiencia operacional.</p>
-    </div>
-    <div class="service-card fade-in">
-     <div class="service-icon">
-      📈
-     </div>
-     <h3 class="service-title">Business Intelligence</h3>
-     <p class="service-description">Implementamos soluciones de BI personalizadas que proporcionan visibilidad completa del rendimiento empresarial y facilitan la planificación estratégica.</p>
-    </div>
-   </div>
-  </section><section id="contacto" class="contact">
-   <div class="contact-content">
-    <h2 class="section-title fade-in">Contactanos</h2>
-    <form class="contact-form fade-in" id="contact-form">
-     <div class="form-group"><label for="name">Nombre Completo</label> <input type="text" id="name" name="name" required>
-     </div>
-     <div class="form-group"><label for="email">Email</label> <input type="email" id="email" name="email" required>
-     </div>
-     <div class="form-group"><label for="company">Empresa</label> <input type="text" id="company" name="company">
-     </div>
-     <div class="form-group"><label for="message">Mensaje</label> <textarea id="message" name="message" rows="5" required></textarea>
-     </div><button type="submit" class="submit-btn">Enviar Mensaje</button>
-    </form>
-   </div>
-  </section><footer class="footer">
-   <div class="footer-content">
-    <p>© 2024 GM-DATOVATE. Todos los derechos reservados.</p>
-    <p>Transformando datos en decisiones estratégicas</p>
-   </div>
-  </footer>
-  <script>
-         // Configuration object for editable content
-         const defaultConfig = {
-             company_name: "GM-DATOVATE",
-             hero_title: "Transformamos datos en decisiones",
-             hero_subtitle: "Soluciones innovadoras en análisis de datos y desarrollo de software que impulsan el crecimiento de tu negocio",
-             diego_name: "Diego Mauricio García",
-             diego_title: "Arquitecto de Datos y Desarrollador Principal",
-             pablo_name: "Pablo Cesar Mafla",
-             pablo_title: "Estratega Comercial y de Negocios",
-             primary_bg: "#0B0D17",
-             secondary_bg: "#1A1D29",
-             accent_color: "#00F5FF",
-             text_primary: "#FFFFFF",
-             text_secondary: "#64FFDA"
-         };
-
-         // Scroll animations
-         function handleScrollAnimations() {
-             const elements = document.querySelectorAll('.fade-in');
-             
-             elements.forEach(element => {
-                 const elementTop = element.getBoundingClientRect().top;
-                 const elementVisible = 150;
-                 
-                 if (elementTop < window.innerHeight - elementVisible) {
-                     element.classList.add('visible');
-                 }
-             });
-         }
-
-         // Contact form handling
-         function handleContactForm() {
-             const form = document.getElementById('contact-form');
-             const submitBtn = form.querySelector('.submit-btn');
-             
-             form.addEventListener('submit', function(e) {
-                 e.preventDefault();
-                 
-                 // Show loading state
-                 const originalText = submitBtn.textContent;
-                 submitBtn.textContent = 'Enviando...';
-                 submitBtn.disabled = true;
-                 
-                 // Simulate form submission (en un proyecto real, aquí iría tu fetch a una API)
-                 setTimeout(() => {
-                     // Show success message
-           _**...[Resto del JavaScript del archivo HTML, omitido por brevedad, va aquí]...**_
-         });
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'999fabc3c53af7b8',t:'MTc2MjM4MDUxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
