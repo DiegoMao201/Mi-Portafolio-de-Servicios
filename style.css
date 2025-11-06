@@ -92,26 +92,149 @@ html, body {
     .nav-links { display: none; }
 }
 
-/* HERO SECTION */
+/* ============================================== */
+/* ========= INICIO DEL NUEVO HERO SECTION ========= */
+/* ============================================== */
+
 .hero {
-    min-height: 90vh;
-    background: radial-gradient(circle at 60% 40%, #00f5ff22 0%, var(--primary-bg) 80%);
+    height: 100vh; /* Ocupa la pantalla completa */
+    background: 
+        linear-gradient(135deg, var(--primary-bg) 0%, #0F1419 25%, var(--secondary-bg) 50%, var(--primary-bg) 100%),
+        radial-gradient(ellipse at top, rgba(0, 245, 255, 0.15) 0%, transparent 70%),
+        radial-gradient(ellipse at bottom, rgba(100, 255, 218, 0.1) 0%, transparent 70%);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 80px 0;
+    overflow: hidden;
+    padding: 20px;
 }
-.hero-card {
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+        conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(0, 245, 255, 0.03) 60deg, transparent 120deg),
+        radial-gradient(circle at 25% 25%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(100, 255, 218, 0.08) 0%, transparent 50%);
+    animation: heroGlow 8s ease-in-out infinite alternate;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+        linear-gradient(45deg, transparent 30%, rgba(0, 245, 255, 0.02) 50%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, rgba(100, 255, 218, 0.02) 50%, transparent 70%);
+    animation: meshMove 12s linear infinite;
+}
+
+@keyframes heroGlow {
+    0% { opacity: 0.6; transform: scale(1) rotate(0deg); }
+    50% { opacity: 0.8; transform: scale(1.02) rotate(1deg); }
+    100% { opacity: 1; transform: scale(1.05) rotate(2deg); }
+}
+
+@keyframes meshMove {
+    0% { transform: translateX(-50px) translateY(-50px) rotate(0deg); }
+    25% { transform: translateX(50px) translateY(-25px) rotate(90deg); }
+    50% { transform: translateX(25px) translateY(50px) rotate(180deg); }
+    75% { transform: translateX(-25px) translateY(25px) rotate(270deg); }
+    100% { transform: translateX(-50px) translateY(-50px) rotate(360deg); }
+}
+
+/* Contenedor del contenido del Héroe */
+.hero-content {
     text-align: center;
-    max-width: 1000px;
-    padding: 50px 40px;
-    background: var(--card-bg);
-    border-radius: 20px;
-    border: 2px solid rgba(0, 245, 255, 0.2);
-    box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.7), 0 0 20px var(--accent-color) inset;
-    transition: all 0.5s;
+    z-index: 2;
+    max-width: 1000px; /* Coincide con el ancho de tu .hero-card anterior */
+    padding: 0 20px;
+    /* La animación 'reveal' de tu JS se aplicará aquí */
 }
+
+/* Logo SVG y Título H1 combinados */
+.company-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    flex-wrap: wrap; /* Permite que se apilen en pantallas pequeñas */
+}
+
+.logo-svg {
+    width: 100px; /* Ajustado para mejor balance con el H1 */
+    height: 100px;
+    filter: drop-shadow(0 0 20px var(--accent-color)) drop-shadow(0 0 40px var(--secondary-accent));
+    animation: logoFloat 4s ease-in-out infinite, logoGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+    25% { transform: translateY(-10px) rotate(2deg) scale(1.05); }
+    50% { transform: translateY(-5px) rotate(-1deg) scale(1.02); }
+    75% { transform: translateY(-15px) rotate(1deg) scale(1.08); }
+}
+
+@keyframes logoGlow {
+    from { filter: drop-shadow(0 0 20px var(--accent-color)) drop-shadow(0 0 40px var(--secondary-accent)); }
+    to { filter: drop-shadow(0 0 30px var(--accent-color)) drop-shadow(0 0 60px var(--secondary-accent)); }
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Partículas de fondo */
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: advancedFloat 8s ease-in-out infinite;
+    filter: blur(0.5px);
+    z-index: 1;
+}
+.particle:nth-child(1) {
+    width: 6px; height: 6px; top: 15%; left: 8%;
+    background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+    animation-delay: 0s; box-shadow: 0 0 10px var(--accent-color);
+}
+.particle:nth-child(2) {
+    width: 8px; height: 8px; top: 65%; left: 85%;
+    background: radial-gradient(circle, var(--secondary-accent) 0%, transparent 70%);
+    animation-delay: 2.5s; box-shadow: 0 0 15px var(--secondary-accent);
+}
+.particle:nth-child(3) {
+    width: 4px; height: 4px; top: 85%; left: 15%;
+    background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+    animation-delay: 5s; box-shadow: 0 0 8px var(--accent-color);
+}
+.particle:nth-child(4) {
+    width: 5px; height: 5px; top: 25%; left: 75%;
+    background: radial-gradient(circle, var(--secondary-accent) 0%, transparent 70%);
+    animation-delay: 1.5s; box-shadow: 0 0 12px var(--secondary-accent);
+}
+.particle:nth-child(5) {
+    width: 7px; height: 7px; top: 45%; left: 25%;
+    background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+    animation-delay: 3.5s; box-shadow: 0 0 14px var(--accent-color);
+}
+
+@keyframes advancedFloat {
+    0% { transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); opacity: 0.8; }
+    25% { transform: translateY(-30px) translateX(15px) rotate(90deg) scale(1.2); opacity: 1; }
+    50% { transform: translateY(-15px) translateX(-20px) rotate(180deg) scale(0.8); opacity: 0.6; }
+    75% { transform: translateY(-40px) translateX(10px) rotate(270deg) scale(1.1); opacity: 0.9; }
+    100% { transform: translateY(0px) translateX(0px) rotate(360deg) scale(1); opacity: 0.8; }
+}
+
+/* ESTILOS DE TEXTO DE TU CSS ORIGINAL (PRESERVADOS) */
+
 .hero-tagline {
     font-size: 0.9rem; /* Reducido */
     font-weight: 600;
@@ -121,7 +244,7 @@ html, body {
     text-transform: uppercase;
     opacity: 0.8;
 }
-/* TITULO IMPONENTE: DATOVATE */
+/* TITULO IMPONENTE: DATOVATE (TU ESTILO ORIGINAL) */
 .hero-title {
     font-size: 5.5rem; /* Aumento drástico */
     font-weight: 900;
@@ -147,7 +270,7 @@ html, body {
     from { text-shadow: 0 0 10px var(--accent-color)aa, 0 0 20px var(--secondary-accent)88; }
     to { text-shadow: 0 0 20px var(--accent-color)cc, 0 0 40px var(--secondary-accent)aa; }
 }
-/* SUB-LÍNEA MÁS PEQUEÑA */
+/* SUB-LÍNEA MÁS PEQUEÑA (TU ESTILO ORIGINAL) */
 .hero-subline {
     font-size: 1.8rem;
     font-weight: 700;
@@ -155,7 +278,7 @@ html, body {
     margin-bottom: 15px;
     line-height: 1.1;
 }
-/* SUBTÍTULO MÁS PEQUEÑO Y COMPACTO */
+/* SUBTÍTULO MÁS PEQUEÑO Y COMPACTO (TU ESTILO ORIGINAL) */
 .hero-subtitle {
     font-size: 1.05rem; /* Reducido */
     color: var(--text-secondary);
@@ -163,7 +286,12 @@ html, body {
     opacity: 0.75;
 }
 
-/* BUTTONS */
+/* ============================================ */
+/* ========= FIN DEL NUEVO HERO SECTION ========= */
+/* ============================================ */
+
+
+/* BUTTONS (TU ESTILO ORIGINAL) */
 .cta-button {
     background: linear-gradient(90deg, var(--accent-color) 0%, var(--secondary-accent) 100%);
     color: var(--primary-bg);
@@ -426,12 +554,22 @@ html, body {
 }
 
 @media (max-width: 768px) {
-    .hero-card { padding: 30px 20px; }
+    /* Responsive para el nuevo Hero */
+    .company-logo {
+        flex-direction: column; /* Apila el SVG y el Título */
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .logo-svg {
+        width: 80px;
+        height: 80px;
+    }
     .hero-title { font-size: 3rem; letter-spacing: 3px;}
     .hero-subline { font-size: 1.3rem; }
     .hero-subtitle { font-size: 1rem; }
+    
+    /* Tu CSS responsive original */
     .section-box { padding: 30px 15px; margin: 30px auto; }
-    /* En móviles, se convierten a 1 columna */
     .pillars-grid { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
     .team-card { max-width: 90%; }
