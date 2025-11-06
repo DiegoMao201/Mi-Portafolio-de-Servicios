@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 4.2 (Corrección de URLs de Lottie a enlaces JSON permanentes)
+# VERSIÓN: 5.0 (Edición "Bulletproof")
+# MEJORA: 100% autocontenida. Se eliminan todas las dependencias de red externas
+# (Lottie, requests, URLs de imágenes) para una fiabilidad de demostración total.
+# Las imágenes ahora están embebidas en Base64.
 # ======================================================================================
 
 import streamlit as st
@@ -16,12 +19,9 @@ from fpdf import FPDF
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
-from PIL import Image  # --- MEJORA 4.0: Necesario para el canvas
-import base64  # --- MEJORA 4.0: Necesario para el canvas
+from PIL import Image
+import base64
 from streamlit_drawable_canvas import st_canvas
-from streamlit_lottie import st_lottie # --- MEJORA 4.0: Para animaciones
-import json
-import requests
 import time
 
 # --- CONFIGURACIÓN DE PÁGINA ---
@@ -37,37 +37,30 @@ COLOR_PRIMARIO = "#0D3B66"      # Azul profundo (Confianza, Inteligencia)
 COLOR_SECUNDARIO = "#1A73E8"    # Azul brillante (Tecnología, Innovación)
 COLOR_ACENTO_ROJO = "#F94144"       # Rojo vivo (Acción, Alerta)
 COLOR_ACENTO_VERDE = "#43AA8B"      # Verde (Finanzas, Crecimiento)
-COLOR_ACENTO_NARANJA = "#F8961E" # --- MEJORA 4.0: Naranja (Energía, CTA)
+COLOR_ACENTO_NARANJA = "#F8961E" # Naranja (Energía, CTA)
 COLOR_FONDO = "#FFFFFF"         # Fondo Blanco Limpio
 COLOR_FONDO_SECUNDARIO = "#F7F9FC" # Fondo gris muy claro para secciones
 COLOR_TEXTO = "#2F2F2F"
 COLOR_TEXTO_SECUNDARIO = "#555555"
 
-# --- URLs de LOTTIE (Animaciones) ---
-# --- VERSIÓN CORREGIDA 4.2: URLs de JSON directas y permanentes ---
-LOTTIE_URL_HERO = "https://lottie.host/8c03664d-2e86-416b-810a-b3b0c3f56e9c/DqjY08I50J.json"
-LOTTIE_URL_COMERCIAL = "https://lottie.host/9e0b1c0b-1f1e-4f9e-8c7a-5b1b4d0e3f1c/q4f0jY3k8J.json"
-LOTTIE_URL_OPERACIONES = "https://lottie.host/248174f3-1833-4f10-ab64-01c9a0f622b7/n9VzEO95a9.json"
-LOTTIE_URL_FINANZAS = "https://lottie.host/b04e223c-f832-426b-b461-12a1c0d510e4/m1p5i9PZkR.json"
-LOTTIE_URL_IA = "https://lottie.host/76b251e6-31a2-4e9b-a621-0e1215b3b1e3/OQjROE9l6w.json"
+# --- IMÁGENES EMBEBIDAS EN BASE64 (MEJORA 5.0) ---
+# Se reemplazan todas las URLs externas (imgur) por datos Base64.
+# Esto elimina la dependencia de red y garantiza que la demo NUNCA falle.
 
-@st.cache_data
-def load_lottie(url: str):
-    """Carga una animación Lottie desde una URL."""
-    try:
-        r = requests.get(url)
-        if r.status_code != 200:
-            print(f"Error al descargar Lottie JSON (Código {r.status_code}): {url}")
-            return None
-        return r.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Error de red al descargar Lottie JSON: {e}")
-        return None
-    except json.JSONDecodeError as e:
-        print(f"Error al decodificar Lottie JSON (no es un JSON válido): {e}")
-        return None
+# Placeholders SVG (ligeros y escalables) codificados en Base64.
+# En un proyecto real, aquí irían las fotos reales del equipo.
+IMG_TEAM_DIEGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNy41IDEyLjVMMTcgMTAuNWwyLTVoNGwxLjUgMyI+PC9wYXRoPjwvc3ZnPg=="
+IMG_TEAM_PABLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNyAxMGwxLjUgMS41TD twenty-threeIDEiPjwvcGF0aD48L3N2Zz4="
 
-# --- INYECCIÓN DE CSS GLOBAL (Mejorada) ---
+# Placeholders de productos (SVG Base64)
+IMG_PROD_DISCO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtdGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI5Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIj48L2NpcmNsZT48L3N2Zz4="
+IMG_PROD_TORNILLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOC4zNCA1LjY2YTIuMTIgMi4xMiAwIDAgMSAwIDNMNi4yMSAxOS44M2wtMi0yTDExLjM0IDguNjZhMi4xMiAyLjEyIDAgMCAxIDMtM3oiPjwvcGF0aD48bGluZSB4MT0iMyIgeTE9IjE0IiB4Mj0iMTAiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSI3IiB5MT0iMTIiB4Mj0iMTIiIHkyPSIxNyI+PC9saW5lPjxsaW5lIHgxPSIxMSIgeTE9IjgiIHgyPSIxNiIgeTI9IjEzIj48L2xpbmU+PC9zdmc+"
+IMG_PROD_ELECTRODO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yIDE4SDVhMyAzIDAgMCAwIDMtM1Y5YTMgMyAwIDAgMCAzLTNoM2EzIDMgMCAwIDAgMy0zVjIiPjwvcGF0aD48bGluZSB4MT0iMTIiIHkxPSI2IiB4Mj0iOCIgeTI9IjEwIj48L2xpbmU+PGxpbmUgeDE9IjgiIHkxPSIxNCIgeDI9IjEwIiB5Mj0iMTIiPjwvbGluZT48bGluZSB4MT0iMTYiIHkxPSI0IiB4Mj0iMTQiIHkyPSI2Ij48L2xpbmU+PGxpbmUgeDE9IjUiIHkxPSIyMiIgeDI9IjIiIHkyPSIxOCI+PC9saW5lPjxsaW5lIHgxPSI5IiB5MT0iMTgiIHgyPSI1IiB5Mj0iMTQiPjwvbGluZT48L3N2Zz4="
+IMG_PROD_GAFA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjYuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMTcuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PHBhdGggZD0iTTIgMTUuNWE0LjUgNC41IDAgMCAwIDQuNSA0LjVoMTFBNi41IDYuNSAwIDAgMCAyMiAxNS41Ij48L3BhdGg+PHBhdGggZD0iTTYuNSAxMS41YTQuNSA0LjUgMCAwIDEgMC05bTEuMiAzLjJsMS4zLTEuNW04LjUgNy4zbDEuNSAxLjUiPjwvcGF0aD48L3N2Zz4="
+IMG_PROD_GUANTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxNGExMiAxMiAwIDAgMS04IDhIMWwtMy04VjZhNCA0IDAgMCAxIDQtNGg1LjVMMTAgNyI+PC9wYXRoPjxwYXRoIGQ9Ik0xMS41IDZhNC41IDQuNSAwIDEgMSAwIDlWNmEiPjwvcGF0aD48cGF0aCBkPSJNMTYgNmE0IDQgMCAwIDEgMCA4VjYiPjwvcGF0aD48cGF0aCBkPSJNMTkgNmEzIDMgMCAwIDEgMCA2VjYiPjwvcGF0aD48L3N2Zz4="
+IMG_LOGO_PLACEHOLDER = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBvbHlnb24gcG9pbnRzPSIyMyA3IDIzIDEgMTcgMSAxNiAyIDcgMiA2IDcgNiAyMiA3IDIyIDcgMjMgMTIgMjMgMTIgNyI+PC9wb2x5Z29uPjxwb2x5Z29uIHBvaW50cz0iMTYgMiAxNiA4IDEzIDEwIDEzIDE2IDEwIDE4IDEwIDIyIDcgMjIiPjwvcG9Gx5Z29uPjwvc3ZnPg=="
+
+# --- INYECCIÓN DE CSS GLOBAL (MEJORA 5.0) ---
 st.markdown(f"""
 <style>
     /* --- Ocultar elementos de Streamlit --- */
@@ -116,23 +109,20 @@ st.markdown(f"""
         color: white;
     }}
     
-    /* --- Héroe (Banner Principal) - MEJORA 4.0 --- */
+    /* --- Héroe (Banner Principal) - MEJORA 5.0: Centrado y sin Lottie --- */
     .hero-container {{
         display: flex;
         align-items: center;
         justify-content: center;
+        text-align: center; /* Centrado */
         padding: 6rem 2rem;
         background: linear-gradient(135deg, {COLOR_PRIMARIO} 0%, {COLOR_SECUNDARIO} 100%);
         color: white;
-        min-height: 80vh; /* Más alto */
+        min-height: 70vh; /* Ligeramente más bajo, ya no necesita espacio para Lottie */
     }}
     .hero-content {{
-        max-width: 600px;
+        max-width: 800px; /* Más ancho para el texto */
         animation: fadeIn 1s ease-out;
-    }}
-    .hero-lottie {{
-        max-width: 500px;
-        margin-left: 2rem;
     }}
     .hero-container h1 {{
         font-size: 3.8rem;
@@ -269,7 +259,7 @@ st.markdown(f"""
         display: none; /* Oculta el highlight azul de Streamlit */
     }}
     
-    /* --- Tarjetas de Equipo (Mejoradas) --- */
+    /* --- Tarjetas de Equipo (MEJORA 5.0: Sin img, con SVG Base64) --- */
     .team-card {{
         background-color: {COLOR_FONDO};
         border-radius: 10px;
@@ -283,12 +273,13 @@ st.markdown(f"""
         transform: translateY(-5px);
         box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     }}
-    .team-card img {{
+    .team-card img {{ /* Esto ahora aplica a los SVG base64 */
         width: 150px;
         height: 150px;
         border-radius: 50%;
         border: 5px solid {COLOR_PRIMARIO};
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        background-color: #f0f0f0; /* Color de fondo para el SVG */
     }}
     .team-card h3 {{ color: {COLOR_PRIMARIO}; margin-top: 1rem; }}
     .team-card p {{
@@ -328,17 +319,8 @@ st.markdown(f"""
     /* --- Media Query para móviles --- */
     @media (max-width: 992px) {{
         .hero-container {{
-            flex-direction: column-reverse; /* El Lottie irá arriba en móvil */
             padding-top: 4rem;
             padding-bottom: 4rem;
-        }}
-        .hero-lottie {{
-            margin-left: 0;
-            margin-bottom: 2rem;
-            max-width: 300px;
-        }}
-        .hero-content {{
-            text-align: center;
         }}
         .hero-container h1 {{ font-size: 2.8rem; }}
         .hero-container h3 {{ font-size: 1.3rem; }}
@@ -383,7 +365,7 @@ def render_kpi(title, value, delta=None, delta_color="normal", card_color=""):
     """, unsafe_allow_html=True)
 
 # ======================================================================================
-# --- DATOS DE EJEMPLO PARA LAS DEMOS (EXPANDIDOS - MEJORA 4.0) ---
+# --- DATOS DE EJEMPLO PARA LAS DEMOS (MEJORA 5.0: Imágenes Base64) ---
 # ======================================================================================
 @st.cache_data
 def get_sample_data():
@@ -412,18 +394,18 @@ def get_sample_data():
         'Ventas ($)': [110_000_000, 90_000_000, 75_000_000, 103_000_000]
     })
 
-    # --- Datos de Cotizador (Nuevos) ---
+    # --- Datos de Cotizador (MEJORA 5.0: Imágenes Base64) ---
     data['catalogo_productos'] = pd.DataFrame({
         'Referencia': ['A-101', 'B-202', 'C-303', 'D-404', 'E-505'],
         'Producto': ['Disco Corte 4-1/2"', 'Tornillo Drywall 6x1', 'Electrodo 6013', 'Gafa de Seguridad', 'Guante Vaqueta'],
         'Vlr. Unitario': [1800, 150, 800, 4500, 7000],
         'Stock': [500, 15000, 800, 120, 300],
         'ImagenURL': [
-            "https://i.imgur.com/gY5aM5A.png", # Disco
-            "https://i.imgur.com/tVq1YtW.png", # Tornillo
-            "https://i.imgur.com/8Qp4W2m.png", # Electrodo
-            "https://i.imgur.com/3f0iXjP.png", # Gafa
-            "https://i.imgur.com/7bQyL4B.png"  # Guante (placeholder)
+            IMG_PROD_DISCO,
+            IMG_PROD_TORNILLO,
+            IMG_PROD_ELECTRODO,
+            IMG_PROD_GAFA,
+            IMG_PROD_GUANTE
         ]
     })
 
@@ -482,34 +464,28 @@ if 'otp_code' not in st.session_state:
     st.session_state.otp_code = ""
 
 # ======================================================================================
-# --- CLASES DE GENERACIÓN DE DOCUMENTOS (PDF Y EXCEL) (MEJORADAS 4.0) ---
+# --- CLASES DE GENERACIÓN DE DOCUMENTOS (PDF Y EXCEL) (MEJORA 5.0) ---
 # ======================================================================================
 
 class DemoPDF(FPDF):
-    """Crea un PDF profesional de ejemplo (MEJORADO 4.0 con Logo y Gráficos)."""
+    """Crea un PDF profesional de ejemplo (MEJORA 5.0: Sin logo externo)."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.title = "Documento de Demostración"
-        self.logo_url = "https://i.imgur.com/7bQyL4B.png" # Placeholder - Cambiar por logo real
+        # self.logo_url = "..." # MEJORA 5.0: Eliminado para robustez.
         self.chart_image = None
 
     def header(self):
         self.set_fill_color(int(COLOR_PRIMARIO[1:3], 16), int(COLOR_PRIMARIO[3:5], 16), int(COLOR_PRIMARIO[5:7], 16))
         self.rect(0, 0, self.w, 30, 'F')
         
-        # --- MEJORA 4.0: Añadir logo ---
-        try:
-            # Usamos un placeholder, idealmente el logo estaría local
-            self.image(self.logo_url, 10, 8, 25) 
-        except:
-            pass # Si falla el logo, no se rompe el PDF
-
+        # --- MEJORA 5.0: Logo eliminado, título centrado ---
         self.set_font('Arial', 'B', 20)
         self.set_text_color(255, 255, 255)
-        self.set_xy(40, 10) # Ajustado para el logo
+        self.set_xy(10, 10) 
         self.cell(0, 10, 'GM-DATOVATE', 0, 0, 'L') 
 
-        self.set_xy(40, 18)
+        self.set_xy(10, 18)
         self.set_font('Arial', 'B', 15)
         self.set_text_color(int(COLOR_ACENTO_NARANJA[1:3], 16), int(COLOR_ACENTO_NARANJA[3:5], 16), int(COLOR_ACENTO_NARANJA[5:7], 16))
         self.cell(0, 10, self.title, 0, 1, 'R')
@@ -541,8 +517,7 @@ class DemoPDF(FPDF):
             try:
                 img_width = self.w * width_percent
                 img_x = (self.w - img_width) / 2
-                self.image(chart_image, x=img_x, w=img_width)
-                self.ln(5)
+                self.image(chart_image, x=img_x, w=img_width, type='PNG') # Especificar tipo
             except Exception as e:
                 self.set_text_color(255, 0, 0)
                 self.cell(0, 5, f"Error al renderizar el gráfico: {e}")
@@ -557,30 +532,30 @@ class DemoPDF(FPDF):
         # Calcular anchos de columna (lógica simplificada para robustez)
         page_width = self.w - 2 * self.l_margin
         num_cols = len(df.columns)
-        col_width = page_width / num_cols
-        col_widths = [col_width] * num_cols
         
-        # Anchos fijos para columnas comunes (Mejora de lógica)
-        for i, col_name in enumerate(df.columns):
-            if 'Producto' in str(col_name) or 'Cliente' in str(col_name):
-                col_widths[i] = page_width * 0.35
-            if 'Monto' in str(col_name) or 'Valor' in str(col_name):
-                 col_widths[i] = page_width * 0.2
+        # Lógica de ancho mejorada
+        col_widths = {}
+        for col in df.columns:
+            if 'Producto' in str(col) or 'Cliente' in str(col):
+                col_widths[col] = page_width * 0.35
+            elif 'Monto' in str(col) or 'Valor' in str(col):
+                col_widths[col] = page_width * 0.2
         
-        # Re-distribuir el ancho restante
-        fixed_width = sum(col_widths[i] for i, col_name in enumerate(df.columns) if ('Producto' in str(col_name) or 'Cliente' in str(col_name) or 'Monto' in str(col_name) or 'Valor' in str(col_name)))
-        non_fixed_cols = num_cols - len([c for c in df.columns if ('Producto' in str(c) or 'Cliente' in str(c) or 'Monto' in str(c) or 'Valor' in str(c))])
+        fixed_width = sum(col_widths.values())
+        fixed_cols = len(col_widths)
+        non_fixed_cols = num_cols - fixed_cols
         
+        dynamic_width = 0
         if non_fixed_cols > 0:
-            remaining_width = page_width - fixed_width
-            dynamic_width = remaining_width / non_fixed_cols
-            for i, col_name in enumerate(df.columns):
-                 if not ('Producto' in str(col_name) or 'Cliente' in str(col_name) or 'Monto' in str(col_name) or 'Valor' in str(col_name)):
-                     col_widths[i] = dynamic_width
+            dynamic_width = (page_width - fixed_width) / non_fixed_cols
+            
+        final_widths = []
+        for col in df.columns:
+            final_widths.append(col_widths.get(col, dynamic_width))
 
         # Renderizar cabecera
         for i, header in enumerate(df.columns):
-            self.cell(col_widths[i], 7, str(header), 1, 0, 'C', fill=True)
+            self.cell(final_widths[i], 7, str(header), 1, 0, 'C', fill=True)
         self.ln()
 
         # Renderizar cuerpo
@@ -594,17 +569,17 @@ class DemoPDF(FPDF):
                 item_str = str(item)
                 if isinstance(item, (int, float)):
                     align = 'R'
-                    if "Monto" in df.columns[i] or "Valor" in df.columns[i] or "Total" in df.columns[i] or "Vlr. Unitario" in df.columns[i]:
+                    if "Monto" in df.columns[i] or "Valor" in df.columns[i] or "Total" in df.columns[i] or "Vlr. Unitario" in df.columns[i] or "Ventas" in df.columns[i]:
                         item_str = f"${item:,.0f}"
                     elif "Avance" in df.columns[i]:
-                         item_str = f"{item:,.1f}%"
+                            item_str = f"{item:,.1f}%"
                     else:
                         item_str = f"{item:,.0f}"
                 elif isinstance(item, (datetime, pd.Timestamp, datetime.date)):
-                     item_str = pd.to_datetime(item).strftime('%Y-%m-%d')
-                     align = 'C'
-                     
-                self.cell(col_widths[i], 6, item_str, 1, 0, align, fill=fill)
+                        item_str = pd.to_datetime(item).strftime('%Y-%m-%d')
+                        align = 'C'
+                    
+                self.cell(final_widths[i], 6, item_str, 1, 0, align, fill=fill)
             self.ln()
             fill = not fill
 
@@ -637,7 +612,6 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
     pdf.add_page()
     
     pdf.chapter_title("Información del Cliente")
-    # ... (código de información del cliente sin cambios) ...
     pdf.set_font('Arial', '', 10)
     pdf.cell(40, 6, "Cliente:")
     pdf.set_font('Arial', 'B', 10)
@@ -726,6 +700,8 @@ def generar_demo_excel(df_dict):
         # --- Fin Hoja de Resumen ---
 
         for sheet_name, df in df_dict.items():
+            if df.empty: # No crear hojas para DFs vacíos
+                continue
             df.to_excel(writer, index=False, sheet_name=sheet_name, startrow=1)
             
             ws = writer.sheets[sheet_name]
@@ -751,11 +727,11 @@ def generar_demo_excel(df_dict):
                 
                 # Aplicar formatos de columna
                 if df[col].dtype == 'datetime64[ns]' or df[col].dtype == 'object' and isinstance(df[col].iloc[0], (datetime, datetime.date)):
-                     for c in ws[get_column_letter(i)][2:]: # [2:] para saltar cabecera y título
-                         c.number_format = date_format
+                        for c in ws[get_column_letter(i)][2:]: # [2:] para saltar cabecera y título
+                            c.number_format = date_format
                 if 'Monto' in col or 'Valor' in col or 'Total' in col or 'Vlr. Unitario' in col or 'Ventas' in col:
-                     for c in ws[get_column_letter(i)][2:]:
-                         c.number_format = currency_format
+                        for c in ws[get_column_letter(i)][2:]:
+                            c.number_format = currency_format
 
             # Título
             ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(df.columns))
@@ -768,20 +744,16 @@ def generar_demo_excel(df_dict):
 
 
 # ======================================================================================
-# --- FUNCIONES DE RENDERIZADO DE PÁGINAS (MEJORADAS 4.0) ---
+# --- FUNCIONES DE RENDERIZADO DE PÁGINAS (MEJORA 5.0) ---
 # ======================================================================================
 
 def render_pagina_inicio():
     """Renderiza la página de bienvenida, el pitch de valor y el equipo."""
     
-    # --- Sección Héroe (MEJORA 4.0) ---
+    # --- Sección Héroe (MEJORA 5.0: Centrado) ---
     with st.container():
-        st.markdown('<div class="hero-container">', unsafe_allow_html=True)
-        
-        col1, col2 = st.columns([1.2, 1]) # Columnas para texto y Lottie
-        
-        with col1:
-            st.markdown(f"""
+        st.markdown(f"""
+        <div class="hero-container">
             <div class="hero-content">
                 <h1>El Sistema Operativo de su Empresa, Impulsado por Datos.</h1>
                 <h3>Deje de reaccionar. Empiece a predecir.</h3>
@@ -795,15 +767,8 @@ def render_pagina_inicio():
                     Solicitar Consulta Estratégica
                 </a>
             </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown('<div class="hero-lottie">', unsafe_allow_html=True)
-            # --- CORRECCIÓN 4.2 ---
-            st_lottie(load_lottie(LOTTIE_URL_HERO), height=400, key="lottie_hero")
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-        st.markdown('</div>', unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
 
     # --- Sección de Servicios/Pilares (MEJORA 4.0) ---
@@ -863,7 +828,7 @@ def render_pagina_inicio():
             
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- Sección "Quiénes Somos" ---
+    # --- Sección "Quiénes Somos" (MEJORA 5.0: Imágenes Base64) ---
     with st.container():
         st.markdown('<div class="section-container section-container-dark">', unsafe_allow_html=True)
         st.markdown("<h2 style='text-align: center; border: none; margin-bottom: 3rem;'>Nuestros Arquitectos de Soluciones</h2>", unsafe_allow_html=True)
@@ -873,7 +838,7 @@ def render_pagina_inicio():
         with col_team1:
             st.markdown(f"""
             <div class="team-card">
-                <img src="https://i.imgur.com/7bQyL4B.png" alt="Foto de Diego Garcia">
+                <img src="{IMG_TEAM_DIEGO}" alt="Foto de Diego Garcia">
                 <h3>Diego Mauricio García</h3>
                 <p>Arquitecto de Datos y Desarrollador Líder</p>
                 <span style="font-size: 0.9rem; color: {COLOR_TEXTO_SECUNDARIO};">
@@ -887,7 +852,7 @@ def render_pagina_inicio():
         with col_team2:
             st.markdown(f"""
             <div class="team-card">
-                <img src="https://i.imgur.com/kF2bWpA.png" alt="Foto de Pablo Mafla">
+                <img src="{IMG_TEAM_PABLO}" alt="Foto de Pablo Mafla">
                 <h3>Pablo Cesar Mafla</h3>
                 <p>Estratega Comercial y de Negocios</p>
                 <span style="font-size: 0.9rem; color: {COLOR_TEXTO_SECUNDARIO};">
@@ -901,14 +866,10 @@ def render_pagina_inicio():
         st.markdown('</div>', unsafe_allow_html=True)
 
 def render_pagina_comercial():
-    """Demo de la Suite de Inteligencia Comercial (MEJORA 4.0 INTERACTIVA)."""
+    """Demo de la Suite de Inteligencia Comercial (MEJORA 5.0: Sin Lottie)."""
     
-    col_lottie, col_title = st.columns([1, 4])
-    with col_lottie:
-        # --- CORRECCIÓN 4.2 ---
-        st_lottie(load_lottie(LOTTIE_URL_COMERCIAL), height=100, key="lottie_com")
-    with col_title:
-        st.markdown("Deje que sus datos le digan cómo vender más. Automatizamos la prospección, la cotización y el análisis de rendimiento.")
+    st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🧠 Inteligencia Comercial</h2>", unsafe_allow_html=True)
+    st.markdown("Deje que sus datos le digan cómo vender más. Automatizamos la prospección, la cotización y el análisis de rendimiento.")
     st.divider()
     
     tab1, tab2, tab3 = st.tabs([
@@ -944,6 +905,10 @@ def render_pagina_comercial():
                 (df_ventas['Vendedor'].isin(vendedores_filtro)) &
                 (df_ventas['Region'].isin(regiones_filtro))
             ]
+            
+            if df_filtrada.empty:
+                st.warning("No hay datos para los filtros seleccionados.")
+                return
 
             # --- MEJORA 4.0: KPIs Personalizados ---
             st.markdown("##### KPIs Generales")
@@ -1055,6 +1020,7 @@ def render_pagina_comercial():
                     col = product_cols[i % num_cols]
                     with col:
                         with st.container(border=True):
+                            # MEJORA 5.0: st.image ahora usa Base64
                             st.image(row['ImagenURL'], use_column_width=True)
                             st.markdown(f"**{row['Producto']}**")
                             st.markdown(f"<span style='color: {COLOR_PRIMARIO}; font-size: 1.1rem; font-weight: bold;'>${row['Vlr. Unitario']:,.0f}</span>", unsafe_allow_html=True)
@@ -1127,14 +1093,10 @@ def render_pagina_comercial():
 
 
 def render_pagina_operaciones():
-    """Demo de la Suite de Operaciones y Logística (MEJORA 4.0 INTERACTIVA)."""
+    """Demo de la Suite de Operaciones y Logística (MEJORA 5.0: Sin Lottie)."""
     
-    col_lottie, col_title = st.columns([1, 4])
-    with col_lottie:
-        # --- CORRECCIÓN 4.2 ---
-        st_lottie(load_lottie(LOTTIE_URL_OPERACIONES), height=100, key="lottie_ops")
-    with col_title:
-        st.markdown("Automatización de la cadena de suministro, desde el proveedor hasta la bodega, con inteligencia de datos.")
+    st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🏭 Operaciones y Logística</h2>", unsafe_allow_html=True)
+    st.markdown("Automatización de la cadena de suministro, desde el proveedor hasta la bodega, con inteligencia de datos.")
     st.divider()
     
     tab1, tab2, tab3 = st.tabs([
@@ -1174,7 +1136,7 @@ def render_pagina_operaciones():
             # (Simulación simple: Traslado=0, Compra = max(0, Necesidad - (Stock + Tránsito)))
             # Una lógica real buscaría en otras bodegas para "Sugerencia Traslado"
             edited_df['Sugerencia Traslado'] = 0 # Simulación
-            edited_df['Sugerencia Compra'] = (edited_df['Necesidad Real'] - (edited_df['Stock (Total)'] + edited_df['Stock Tránsito'])).clip(lower=0)
+            edited_df['Sugerencia Compra'] = (edited_df['Necesidad Real'] - (edited_df['Stock (Total)'] + edited_df['Stock Tránsito'])).clip(lower=0).astype(int)
             
             # Si los datos cambiaron, st.data_editor ya tiene el nuevo estado.
             # Volvemos a mostrarlo con el estilo aplicado sobre el DF editado.
@@ -1188,6 +1150,7 @@ def render_pagina_operaciones():
             # --- Botones de acción (Funcionales, basados en el DF editado) ---
             st.subheader("Generación de Órdenes (Demo)")
             df_orden = edited_df[edited_df['Sugerencia Compra'] > 0]
+            df_traslado = edited_df[edited_df['Sugerencia Traslado'] > 0]
             
             pdf_data = generar_demo_pdf(
                 df_orden[['SKU', 'Producto', 'Sugerencia Compra']],
@@ -1196,18 +1159,20 @@ def render_pagina_operaciones():
             )
             excel_data = generar_demo_excel({
                 "Orden_de_Compra": df_orden,
-                "Detalle_Traslados": edited_df[edited_df['Sugerencia Traslado'] > 0],
+                "Detalle_Traslados": df_traslado,
                 "Reporte_Completo": edited_df
             })
 
             c1, c2 = st.columns(2)
             c1.download_button(
                 label="📄 Descargar Orden de Compra PDF (Demo)", data=pdf_data,
-                file_name="Demo_Orden_de_Compra.pdf", mime="application/pdf", use_container_width=True, type="primary"
+                file_name="Demo_Orden_de_Compra.pdf", mime="application/pdf", use_container_width=True, type="primary",
+                disabled=df_orden.empty
             )
             c2.download_button(
                 label="📊 Descargar Reporte Excel (Demo)", data=excel_data,
-                file_name="Demo_Reporte_Abastecimiento.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True
+                file_name="Demo_Reporte_Abastecimiento.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True,
+                disabled=edited_df.empty
             )
 
     # --- DEMO 2: CONTROL DE INVENTARIO MÓVIL ---
@@ -1249,7 +1214,7 @@ def render_pagina_operaciones():
         col1, col2 = st.columns(2)
         
         with col1:
-             st.graphviz_chart(f"""
+            st.graphviz_chart(f"""
                 digraph "ETL Process" {{
                     node [shape=box, style="filled,rounded", fontname="Arial", fontsize=12];
                     graph [bgcolor="transparent"];
@@ -1296,14 +1261,10 @@ def render_pagina_operaciones():
 
 
 def render_pagina_finanzas():
-    """Demo de la Suite Financiera (MEJORA 4.0 INTERACTIVA)."""
+    """Demo de la Suite Financiera (MEJORA 5.0: Sin Lottie)."""
     
-    col_lottie, col_title = st.columns([1, 4])
-    with col_lottie:
-        # --- CORRECCIÓN 4.2 ---
-        st_lottie(load_lottie(LOTTIE_URL_FINANZAS), height=100, key="lottie_fin")
-    with col_title:
-        st.markdown("Controle el flujo de caja, automatice la contabilidad y gestione el riesgo de cartera como nunca antes.")
+    st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🏦 Finanzas y Tesorería</h2>", unsafe_allow_html=True)
+    st.markdown("Controle el flujo de caja, automatice la contabilidad y gestione el riesgo de cartera como nunca antes.")
     st.divider()
     
     tab1, tab2, tab3 = st.tabs([
@@ -1394,10 +1355,10 @@ def render_pagina_finanzas():
             # --- MEJORA 4.0: Cuadre de caja interactivo ---
             # Usamos st.session_state para inicializar los valores del data_editor
             if 'cuadre_data' not in st.session_state:
-                 st.session_state.cuadre_data = pd.DataFrame({
-                    'Tipo': ['Tarjetas', 'Consignaciones', 'Gastos', 'Efectivo Entregado'],
-                    'Valor': [2500000, 1500000, 200000, 800000]
-                })
+                    st.session_state.cuadre_data = pd.DataFrame({
+                        'Tipo': ['Tarjetas', 'Consignaciones', 'Gastos', 'Efectivo Entregado'],
+                        'Valor': [2500000, 1500000, 200000, 800000]
+                    })
 
             edited_cuadre = st.data_editor(
                 st.session_state.cuadre_data,
@@ -1462,14 +1423,10 @@ def render_pagina_finanzas():
             )
 
 def render_pagina_integracion():
-    """Demo de la Suite de Integración (MEJORA 4.0 INTERACTIVA)."""
+    """Demo de la Suite de Integración (MEJORA 5.0: Sin Lottie)."""
     
-    col_lottie, col_title = st.columns([1, 4])
-    with col_lottie:
-        # --- CORRECCIÓN 4.2 ---
-        st_lottie(load_lottie(LOTTIE_URL_IA), height=100, key="lottie_ia")
-    with col_title:
-        st.markdown("Conectamos todos los procesos, desde la vinculación de un cliente hasta el servicio post-venta con IA.")
+    st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🤖 Integración y Futuro (IA)</h2>", unsafe_allow_html=True)
+    st.markdown("Conectamos todos los procesos, desde la vinculación de un cliente hasta el servicio post-venta con IA.")
     st.divider()
 
     tab1, tab2 = st.tabs([
@@ -1554,16 +1511,15 @@ def render_pagina_integracion():
                 if "deuda" in low_msg or "cartera" in low_msg or "factura" in low_msg:
                     return (
                         "¡Hola! Soy **DATO** 🕵️‍♂️. Consulté tu estado de cuenta (simulación) y veo lo siguiente:\n\n"
-                        "1.  **Estado de Cartera:** Tienes una deuda vencida de **$1,250,000**.\n"
-                        "2.  **Factura Vencida:** La factura FV-901 por $1,250,000 tiene 45 días de vencimiento.\n\n"
+                        "1.  **Estado de Cartera:** Tienes una deuda vencida de **$1,200,000**.\n"
+                        "2.  **Factura Vencida:** La factura FV-901 por $1,200,000 tiene 45 días de vencimiento.\n\n"
                         "¿Te gustaría que te envíe el estado de cuenta a tu correo?"
                     )
                 elif "stock" in low_msg or "inventario" in low_msg or "disco" in low_msg or "tornillo" in low_msg:
                     return (
                         "¡Claro! Consulté nuestro inventario en tiempo real (simulación):\n\n"
-                        "* **'Disco de Corte Inox' (Ref: A-101):**\n"
-                        "    * Bodega CEDI: **5,200** unidades\n"
-                        "    * Tienda Pereira: **450** unidades\n"
+                        "* **'Disco Corte 4-1/2\"' (Ref: A-101):**\n"
+                        "    * Bodega CEDI: **500** unidades\n"
                         "* **'Tornillo Drywall 6x1' (Ref: B-202):**\n"
                         "    * Bodega CEDI: **15,000** unidades\n"
                         "    * En Tránsito: **5,000** unidades\n\n"
@@ -1674,7 +1630,7 @@ tab_com, tab_ops, tab_fin, tab_int = st.tabs([
 with tab_com:
     render_pagina_comercial()
 
-with tab_OS:
+with tab_ops: # <-- CORRECCIÓN 5.0: Arreglado el bug (antes 'tab_OS')
     render_pagina_operaciones()
 
 with tab_fin:
