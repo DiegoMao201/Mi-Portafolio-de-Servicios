@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 5.0 (Edición "Bulletproof")
-# MEJORA: 100% autocontenida. Se eliminan todas las dependencias de red externas
-# (Lottie, requests, URLs de imágenes) para una fiabilidad de demostración total.
-# Las imágenes ahora están embebidas en Base64.
+# VERSIÓN: 6.0 (Edición "Estabilidad Total y Estética Móvil")
+# MEJORA:
+# 1. (BUG FIX) Corregido `min_val` por `min_value` en todo el st.column_config.
+# 2. (CSS FIX) Añadida regla para forzar el fondo claro (evita "modo combinado" en móviles).
+# 3. (CSS FIX) Añadida regla @media query para forzar el apilado de st.columns en
+#    dispositivos móviles dentro de las pestañas, solucionando el problema de
+#    "espacios pequeños".
 # ======================================================================================
 
 import streamlit as st
@@ -60,7 +63,7 @@ IMG_PROD_GAFA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vc
 IMG_PROD_GUANTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxNGExMiAxMiAwIDAgMS04IDhIMWwtMy04VjZhNCA0IDAgMCAxIDQtNGg1LjVMMTAgNyI+PC9wYXRoPjxwYXRoIGQ9Ik0xMS41IDZhNC41IDQuNSAwIDEgMSAwIDlWNmEiPjwvcGF0aD48cGF0aCBkPSJNMTYgNmE0IDQgMCAwIDEgMCA4VjYiPjwvcGF0aD48cGF0aCBkPSJNMTkgNmEzIDMgMCAwIDEgMCA2VjYiPjwvcGF0aD48L3N2Zz4="
 IMG_LOGO_PLACEHOLDER = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBvbHlnb24gcG9pbnRzPSIyMyA3IDIzIDEgMTcgMSAxNiAyIDcgMiA2IDcgNiAyMiA3IDIyIDcgMjMgMTIgMjMgMTIgNyI+PC9wb2x5Z29uPjxwb2x5Z29uIHBvaW50cz0iMTYgMiAxNiA4IDEzIDEwIDEzIDE2IDEwIDE4IDEwIDIyIDcgMjIiPjwvcG9Gx5Z29uPjwvc3ZnPg=="
 
-# --- INYECCIÓN DE CSS GLOBAL (MEJORA 5.0) ---
+# --- INYECCIÓN DE CSS GLOBAL (MEJORA 6.0) ---
 st.markdown(f"""
 <style>
     /* --- Ocultar elementos de Streamlit --- */
@@ -79,8 +82,13 @@ st.markdown(f"""
     .main .block-container {{
         padding: 0rem;
     }}
+    
+    /* MEJORA 6.0: Forzar Fondo Claro (Evita "modo combinado" en móviles) */
     .stApp {{
-        background-color: {COLOR_FONDO};
+        background-color: {COLOR_FONDO} !important;
+    }}
+    body {{
+        background-color: {COLOR_FONDO} !important;
     }}
 
     /* --- Animaciones (MEJORA 4.0) --- */
@@ -168,7 +176,7 @@ st.markdown(f"""
         border-radius: 10px;
         padding: 2rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        height: 100%;
+        height: 100%; /* Esta es la clave para columnas iguales */
         transition: all 0.3s ease; /* Efecto hover */
     }}
     .service-card:hover {{
@@ -268,6 +276,7 @@ st.markdown(f"""
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         border: 1px solid #E0E0E0;
         transition: all 0.3s ease;
+        height: 100%; /* Clave para columnas iguales */
     }}
     .team-card:hover {{
         transform: translateY(-5px);
@@ -327,8 +336,34 @@ st.markdown(f"""
     }}
     @media (max-width: 768px) {{
         .hero-container h1 {{ font-size: 2.2rem; }}
-        .section-container {{ padding: 2rem 1rem; }}
+        .section-container {{ padding: 2rem 1.5rem; }} /* Más espacio lateral */
         .service-card, .team-card {{ margin-bottom: 1rem; }}
+        
+        /* * MEJORA 6.0: Forzar apilado de columnas en móviles.
+         * Esto soluciona el problema de "espacios pequeños" en las demos.
+         * Se aplica a las columnas dentro de las pestañas y el formulario de contacto.
+        */
+        .stTabs [data-testid="stHorizontalBlock"],
+        .contact-form-container [data-testid="stHorizontalBlock"] {
+            flex-direction: column !important;
+            flex-wrap: nowrap !important;
+        }
+        
+        /* Asegurar que las columnas apiladas ocupen todo el ancho */
+        .stTabs [data-testid="stHorizontalBlock"] > div[data-testid="stVerticalBlock"],
+        .contact-form-container [data-testid="stHorizontalBlock"] > div[data-testid="stVerticalBlock"] {
+            width: 100% !important;
+            margin-bottom: 1rem; /* Añadir espacio entre elementos apilados */
+        }
+        
+        /* Ajustar el canvas de firma en móvil */
+        .stCanvas > canvas {{
+            width: 100% !important;
+            height: 150px !important;
+        }}
+        .stCanvas {{
+            width: 100% !important;
+        }}
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -744,7 +779,7 @@ def generar_demo_excel(df_dict):
 
 
 # ======================================================================================
-# --- FUNCIONES DE RENDERIZADO DE PÁGINAS (MEJORA 5.0) ---
+# --- FUNCIONES DE RENDERIZADO DE PÁGINAS (MEJORA 6.0) ---
 # ======================================================================================
 
 def render_pagina_inicio():
@@ -866,7 +901,7 @@ def render_pagina_inicio():
         st.markdown('</div>', unsafe_allow_html=True)
 
 def render_pagina_comercial():
-    """Demo de la Suite de Inteligencia Comercial (MEJORA 5.0: Sin Lottie)."""
+    """Demo de la Suite de Inteligencia Comercial (MEJORA 6.0: Bug `min_value` corregido)."""
     
     st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🧠 Inteligencia Comercial</h2>", unsafe_allow_html=True)
     st.markdown("Deje que sus datos le digan cómo vender más. Automatizamos la prospección, la cotización y el análisis de rendimiento.")
@@ -1053,7 +1088,10 @@ def render_pagina_comercial():
                     edited_cart = st.data_editor(
                         st.session_state.cart,
                         column_config={
-                            "Cantidad": st.column_config.NumberColumn(min_val=1, step=1),
+                            # ======================================================
+                            # --- CORRECCIÓN 6.0: min_val -> min_value ---
+                            # ======================================================
+                            "Cantidad": st.column_config.NumberColumn(min_value=1, step=1),
                             "Total": st.column_config.NumberColumn(format="$ %d", disabled=True),
                             "Vlr. Unitario": st.column_config.NumberColumn(format="$ %d", disabled=True),
                             "Referencia": st.column_config.Column(disabled=True),
@@ -1093,7 +1131,7 @@ def render_pagina_comercial():
 
 
 def render_pagina_operaciones():
-    """Demo de la Suite de Operaciones y Logística (MEJORA 5.0: Sin Lottie)."""
+    """Demo de la Suite de Operaciones y Logística (MEJORA 6.0: Bug `min_value` corregido)."""
     
     st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🏭 Operaciones y Logística</h2>", unsafe_allow_html=True)
     st.markdown("Automatización de la cadena de suministro, desde el proveedor hasta la bodega, con inteligencia de datos.")
@@ -1121,9 +1159,12 @@ def render_pagina_operaciones():
                 column_config={
                     "SKU": st.column_config.Column(disabled=True),
                     "Producto": st.column_config.Column(width="large", disabled=True),
-                    "Stock (Total)": st.column_config.NumberColumn(min_val=0, step=10),
-                    "Stock Tránsito": st.column_config.NumberColumn(min_val=0, step=10),
-                    "Necesidad Real": st.column_config.NumberColumn(min_val=0, step=10),
+                    # ======================================================
+                    # --- CORRECCIÓN 6.0: min_val -> min_value ---
+                    # ======================================================
+                    "Stock (Total)": st.column_config.NumberColumn(min_value=0, step=10),
+                    "Stock Tránsito": st.column_config.NumberColumn(min_value=0, step=10),
+                    "Necesidad Real": st.column_config.NumberColumn(min_value=0, step=10),
                     "Sugerencia Traslado": st.column_config.NumberColumn(format="%d", disabled=True),
                     "Sugerencia Compra": st.column_config.NumberColumn(format="%d", disabled=True)
                 },
@@ -1261,7 +1302,7 @@ def render_pagina_operaciones():
 
 
 def render_pagina_finanzas():
-    """Demo de la Suite Financiera (MEJORA 5.0: Sin Lottie)."""
+    """Demo de la Suite Financiera (MEJORA 6.0: Bug `min_value` corregido)."""
     
     st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🏦 Finanzas y Tesorería</h2>", unsafe_allow_html=True)
     st.markdown("Controle el flujo de caja, automatice la contabilidad y gestione el riesgo de cartera como nunca antes.")
@@ -1364,7 +1405,10 @@ def render_pagina_finanzas():
                 st.session_state.cuadre_data,
                 column_config={
                     "Tipo": st.column_config.Column(disabled=True),
-                    "Valor": st.column_config.NumberColumn(format="$ %d", min_val=0, step=10000)
+                    # ======================================================
+                    # --- CORRECCIÓN 6.0: min_val -> min_value ---
+                    # ======================================================
+                    "Valor": st.column_config.NumberColumn(format="$ %d", min_value=0, step=10000)
                 },
                 use_container_width=True,
                 hide_index=True,
@@ -1451,6 +1495,7 @@ def render_pagina_integracion():
                 st.text_input("C.C. del Representante*", "1.234.567.890", key="demo_cc")
                 st.info("Por favor, firme en el recuadro:")
                 
+                # El CSS en MEJORA 6.0 hace que este canvas sea responsivo
                 st_canvas(
                     stroke_width=3, stroke_color="#000000",
                     background_color="#FFFFFF", height=130, width=400,
