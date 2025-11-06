@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 6.0 (Edición "Estabilidad Total y Estética Móvil")
+# VERSIÓN: 6.1 (Edición "Estabilidad Total y Estética Móvil")
 # MEJORA:
 # 1. (BUG FIX) Corregido `min_val` por `min_value` en todo el st.column_config.
 # 2. (CSS FIX) Añadida regla para forzar el fondo claro (evita "modo combinado" en móviles).
 # 3. (CSS FIX) Añadida regla @media query para forzar el apilado de st.columns en
 #    dispositivos móviles dentro de las pestañas, solucionando el problema de
 #    "espacios pequeños".
+# 4. (BUG FIX 6.1) Corregido error 'NameError' en CSS de media query al escapar
+#    llaves ({}) en f-string.
 # ======================================================================================
 
 import streamlit as st
@@ -342,21 +344,28 @@ st.markdown(f"""
         /* * MEJORA 6.0: Forzar apilado de columnas en móviles.
          * Esto soluciona el problema de "espacios pequeños" en las demos.
          * Se aplica a las columnas dentro de las pestañas y el formulario de contacto.
-        */
+         */
+        
+        /* ====================================================== */
+        /* --- CORRECCIÓN 6.1: Se escapan las llaves { y } --- */
+        /* ====================================================== */
         .stTabs [data-testid="stHorizontalBlock"],
-        .contact-form-container [data-testid="stHorizontalBlock"] {
+        .contact-form-container [data-testid="stHorizontalBlock"] {{
             flex-direction: column !important;
             flex-wrap: nowrap !important;
-        }
+        }}
         
         /* Asegurar que las columnas apiladas ocupen todo el ancho */
+        /* ====================================================== */
+        /* --- CORRECCIÓN 6.1: Se escapan las llaves { y } --- */
+        /* ====================================================== */
         .stTabs [data-testid="stHorizontalBlock"] > div[data-testid="stVerticalBlock"],
-        .contact-form-container [data-testid="stHorizontalBlock"] > div[data-testid="stVerticalBlock"] {
+        .contact-form-container [data-testid="stHorizontalBlock"] > div[data-testid="stVerticalBlock"] {{
             width: 100% !important;
             margin-bottom: 1rem; /* Añadir espacio entre elementos apilados */
-        }
+        }}
         
-        /* Ajustar el canvas de firma en móvil */
+        /* Ajustar el canvas de firma en móvil (Este ya estaba bien) */
         .stCanvas > canvas {{
             width: 100% !important;
             height: 150px !important;
@@ -613,7 +622,7 @@ class DemoPDF(FPDF):
                 elif isinstance(item, (datetime, pd.Timestamp, datetime.date)):
                         item_str = pd.to_datetime(item).strftime('%Y-%m-%d')
                         align = 'C'
-                    
+                        
                 self.cell(final_widths[i], 6, item_str, 1, 0, align, fill=fill)
             self.ln()
             fill = not fill
@@ -903,7 +912,7 @@ def render_pagina_inicio():
 def render_pagina_comercial():
     """Demo de la Suite de Inteligencia Comercial (MEJORA 6.0: Bug `min_value` corregido)."""
     
-    st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🧠 Inteligencia Comercial</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='color: {COLOR_PRIMARIO};'>🧠 Inteligencia Comercial</h2>", unsafe_allow_html=True)
     st.markdown("Deje que sus datos le digan cómo vender más. Automatizamos la prospección, la cotización y el análisis de rendimiento.")
     st.divider()
     
@@ -1133,7 +1142,7 @@ def render_pagina_comercial():
 def render_pagina_operaciones():
     """Demo de la Suite de Operaciones y Logística (MEJORA 6.0: Bug `min_value` corregido)."""
     
-    st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🏭 Operaciones y Logística</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='color: {COLOR_PRIMARIO};'>🏭 Operaciones y Logística</h2>", unsafe_allow_html=True)
     st.markdown("Automatización de la cadena de suministro, desde el proveedor hasta la bodega, con inteligencia de datos.")
     st.divider()
     
@@ -1304,7 +1313,7 @@ def render_pagina_operaciones():
 def render_pagina_finanzas():
     """Demo de la Suite Financiera (MEJORA 6.0: Bug `min_value` corregido)."""
     
-    st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🏦 Finanzas y Tesorería</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='color: {COLOR_PRIMARIO};'>🏦 Finanzas y Tesorería</h2>", unsafe_allow_html=True)
     st.markdown("Controle el flujo de caja, automatice la contabilidad y gestione el riesgo de cartera como nunca antes.")
     st.divider()
     
@@ -1469,7 +1478,7 @@ def render_pagina_finanzas():
 def render_pagina_integracion():
     """Demo de la Suite de Integración (MEJORA 5.0: Sin Lottie)."""
     
-    st.markdown("<h2 style='color: {COLOR_PRIMARIO};'>🤖 Integración y Futuro (IA)</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='color: {COLOR_PRIMARIO};'>🤖 Integración y Futuro (IA)</h2>", unsafe_allow_html=True)
     st.markdown("Conectamos todos los procesos, desde la vinculación de un cliente hasta el servicio post-venta con IA.")
     st.divider()
 
