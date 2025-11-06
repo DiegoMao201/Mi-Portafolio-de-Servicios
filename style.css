@@ -2,7 +2,7 @@
 :root {
     --primary-bg: #0B0D17;
     --secondary-bg: #1A1D29;
-    --card-bg: rgba(18, 28, 38, 0.96); 
+    --card-bg: rgba(18, 28, 38, 0.96); /* Más oscuro para profesionalismo */
     --accent-color: #00F5FF;
     --secondary-accent: #64FFDA;
     --text-primary: #FFFFFF;
@@ -29,7 +29,7 @@ html, body {
 
 /* LAYOUT GENERAL */
 .container {
-    max-width: 1200px; 
+    max-width: 1200px; /* Aumentado para el diseño de 4 columnas */
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -104,7 +104,7 @@ html, body {
 }
 .hero-card {
     text-align: center;
-    max-width: 900px;
+    max-width: 1000px;
     padding: 50px 40px;
     background: var(--card-bg);
     border-radius: 20px;
@@ -112,53 +112,68 @@ html, body {
     box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.7), 0 0 20px var(--accent-color) inset;
     transition: all 0.5s;
 }
-
-/* ESTILO DEL TITULAR DE LA COMPAÑÍA EN EL HERO (SEGUN IMAGEN) */
-.company-tagline {
-    font-size: 3rem; 
+.hero-tagline {
+    font-size: 0.9rem; /* Reducido */
+    font-weight: 600;
+    color: var(--secondary-accent);
+    margin-bottom: 10px; /* Reducido */
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+/* TITULO IMPONENTE: DATOVATE */
+.hero-title {
+    font-size: 5.5rem; /* Aumento drástico */
     font-weight: 900;
     color: #fff;
-    margin-bottom: 25px;
-    letter-spacing: 5px;
+    margin-bottom: 10px; /* Reducido */
+    letter-spacing: 8px; /* Espaciado para impacto */
     text-transform: uppercase;
-    opacity: 0.2; /* Opacidad baja para el efecto "back-glow" */
+    background: linear-gradient(90deg, #00f5ff 0%, #64ffda 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     
-    /* Efecto de Glow */
+    /* Efecto Glow 3D Extremo */
     text-shadow: 
         0 0 5px var(--accent-color)77, 
-        0 0 15px var(--accent-color)33;
+        0 0 15px var(--accent-color)99, 
+        0 0 30px var(--accent-color)aa, 
+        0 0 45px var(--secondary-accent)aa;
+    
+    animation: glow-pulse 2s ease-in-out infinite alternate;
 }
-
-/* ESTILO DEL SLOGAN PRINCIPAL (SEGUN IMAGEN) */
-.hero-main-slogan {
-    font-size: 2.7rem;
+@keyframes glow-pulse {
+    from { text-shadow: 0 0 10px var(--accent-color)aa, 0 0 20px var(--secondary-accent)88; }
+    to { text-shadow: 0 0 20px var(--accent-color)cc, 0 0 40px var(--secondary-accent)aa; }
+}
+/* SUB-LÍNEA MÁS PEQUEÑA */
+.hero-subline {
+    font-size: 1.8rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 20px;
-    line-height: 1.3;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    margin-bottom: 15px;
+    line-height: 1.1;
 }
-
-/* ESTILO DEL SUBTÍTULO DESCRIPTIVO (SEGUN IMAGEN) */
-.hero-subtitle-desc {
-    font-size: 1.15rem;
+/* SUBTÍTULO MÁS PEQUEÑO Y COMPACTO */
+.hero-subtitle {
+    font-size: 1.05rem; /* Reducido */
     color: var(--text-secondary);
-    margin-bottom: 40px;
-    opacity: 0.85;
+    margin-bottom: 30px; /* Reducido */
+    opacity: 0.75;
 }
-
 
 /* BUTTONS */
 .cta-button {
     background: linear-gradient(90deg, var(--accent-color) 0%, var(--secondary-accent) 100%);
-    color: var(--primary-bg) !important; /* Asegurar color oscuro del texto */
+    color: var(--primary-bg);
     border-radius: 50px;
-    padding: 18px 45px; /* Más grande que el resto */
-    font-size: 1.25rem;
+    padding: 15px 40px;
+    font-size: 1.1rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 0 25px var(--accent-color)55, 0 0 10px var(--secondary-accent)aa;
+    box-shadow: 0 0 20px var(--accent-color)55;
     border: none;
     transition: all 0.3s;
     display: inline-block;
@@ -166,8 +181,27 @@ html, body {
 }
 .cta-button:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 40px var(--accent-color)99;
-    color: var(--primary-bg) !important;
+    box-shadow: 0 0 35px var(--accent-color)77;
+    color: var(--primary-bg);
+}
+.cta-button-secondary {
+    all: unset;
+    cursor: pointer;
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: 2px solid var(--accent-color);
+    border-radius: 50px;
+    padding: 12px 30px;
+    transition: all 0.3s;
+    display: inline-block;
+    text-shadow: 0 0 5px var(--accent-color);
+}
+.cta-button-secondary:hover {
+    background: var(--accent-color);
+    color: var(--primary-bg);
+    box-shadow: 0 0 15px var(--accent-color);
+    text-shadow: none;
 }
 
 /* SECTION GENERAL STYLES */
@@ -248,13 +282,14 @@ html, body {
     opacity: 0.8;
 }
 
-/* PILARES DE VALOR (PILLARS GRID) - DISEÑO DE 4 COLUMNAS EN ESCRITORIO */
+/* PILARES DE VALOR (PILLARS GRID) */
 .pillars-grid {
+    /* FORZANDO 4 COLUMNAS IGUALES EN ESCRITORIO */
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px; 
+    gap: 20px; /* Reducido para que quepan */
     margin-top: 40px;
-    justify-content: center;
+    justify-content: center; /* Asegura el centrado si el contenedor es más grande */
 }
 .pillar-card {
     background: var(--secondary-bg);
@@ -384,19 +419,17 @@ html, body {
 }
 
 @media (max-width: 992px) {
-    .company-tagline { font-size: 2.2rem; }
-    .hero-main-slogan { font-size: 2rem; }
-    .hero-subtitle-desc { font-size: 1.05rem; }
-    .cta-button { font-size: 1.1rem; padding: 15px 35px; }
+    .hero-title { font-size: 4rem; letter-spacing: 5px; }
+    .hero-subline { font-size: 1.5rem; }
     .section-title { font-size: 2rem; }
     .team-grid { flex-direction: column; align-items: center; }
 }
 
 @media (max-width: 768px) {
     .hero-card { padding: 30px 20px; }
-    .company-tagline { font-size: 1.8rem; letter-spacing: 3px; }
-    .hero-main-slogan { font-size: 1.6rem; }
-    .hero-subtitle-desc { font-size: 1rem; }
+    .hero-title { font-size: 3rem; letter-spacing: 3px;}
+    .hero-subline { font-size: 1.3rem; }
+    .hero-subtitle { font-size: 1rem; }
     .section-box { padding: 30px 15px; margin: 30px auto; }
     /* En móviles, se convierten a 1 columna */
     .pillars-grid { grid-template-columns: 1fr; }
@@ -405,7 +438,6 @@ html, body {
 }
 
 @media (max-width: 480px) {
-    .company-tagline { font-size: 1.5rem; }
-    .hero-main-slogan { font-size: 1.3rem; }
+    .hero-title { font-size: 2.5rem; letter-spacing: 2px;}
     .cta-button { padding: 12px 25px; font-size: 1rem; }
 }
