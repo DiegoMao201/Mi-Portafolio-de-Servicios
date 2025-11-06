@@ -116,18 +116,15 @@
             <p class="text-body-small text-center mb-4">
                 Cuéntenos su mayor "dolor". Dénos 30 minutos y le mostraremos un plan de acción estratégico para convertir ese dato aislado en una ventaja competitiva.
             </p>
+            
             <form 
                 class="contact-form" 
                 id="contact-form" 
                 name="contacto" 
-                data-netlify="true" 
-                method="POST" 
-                netlify-honeypot="bot-field"
+                method="POST"
+                action="https://formspree.io/f/mgvpgdrd"
             >
-                <input type="hidden" name="form-name" value="contacto" />
-                <p style="display:none">
-                    <label>Si eres humano, deja este campo vacío: <input name="bot-field" /></label>
-                </p>
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="name">Nombre Completo</label>
@@ -154,7 +151,7 @@
                     Solicitar Consulta Estratégica
                 </button>
             </form>
-        </div>
+            </div>
     </section>
 
     <footer class="footer">
@@ -203,11 +200,22 @@
                 submitBtn.textContent = 'Enviando...';
                 submitBtn.disabled = true;
 
+                // =============================================================
+                // INICIO DE LA MODIFICACIÓN DE JAVASCRIPT
+                // - Se agregó 'Accept': 'application/json' a los headers
+                //   para que Formspree responda correctamente a tu fetch.
+                // =============================================================
                 fetch(form.action, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    headers: { 
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json' // <-- AJUSTE PARA FORMSPREE
+                    },
                     body: new URLSearchParams(new FormData(form)).toString()
                 })
+                // =============================================================
+                // FIN DE LA MODIFICACIÓN DE JAVASCRIPT
+                // =============================================================
                 .then(response => {
                     if (response.ok) {
                         form.innerHTML = `<h3 class='neon-text text-center'>¡Gracias por contactarnos!</h3><p class='text-body text-center mt-3'>Hemos recibido su desafío. Nuestro equipo se pondrá en contacto con usted en breve para la consulta estratégica.</p>`;
