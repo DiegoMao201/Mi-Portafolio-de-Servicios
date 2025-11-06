@@ -33,9 +33,116 @@
     </nav>
 
     <section id="inicio" class="hero">
-        <div class="container hero-card reveal">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        
+        <div class="hero-content reveal">
+            
+            <div class="company-logo">
+                <svg class="logo-svg" viewbox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialgradient id="bgGradient" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" style="stop-color:var(--accent-color);stop-opacity:0.2" />
+                            <stop offset="50%" style="stop-color:var(--secondary-accent);stop-opacity:0.1" />
+                            <stop offset="100%" style="stop-color:var(--primary-bg);stop-opacity:0.8" />
+                        </radialgradient>
+                        <lineargradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:var(--accent-color)" />
+                            <stop offset="30%" style="stop-color:var(--secondary-accent)" />
+                            <stop offset="70%" style="stop-color:var(--text-primary)" />
+                            <stop offset="100%" style="stop-color:var(--accent-color)" />
+                        </lineargradient>
+                        <lineargradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:var(--accent-color);stop-opacity:0.8" />
+                            <stop offset="50%" style="stop-color:var(--secondary-accent);stop-opacity:0.6" />
+                            <stop offset="100%" style="stop-color:var(--accent-color);stop-opacity:0.8" />
+                        </lineargradient>
+                        <filter id="glow">
+                            <fegaussianblur stddeviation="3" result="coloredBlur" />
+                            <femerge>
+                                <femergenode in="coloredBlur" />
+                                <femergenode in="SourceGraphic" />
+                            </femerge>
+                        </filter>
+                        <filter id="innerGlow">
+                            <fegaussianblur stddeviation="2" result="coloredBlur" />
+                            <femerge>
+                                <femergenode in="coloredBlur" />
+                                <femergenode in="SourceGraphic" />
+                            </femerge>
+                        </filter>
+                    </defs>
+                    <circle cx="100" cy="100" r="95" fill="url(#bgGradient)" stroke="url(#mainGradient)" stroke-width="2" opacity="0.3" />
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="url(#glowGradient)" stroke-width="1" opacity="0.6">
+                        <animatetransform attributename="transform" attributetype="XML" type="rotate" from="0 100 100" to="360 100 100" dur="20s" repeatcount="indefinite" />
+                    </circle>
+                    <circle cx="100" cy="100" r="65" fill="none" stroke="url(#glowGradient)" stroke-width="1" opacity="0.4">
+                        <animatetransform attributename="transform" attributetype="XML" type="rotate" from="360 100 100" to="0 100 100" dur="15s" repeatcount="indefinite" />
+                    </circle>
+                    <g transform="translate(40, 60)">
+                        <path d="M 20 10 Q 10 10 10 20 Q 10 30 20 30 L 25 30 L 25 25 L 20 25 Q 15 25 15 20 Q 15 15 20 15 L 30 15 L 30 10 Z" fill="url(#mainGradient)" filter="url(#glow)" stroke="url(#glowGradient)" stroke-width="0.5">
+                            <animatetransform attributename="transform" attributetype="XML" type="scale" values="1;1.1;1" dur="3s" repeatcount="indefinite" />
+                        </path>
+                    </g>
+                    <g transform="translate(70, 60)">
+                        <path d="M 5 10 L 5 30 L 10 30 L 10 20 L 15 25 L 20 20 L 20 30 L 25 30 L 25 10 L 20 10 L 15 17 L 10 10 Z" fill="url(#mainGradient)" filter="url(#glow)" stroke="url(#glowGradient)" stroke-width="0.5">
+                            <animatetransform attributename="transform" attributetype="XML" type="scale" values="1;1.1;1" dur="3s" begin="0.5s" repeatcount="indefinite" />
+                        </path>
+                    </g>
+                    <g transform="translate(60, 110)">
+                        <rect x="10" y="15" width="8" height="15" fill="url(#mainGradient)" filter="url(#innerGlow)">
+                            <animate attributename="height" values="15;25;15" dur="2s" repeatcount="indefinite" />
+                            <animate attributename="y" values="15;5;15" dur="2s" repeatcount="indefinite" />
+                        </rect>
+                        <rect x="22" y="10" width="8" height="20" fill="url(#mainGradient)" filter="url(#innerGlow)">
+                            <animate attributename="height" values="20;30;20" dur="2s" begin="0.3s" repeatcount="indefinite" />
+                            <animate attributename="y" values="10;0;10" dur="2s" begin="0.3s" repeatcount="indefinite" />
+                        </rect>
+                        <rect x="34" y="5" width="8" height="25" fill="url(#mainGradient)" filter="url(#innerGlow)">
+                            <animate attributename="height" values="25;35;25" dur="2s" begin="0.6s" repeatcount="indefinite" />
+                            <animate attributename="y" values="5;-5;5" dur="2s" begin="0.6s" repeatcount="indefinite" />
+                        </rect>
+                        <rect x="46" y="12" width="8" height="18" fill="url(#mainGradient)" filter="url(#innerGlow)">
+                            <animate attributename="height" values="18;28;18" dur="2s" begin="0.9s" repeatcount="indefinite" />
+                            <animate attributename="y" values="12;2;12" dur="2s" begin="0.9s" repeatcount="indefinite" />
+                        </rect>
+                        <rect x="58" y="8" width="8" height="22" fill="url(#mainGradient)" filter="url(#innerGlow)">
+                            <animate attributename="height" values="22;32;22" dur="2s" begin="1.2s" repeatcount="indefinite" />
+                            <animate attributename="y" values="8;-2;8" dur="2s" begin="1.2s" repeatcount="indefinite" />
+                        </rect>
+                        <path d="M 14 22 Q 26 15 38 8 Q 50 18 62 12" fill="none" stroke="url(#glowGradient)" stroke-width="2" opacity="0.8" filter="url(#glow)">
+                            <animate attributename="stroke-dasharray" values="0,100;100,0;0,100" dur="4s" repeatcount="indefinite" />
+                        </path>
+                    </g>
+                    <circle cx="50" cy="50" r="2" fill="url(#mainGradient)" opacity="0.8">
+                        <animatetransform attributename="transform" attributetype="XML" type="translate" values="0,0;10,-5;0,0" dur="3s" repeatcount="indefinite" />
+                        <animate attributename="opacity" values="0.8;1;0.8" dur="3s" repeatcount="indefinite" />
+                    </circle>
+                    <circle cx="150" cy="60" r="1.5" fill="url(#glowGradient)" opacity="0.6">
+                        <animatetransform attributename="transform" attributetype="XML" type="translate" values="0,0;-8,8;0,0" dur="4s" repeatcount="indefinite" />
+                        <animate attributename="opacity" values="0.6;1;0.6" dur="4s" repeatcount="indefinite" />
+                    </circle>
+                    <circle cx="40" cy="150" r="2.5" fill="url(#mainGradient)" opacity="0.7">
+                        <animatetransform attributename="transform" attributetype="XML" type="translate" values="0,0;15,0;0,0" dur="5s" repeatcount="indefinite" />
+                        <animate attributename="opacity" values="0.7;1;0.7" dur="5s" repeatcount="indefinite" />
+                    </circle>
+                    <circle cx="160" cy="140" r="1.8" fill="url(#glowGradient)" opacity="0.9">
+                        <animatetransform attributename="transform" attributetype="XML" type="translate" values="0,0;-12,-10;0,0" dur="3.5s" repeatcount="indefinite" />
+                        <animate attributename="opacity" values="0.9;1;0.9" dur="3.5s" repeatcount="indefinite" />
+                    </circle>
+                    <circle cx="100" cy="100" r="5" fill="url(#mainGradient)" opacity="0.8" filter="url(#glow)">
+                        <animate attributename="r" values="5;15;5" dur="2s" repeatcount="indefinite" />
+                        <animate attributename="opacity" values="0.8;0.2;0.8" dur="2s" repeatcount="indefinite" />
+                    </circle>
+                </svg>
+                
+                <h1 class="hero-title">GM-DATOVATE</h1>
+            </div>
+            
             <p class="hero-tagline">DATA · AUTOMATIZACIÓN · INTELIGENCIA ARTIFICIAL</p>
-            <h1 class="hero-title">GM-DATOVATE</h1>
             <h2 class="hero-subline">De Datos Aislados a un <span class="neon-text">Ecosistema de Negocios Inteligente</span>.</h2>
             <p class="hero-subtitle">Transformamos su operación conectando Ventas, Finanzas y Operaciones para resultados rápidos y tangibles.</p>
             
