@@ -347,7 +347,7 @@ st.markdown(f"""
          */
         
         /* ====================================================== */
-        /* --- CORRECCIÓN 6.1: Se escapan las llaves { y } --- */
+        /* --- CORRECCIÓN 6.1: Se escapan las llaves {{ y }} --- */
         /* ====================================================== */
         .stTabs [data-testid="stHorizontalBlock"],
         .contact-form-container [data-testid="stHorizontalBlock"] {{
@@ -357,7 +357,7 @@ st.markdown(f"""
         
         /* Asegurar que las columnas apiladas ocupen todo el ancho */
         /* ====================================================== */
-        /* --- CORRECCIÓN 6.1: Se escapan las llaves { y } --- */
+        /* --- CORRECCIÓN 6.1: Se escapan las llaves {{ y }} --- */
         /* ====================================================== */
         .stTabs [data-testid="stHorizontalBlock"] > div[data-testid="stVerticalBlock"],
         .contact-form-container [data-testid="stHorizontalBlock"] > div[data-testid="stVerticalBlock"] {{
