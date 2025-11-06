@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 4.1 (Corrección de Lottie URLs y método de carga)
+# VERSIÓN: 4.2 (Corrección de URLs de Lottie a enlaces JSON permanentes)
 # ======================================================================================
 
 import streamlit as st
@@ -43,15 +43,29 @@ COLOR_FONDO_SECUNDARIO = "#F7F9FC" # Fondo gris muy claro para secciones
 COLOR_TEXTO = "#2F2F2F"
 COLOR_TEXTO_SECUNDARIO = "#555555"
 
-# --- URLs de LOTTIE (Animaciones) - VERSIÓN CORREGIDA 4.1 ---
-# Estas son las URLs de las PÁGINAS, que st_lottie puede procesar.
-LOTTIE_URL_HERO = "https://lottiefiles.com/free-animations/analytics-use"
-LOTTIE_URL_COMERCIAL = "https://lottiefiles.com/free-animations/sales-chart-up"
-LOTTIE_URL_OPERACIONES = "https://lottiefiles.com/free-animations/logistics"
-LOTTIE_URL_FINANZAS = "https://lottiefiles.com/free-animations/finance-growth"
-LOTTIE_URL_IA = "https://lottiefiles.com/free-animations/ai-chatbot"
+# --- URLs de LOTTIE (Animaciones) ---
+# --- VERSIÓN CORREGIDA 4.2: URLs de JSON directas y permanentes ---
+LOTTIE_URL_HERO = "https://lottie.host/8c03664d-2e86-416b-810a-b3b0c3f56e9c/DqjY08I50J.json"
+LOTTIE_URL_COMERCIAL = "https://lottie.host/9e0b1c0b-1f1e-4f9e-8c7a-5b1b4d0e3f1c/q4f0jY3k8J.json"
+LOTTIE_URL_OPERACIONES = "https://lottie.host/248174f3-1833-4f10-ab64-01c9a0f622b7/n9VzEO95a9.json"
+LOTTIE_URL_FINANZAS = "https://lottie.host/b04e223c-f832-426b-b461-12a1c0d510e4/m1p5i9PZkR.json"
+LOTTIE_URL_IA = "https://lottie.host/76b251e6-31a2-4e9b-a621-0e1215b3b1e3/OQjROE9l6w.json"
 
-# --- FUNCIÓN load_lottie ELIMINADA (ERA LA CAUSA DEL ERROR) ---
+@st.cache_data
+def load_lottie(url: str):
+    """Carga una animación Lottie desde una URL."""
+    try:
+        r = requests.get(url)
+        if r.status_code != 200:
+            print(f"Error al descargar Lottie JSON (Código {r.status_code}): {url}")
+            return None
+        return r.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error de red al descargar Lottie JSON: {e}")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"Error al decodificar Lottie JSON (no es un JSON válido): {e}")
+        return None
 
 # --- INYECCIÓN DE CSS GLOBAL (Mejorada) ---
 st.markdown(f"""
@@ -785,8 +799,8 @@ def render_pagina_inicio():
         
         with col2:
             st.markdown('<div class="hero-lottie">', unsafe_allow_html=True)
-            # --- CORRECCIÓN 4.1 ---
-            st_lottie(LOTTIE_URL_HERO, height=400, key="lottie_hero")
+            # --- CORRECCIÓN 4.2 ---
+            st_lottie(load_lottie(LOTTIE_URL_HERO), height=400, key="lottie_hero")
             st.markdown('</div>', unsafe_allow_html=True)
             
         st.markdown('</div>', unsafe_allow_html=True)
@@ -891,8 +905,8 @@ def render_pagina_comercial():
     
     col_lottie, col_title = st.columns([1, 4])
     with col_lottie:
-        # --- CORRECCIÓN 4.1 ---
-        st_lottie(LOTTIE_URL_COMERCIAL, height=100, key="lottie_com")
+        # --- CORRECCIÓN 4.2 ---
+        st_lottie(load_lottie(LOTTIE_URL_COMERCIAL), height=100, key="lottie_com")
     with col_title:
         st.markdown("Deje que sus datos le digan cómo vender más. Automatizamos la prospección, la cotización y el análisis de rendimiento.")
     st.divider()
@@ -1117,8 +1131,8 @@ def render_pagina_operaciones():
     
     col_lottie, col_title = st.columns([1, 4])
     with col_lottie:
-        # --- CORRECCIÓN 4.1 ---
-        st_lottie(LOTTIE_URL_OPERACIONES, height=100, key="lottie_ops")
+        # --- CORRECCIÓN 4.2 ---
+        st_lottie(load_lottie(LOTTIE_URL_OPERACIONES), height=100, key="lottie_ops")
     with col_title:
         st.markdown("Automatización de la cadena de suministro, desde el proveedor hasta la bodega, con inteligencia de datos.")
     st.divider()
@@ -1286,8 +1300,8 @@ def render_pagina_finanzas():
     
     col_lottie, col_title = st.columns([1, 4])
     with col_lottie:
-        # --- CORRECCIÓN 4.1 ---
-        st_lottie(LOTTIE_URL_FINANZAS, height=100, key="lottie_fin")
+        # --- CORRECCIÓN 4.2 ---
+        st_lottie(load_lottie(LOTTIE_URL_FINANZAS), height=100, key="lottie_fin")
     with col_title:
         st.markdown("Controle el flujo de caja, automatice la contabilidad y gestione el riesgo de cartera como nunca antes.")
     st.divider()
@@ -1452,8 +1466,8 @@ def render_pagina_integracion():
     
     col_lottie, col_title = st.columns([1, 4])
     with col_lottie:
-        # --- CORRECCIÓN 4.1 ---
-        st_lottie(LOTTIE_URL_IA, height=100, key="lottie_ia")
+        # --- CORRECCIÓN 4.2 ---
+        st_lottie(load_lottie(LOTTIE_URL_IA), height=100, key="lottie_ia")
     with col_title:
         st.markdown("Conectamos todos los procesos, desde la vinculación de un cliente hasta el servicio post-venta con IA.")
     st.divider()
@@ -1660,7 +1674,7 @@ tab_com, tab_ops, tab_fin, tab_int = st.tabs([
 with tab_com:
     render_pagina_comercial()
 
-with tab_ops:
+with tab_OS:
     render_pagina_operaciones()
 
 with tab_fin:
