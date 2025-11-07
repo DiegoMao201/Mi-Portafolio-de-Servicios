@@ -3,10 +3,8 @@ streamlit
 pandas
 numpy
 plotly
-fpdf
+fpdf2
 openpyxl
 streamlit-drawable-canvas
-streamlit-lottie
-requests
 Pillow
 kaleido
