@@ -3,12 +3,12 @@
 # VERSIÓN: 6.9 (Edición "Blindaje de Generadores de Archivos")
 # CORRECCIÓN CRÍTICA:
 # 1. (BUG FIX 6.9) Corregido 'StreamlitAPIException: Invalid binary data format'.
-#    Se blindaron 'generar_demo_pdf' y 'generar_demo_pdf_cartera' con
-#    bloques try...except para que retornen 'None' en caso de fallo.
-#    Se actualizaron todos los st.download_button de PDF para incluir
-#    la comprobación 'is None' en su parámetro 'disabled'.
+#    Se blindaron 'generar_demo_pdf' y 'generar_demo_pdf_cartera' con
+#    bloques try...except para que retornen 'None' en caso de fallo.
+#    Se actualizaron todos los st.download_button de PDF para incluir
+#    la comprobación 'is None' en su parámetro 'disabled'.
 # 2. (BUG FIX 6.8) Corregido 'TypeError' en 'st.button' (Demo Catálogo).
-#    Se cambió 'use_column_width' por 'use_container_width'.
+#    Se cambió 'use_column_width' por 'use_container_width'.
 # 3. (BUG FIX 6.7) Corregido 'AttributeError' en 'pdf.output()'.
 # 4. (BUG FIX 6.6) Eliminado 'st.rerun()' explícito en 'render_pagina_comercial'.
 # 5. (BUG FIX 6.5) Actualizados todos los parámetros deprecados.
@@ -46,12 +46,12 @@ st.set_page_config(
 )
 
 # --- PALETA DE COLORES Y ESTILOS ---
-COLOR_PRIMARIO = "#0D3B66"      # Azul profundo (Confianza, Inteligencia)
-COLOR_SECUNDARIO = "#1A73E8"    # Azul brillante (Tecnología, Innovación)
+COLOR_PRIMARIO = "#0D3B66"     # Azul profundo (Confianza, Inteligencia)
+COLOR_SECUNDARIO = "#1A73E8"   # Azul brillante (Tecnología, Innovación)
 COLOR_ACENTO_ROJO = "#F94144"       # Rojo vivo (Acción, Alerta)
 COLOR_ACENTO_VERDE = "#43AA8B"      # Verde (Finanzas, Crecimiento)
 COLOR_ACENTO_NARANJA = "#F8961E" # Naranja (Energía, CTA)
-COLOR_FONDO = "#FFFFFF"     # Fondo Blanco Limpio
+COLOR_FONDO = "#FFFFFF"   # Fondo Blanco Limpio
 COLOR_FONDO_SECUNDARIO = "#F7F9FC" # Fondo gris muy claro para secciones
 COLOR_TEXTO = "#2F2F2F"
 COLOR_TEXTO_SECUNDARIO = "#555555"
