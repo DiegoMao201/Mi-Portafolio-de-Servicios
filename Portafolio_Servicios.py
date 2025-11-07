@@ -1,22 +1,21 @@
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 6.9 (Edición "Blindaje de Generadores de Archivos")
+# VERSIÓN: 7.0 (Edición "Blindaje Definitivo de Generadores")
 # CORRECCIÓN CRÍTICA:
-# 1. (BUG FIX 6.9) Corregido 'StreamlitAPIException: Invalid binary data format'.
-#    Se blindaron 'generar_demo_pdf' y 'generar_demo_pdf_cartera' con
-#    bloques try...except para que retornen 'None' en caso de fallo.
-#    Se actualizaron todos los st.download_button de PDF para incluir
-#    la comprobación 'is None' en su parámetro 'disabled'.
-# 2. (BUG FIX 6.8) Corregido 'TypeError' en 'st.button' (Demo Catálogo).
-#    Se cambió 'use_column_width' por 'use_container_width'.
-# 3. (BUG FIX 6.7) Corregido 'AttributeError' en 'pdf.output()'.
-# 4. (BUG FIX 6.6) Eliminado 'st.rerun()' explícito en 'render_pagina_comercial'.
-# 5. (BUG FIX 6.5) Actualizados todos los parámetros deprecados.
-# 6. (BUG FIX 6.4) Blindado DemoPDF.add_table() para tipos de fecha.
+# 1. (BUG FIX 7.0) Reforzado 'StreamlitAPIException: Invalid binary data format'.
+#    Aunque el (FIX 6.9) añadía 'is None' al 'disabled', esta versión
+#    refuerza el parámetro 'data' para que pase 'b""' (bytes vacíos)
+#    en lugar de 'None' si la generación falla.
+#    Esto evita que Streamlit intente procesar un tipo 'NoneType'.
+# 2. (BUG FIX 6.9) Corregido 'StreamlitAPIException'.
+#    Se blindaron 'generar_demo_pdf' y 'generar_demo_pdf_cartera' con
+#    bloques try...except para que retornen 'None' en caso de fallo.
+# 3. (BUG FIX 6.8) Corregido 'TypeError' en 'st.button' (Demo Catálogo).
+#    Se cambió 'use_column_width' por 'use_container_width'.
+# 4. (BUG FIX 6.7) Corregido 'AttributeError' en 'pdf.output()'.
 #
 # NOTA DE ENTORNO: Esta app requiere 'kaleido' en requirements.txt
 # Y las dependencias de sistema en 'packages.txt' para Streamlit Cloud
-# (ver notas de la solución anterior).
 # ======================================================================================
 
 import streamlit as st
@@ -58,7 +57,7 @@ COLOR_TEXTO_SECUNDARIO = "#555555"
 
 # --- IMÁGENES EMBEBIDAS EN BASE64 (SVG Placeholders) ---
 IMG_TEAM_DIEGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNy41IDEyLjVMMTcgMTAuNWwyLTVoNGwxLjUgMyI+PC9wYXRoPjwvc3ZnPg=="
-IMG_TEAM_PABLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNyAxMGwxLjUgMS41TDYgMjFIMTciPjwvc3ZnPg=="
+IMG_TEAM_PABLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNyAxMGwxLjUgMS41TDYgMjFIMTciPjwvcGF0aD48L3N2Zz4="
 IMG_PROD_DISCO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtdGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI5Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIj48L2NpcmNsZT48L3N2Zz4="
 IMG_PROD_TORNILLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOC4zNCA1LjY2YTIuMTIgMi4xMiAwIDAgMSAwIDNMNi4yMSAxOS44M2wtMi0yTDExLjM0IDguNjZhMi4xMiAyLjEyIDAgMCAxIDMtM3oiPjwvcGF0aD48bGluZSB4MT0iMyIgeTE9IjE0IiB4Mj0iMTAiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSI3IiB5MT0iMTIiIHgyPSIxMiIgeTI9IjE3Ij48L2xpbmU+PGxpbmUgeDE9IjExIiB5MT0iOCIgeDI9IjE2IiB5Mj0iMTMiPjwvbGluZT48L3N2Zz4="
 IMG_PROD_ELECTRODO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yIDE4SDVhMyAzIDAgMCAwIDMtM1Y5YTMgMyAwIDAgMCAzLTNoM2EzIDMgMCAwIDAgMy0zVjIiPjwvcGF0aD48bGluZSB4MT0iMTIiIHkxPSI2IiB4Mj0iOCIgeTI9IjEwIj48L2xpbmU+PGxpbmUgeDE9IjgiIHkxPSIxNCIgeDI9IjEwIiB5Mj0iMTIiPjwvbGluZT48bGluZSB4MT0iMTYiIHkxPSI0IiB4Mj0iMTQiIHkyPSI2Ij48L2xpbmU+PGxpbmUgeDE9IjUiIHkxPSIyMiIgeDI9IjIiIHkyPSIxOCI+PC9saW5lPjxsaW5lIHgxPSI5IiB5MT0iMTgiIHgyPSI1IiB5Mj0iMTQiPjwvbGluZT48L3N2Zz4="
@@ -1076,15 +1075,15 @@ def render_pagina_comercial():
                         "Este es un ejemplo de cotización profesional generada automáticamente por el sistema de GM-DATOVATE con los productos seleccionados."
                     )
                     
-                    # --- (BUG FIX 6.9) Añadida comprobación de 'is None' ---
+                    # --- (BUG FIX 7.0) Blindaje de 'data=None' ---
                     st.download_button(
                         label="📄 Descargar PDF Profesional (Demo)",
-                        data=pdf_data,
+                        data=pdf_data if pdf_data is not None else b"", # Corrección
                         file_name="Demo_Cotizacion_GM-DATOVATE.pdf",
                         mime="application/pdf",
                         use_container_width=True,
                         type="primary",
-                        disabled=(pdf_data is None) # Corrección
+                        disabled=(pdf_data is None) # Corrección (6.9)
                     )
                     if st.button("Vaciar Carrito", use_container_width=True):
                         st.session_state.cart = pd.DataFrame(columns=['Referencia', 'Producto', 'Cantidad', 'Vlr. Unitario', 'Total'])
@@ -1161,17 +1160,26 @@ def render_pagina_operaciones():
 
             c1, c2 = st.columns(2)
             
-            # --- (BUG FIX 6.9) Añadida comprobación de 'is None' ---
-            # Esta es la línea del traceback
+            # --- (BUG FIX 7.0) Blindaje de 'data=None' ---
+            # Esta es la línea del traceback original
             c1.download_button(
-                label="📄 Descargar Orden de Compra PDF (Demo)", data=pdf_data,
-                file_name="Demo_Orden_de_Compra.pdf", mime="application/pdf", use_container_width=True, type="primary",
-                disabled=df_orden.empty or pdf_data is None # Corrección
+                label="📄 Descargar Orden de Compra PDF (Demo)", 
+                data=pdf_data if pdf_data is not None else b"", # Corrección 7.0
+                file_name="Demo_Orden_de_Compra.pdf", 
+                mime="application/pdf", 
+                use_container_width=True, 
+                type="primary",
+                disabled=df_orden.empty or pdf_data is None # Corrección 6.9
             )
+            
+            # --- (BUG FIX 7.0) Blindaje de 'data=None' ---
             c2.download_button(
-                label="📊 Descargar Reporte Excel (Demo)", data=excel_data,
-                file_name="Demo_Reporte_Abastecimiento.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True,
-                disabled=edited_df.empty or excel_data is None # Esta ya estaba correcta
+                label="📊 Descargar Reporte Excel (Demo)", 
+                data=excel_data if excel_data is not None else b"", # Corrección 7.0
+                file_name="Demo_Reporte_Abastecimiento.xlsx", 
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+                use_container_width=True,
+                disabled=edited_df.empty or excel_data is None
             )
 
     # --- DEMO 2: CONTROL DE INVENTARIO MÓVIL ---
@@ -1322,12 +1330,14 @@ def render_pagina_finanzas():
                 # Esta es la línea que genera el error si falta la dependencia del sistema
                 pdf_cartera = generar_demo_pdf_cartera(cliente_demo_data, cliente_info, fig_pie)
                 
-                # --- (BUG FIX 6.9) Añadida comprobación de 'is None' ---
+                # --- (BUG FIX 7.0) Blindaje de 'data=None' ---
                 c1.download_button(
-                    label="📄 Descargar PDF (Demo)", data=pdf_cartera,
-                    file_name=f"Cartera_{cliente_info['Cliente']}.pdf", mime="application/pdf",
+                    label="📄 Descargar PDF (Demo)", 
+                    data=pdf_cartera if pdf_cartera is not None else b"", # Corrección 7.0
+                    file_name=f"Cartera_{cliente_info['Cliente']}.pdf", 
+                    mime="application/pdf",
                     use_container_width=True,
-                    disabled=(pdf_cartera is None) # Corrección
+                    disabled=(pdf_cartera is None) # Corrección 6.9
                 )
                 
                 if c2.button("✉️ Enviar Email (Demo)", use_container_width=True):
@@ -1404,9 +1414,10 @@ def render_pagina_finanzas():
             st.success("**Acción: Estas facturas ya fueron pagadas (no están en cartera) pero siguen activas en la agencia. Deben exonerarse.**")
             st.dataframe(SAMPLE_DATA['covinoc_exonerar'], use_container_width=True, hide_index=True)
 
+            # --- (BUG FIX 7.0) Blindaje de 'data=None' ---
             st.download_button(
                 "📥 Descargar Reporte de Acciones (Excel Demo)", 
-                excel_demo_data, 
+                data=excel_demo_data if excel_demo_data is not None else b"", # Corrección 7.0 
                 file_name="Demo_Reporte_Riesgo_GM-DATOVATE.xlsx", 
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
                 use_container_width=True, type="primary",
