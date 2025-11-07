@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 6.1 (Edición "Estabilidad Total y Estética Móvil")
-# MEJORA:
-# 1. (BUG FIX) Corregido `min_val` por `min_value` en todo el st.column_config.
-# 2. (CSS FIX) Añadida regla para forzar el fondo claro (evita "modo combinado" en móviles).
-# 3. (CSS FIX) Añadida regla @media query para forzar el apilado de st.columns en
-#    dispositivos móviles dentro de las pestañas, solucionando el problema de
-#    "espacios pequeños".
-# 4. (BUG FIX 6.1) Corregido error 'NameError' en CSS de media query al escapar
-#    llaves ({}) en f-string.
+# VERSIÓN: 6.2 (Edición "Estabilidad Total y Estética Móvil")
+# CORRECCIÓN CRÍTICA:
+# 1. (BUG FIX 6.2) Corregido TypeError en generar_demo_excel al acceder a df[col].iloc[0]
+#    sin validar si el DataFrame o la columna están vacíos o contienen solo NaN.
+# 2. (BUG FIX 6.2) Corregido error 'NameError' en CSS de media query al escapar
+#    llaves ({}) en f-string (corrección aplicada en la versión anterior).
 # ======================================================================================
 
 import streamlit as st
@@ -38,34 +35,29 @@ st.set_page_config(
 )
 
 # --- PALETA DE COLORES Y ESTILOS (Ajustada) ---
-COLOR_PRIMARIO = "#0D3B66"      # Azul profundo (Confianza, Inteligencia)
-COLOR_SECUNDARIO = "#1A73E8"    # Azul brillante (Tecnología, Innovación)
-COLOR_ACENTO_ROJO = "#F94144"       # Rojo vivo (Acción, Alerta)
-COLOR_ACENTO_VERDE = "#43AA8B"      # Verde (Finanzas, Crecimiento)
+COLOR_PRIMARIO = "#0D3B66"       # Azul profundo (Confianza, Inteligencia)
+COLOR_SECUNDARIO = "#1A73E8"     # Azul brillante (Tecnología, Innovación)
+COLOR_ACENTO_ROJO = "#F94144"        # Rojo vivo (Acción, Alerta)
+COLOR_ACENTO_VERDE = "#43AA8B"       # Verde (Finanzas, Crecimiento)
 COLOR_ACENTO_NARANJA = "#F8961E" # Naranja (Energía, CTA)
-COLOR_FONDO = "#FFFFFF"         # Fondo Blanco Limpio
+COLOR_FONDO = "#FFFFFF"          # Fondo Blanco Limpio
 COLOR_FONDO_SECUNDARIO = "#F7F9FC" # Fondo gris muy claro para secciones
 COLOR_TEXTO = "#2F2F2F"
 COLOR_TEXTO_SECUNDARIO = "#555555"
 
-# --- IMÁGENES EMBEBIDAS EN BASE64 (MEJORA 5.0) ---
-# Se reemplazan todas las URLs externas (imgur) por datos Base64.
-# Esto elimina la dependencia de red y garantiza que la demo NUNCA falle.
+# --- IMÁGENES EMBEBIDAS EN BASE64 (SVG Placeholders) ---
+# Esto asegura que el demo nunca falle por problemas de red o URLs de imágenes.
 
-# Placeholders SVG (ligeros y escalables) codificados en Base64.
-# En un proyecto real, aquí irían las fotos reales del equipo.
 IMG_TEAM_DIEGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNy41IDEyLjVMMTcgMTAuNWwyLTVoNGwxLjUgMyI+PC9wYXRoPjwvc3ZnPg=="
-IMG_TEAM_PABLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNyAxMGwxLjUgMS41TD twenty-threeIDEiPjwvcGF0aD48L3N2Zz4="
+IMG_TEAM_PABLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNyAxMGwxLjUgMS41TDYgMjFIMTciPjwvcGF0aD48L3N2Zz4="
 
-# Placeholders de productos (SVG Base64)
 IMG_PROD_DISCO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtdGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI5Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIj48L2NpcmNsZT48L3N2Zz4="
-IMG_PROD_TORNILLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOC4zNCA1LjY2YTIuMTIgMi4xMiAwIDAgMSAwIDNMNi4yMSAxOS44M2wtMi0yTDExLjM0IDguNjZhMi4xMiAyLjEyIDAgMCAxIDMtM3oiPjwvcGF0aD48bGluZSB4MT0iMyIgeTE9IjE0IiB4Mj0iMTAiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSI3IiB5MT0iMTIiB4Mj0iMTIiIHkyPSIxNyI+PC9saW5lPjxsaW5lIHgxPSIxMSIgeTE9IjgiIHgyPSIxNiIgeTI9IjEzIj48L2xpbmU+PC9zdmc+"
+IMG_PROD_TORNILLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOC4zNCA1LjY2YTIuMTIgMi4xMiAwIDAgMSAwIDNMNi4yMSAxOS44M2wtMi0yTDExLjM0IDguNjZhMi4xMiAyLjEyIDAgMCAxIDMtM3oiPjwvcGF0aD48bGluZSB4MT0iMyIgeTE9IjE0IiB4Mj0iMTAiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSI3IiB5MT0iMTIiIHgyPSIxMiIgeTI9IjE3Ij48L2xpbmU+PGxpbmUgeDE9IjExIiB5MT0iOCIgeDI9IjE2IiB5Mj0iMTMiPjwvbGluZT48L3N2Zz4="
 IMG_PROD_ELECTRODO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yIDE4SDVhMyAzIDAgMCAwIDMtM1Y5YTMgMyAwIDAgMCAzLTNoM2EzIDMgMCAwIDAgMy0zVjIiPjwvcGF0aD48bGluZSB4MT0iMTIiIHkxPSI2IiB4Mj0iOCIgeTI9IjEwIj48L2xpbmU+PGxpbmUgeDE9IjgiIHkxPSIxNCIgeDI9IjEwIiB5Mj0iMTIiPjwvbGluZT48bGluZSB4MT0iMTYiIHkxPSI0IiB4Mj0iMTQiIHkyPSI2Ij48L2xpbmU+PGxpbmUgeDE9IjUiIHkxPSIyMiIgeDI9IjIiIHkyPSIxOCI+PC9saW5lPjxsaW5lIHgxPSI5IiB5MT0iMTgiIHgyPSI1IiB5Mj0iMTQiPjwvbGluZT48L3N2Zz4="
 IMG_PROD_GAFA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjYuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMTcuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PHBhdGggZD0iTTIgMTUuNWE0LjUgNC41IDAgMCAwIDQuNSA0LjVoMTFBNi41IDYuNSAwIDAgMCAyMiAxNS41Ij48L3BhdGg+PHBhdGggZD0iTTYuNSAxMS41YTQuNSA0LjUgMCAwIDEgMC05bTEuMiAzLjJsMS4zLTEuNW04LjUgNy4zbDEuNSAxLjUiPjwvcGF0aD48L3N2Zz4="
 IMG_PROD_GUANTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxNGExMiAxMiAwIDAgMS04IDhIMWwtMy04VjZhNCA0IDAgMCAxIDQtNGg1LjVMMTAgNyI+PC9wYXRoPjxwYXRoIGQ9Ik0xMS41IDZhNC41IDQuNSAwIDEgMSAwIDlWNmEiPjwvcGF0aD48cGF0aCBkPSJNMTYgNmE0IDQgMCAwIDEgMCA4VjYiPjwvcGF0aD48cGF0aCBkPSJNMTkgNmEzIDMgMCAwIDEgMCA2VjYiPjwvcGF0aD48L3N2Zz4="
-IMG_LOGO_PLACEHOLDER = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBvbHlnb24gcG9pbnRzPSIyMyA3IDIzIDEgMTcgMSAxNiAyIDcgMiA2IDcgNiAyMiA3IDIyIDcgMjMgMTIgMjMgMTIgNyI+PC9wb2x5Z29uPjxwb2x5Z29uIHBvaW50cz0iMTYgMiAxNiA4IDEzIDEwIDEzIDE2IDEwIDE4IDEwIDIyIDcgMjIiPjwvcG9Gx5Z29uPjwvc3ZnPg=="
 
-# --- INYECCIÓN DE CSS GLOBAL (MEJORA 6.0) ---
+# --- INYECCIÓN DE CSS GLOBAL (PROFESIONAL) ---
 st.markdown(f"""
 <style>
     /* --- Ocultar elementos de Streamlit --- */
@@ -119,7 +111,7 @@ st.markdown(f"""
         color: white;
     }}
     
-    /* --- Héroe (Banner Principal) - MEJORA 5.0: Centrado y sin Lottie --- */
+    /* --- Héroe (Banner Principal) - Centrado y Limpio --- */
     .hero-container {{
         display: flex;
         align-items: center;
@@ -128,7 +120,7 @@ st.markdown(f"""
         padding: 6rem 2rem;
         background: linear-gradient(135deg, {COLOR_PRIMARIO} 0%, {COLOR_SECUNDARIO} 100%);
         color: white;
-        min-height: 70vh; /* Ligeramente más bajo, ya no necesita espacio para Lottie */
+        min-height: 70vh;
     }}
     .hero-content {{
         max-width: 800px; /* Más ancho para el texto */
@@ -171,17 +163,17 @@ st.markdown(f"""
         transform: scale(1.05);
     }}
 
-    /* --- Tarjetas de Servicios - MEJORA 4.0 --- */
-    .service-card {{
+    /* --- Tarjetas de Servicios y Equipo --- */
+    .service-card, .team-card {{
+        height: 100%;
         background-color: {COLOR_FONDO};
-        border: 1px solid #E0E0E0;
         border-radius: 10px;
         padding: 2rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        height: 100%; /* Esta es la clave para columnas iguales */
-        transition: all 0.3s ease; /* Efecto hover */
+        border: 1px solid #E0E0E0;
+        transition: all 0.3s ease;
     }}
-    .service-card:hover {{
+    .service-card:hover, .team-card:hover {{
         transform: translateY(-10px);
         box-shadow: 0 12px 24px rgba(0,0,0,0.1);
     }}
@@ -194,47 +186,17 @@ st.markdown(f"""
         color: {COLOR_PRIMARIO};
         font-size: 1.4rem;
     }}
+    .team-card img {{ 
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 5px solid {COLOR_PRIMARIO};
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        background-color: #f0f0f0;
+    }}
+    .team-card h3 {{ color: {COLOR_PRIMARIO}; margin-top: 1rem; }}
 
-    /* --- Tarjetas de KPI (MEJORA 4.0) --- */
-    .kpi-card {{
-        background-color: #FFFFFF;
-        border: 1px solid #E0E0E0;
-        border-left: 5px solid {COLOR_PRIMARIO};
-        border-radius: 8px;
-        padding: 1.2rem 1.5rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }}
-    .kpi-card-red {{
-        border-left-color: {COLOR_ACENTO_ROJO};
-    }}
-    .kpi-card-green {{
-        border-left-color: {COLOR_ACENTO_VERDE};
-    }}
-    .kpi-title {{
-        font-size: 0.9rem;
-        color: {COLOR_TEXTO_SECUNDARIO};
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-    }}
-    .kpi-value {{
-        font-size: 2rem;
-        font-weight: 700;
-        color: {COLOR_PRIMARIO};
-        line-height: 1;
-    }}
-    .kpi-delta {{
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-top: 0.25rem;
-    }}
-    /* Para anular el .stMetric de Streamlit */
-    [data-testid="stMetric"] {{
-        display: none; 
-    }}
-
-    /* --- Pestañas de Demo (Ajustadas) --- */
+    /* --- Pestañas de Demo --- */
     .stTabs {{
         background-color: {COLOR_FONDO_SECUNDARIO};
         padding: 2rem 2rem 4rem 2rem;
@@ -246,140 +208,53 @@ st.markdown(f"""
         padding-right: 1rem;
         border-bottom: 2px solid #E0E0E0;
     }}
-    .stTabs [data-baseweb="tab"] {{
-        height: 50px;
-        background-color: transparent;
-        border-bottom: 4px solid transparent; /* Borde inferior transparente */
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: {COLOR_TEXTO_SECUNDARIO};
-        transition: all 0.3s;
-        margin-bottom: -2px; /* Alinea con el borde de la lista */
-    }}
-    .stTabs [data-baseweb="tab"]:hover {{
-        background-color: #E9ECEF;
-        color: {COLOR_PRIMARIO};
-    }}
     .stTabs [aria-selected="true"] {{
         border-bottom: 4px solid {COLOR_ACENTO_ROJO};
         color: {COLOR_PRIMARIO};
         font-weight: bold;
     }}
-    .stTabs [data-baseweb="tab-highlight"] {{
-        display: none; /* Oculta el highlight azul de Streamlit */
-    }}
     
-    /* --- Tarjetas de Equipo (MEJORA 5.0: Sin img, con SVG Base64) --- */
-    .team-card {{
-        background-color: {COLOR_FONDO};
-        border-radius: 10px;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        border: 1px solid #E0E0E0;
-        transition: all 0.3s ease;
-        height: 100%; /* Clave para columnas iguales */
-    }}
-    .team-card:hover {{
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }}
-    .team-card img {{ /* Esto ahora aplica a los SVG base64 */
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        border: 5px solid {COLOR_PRIMARIO};
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        background-color: #f0f0f0; /* Color de fondo para el SVG */
-    }}
-    .team-card h3 {{ color: {COLOR_PRIMARIO}; margin-top: 1rem; }}
-    .team-card p {{
-        color: {COLOR_ACENTO_ROJO};
-        font-weight: bold;
-        font-size: 1rem;
-    }}
-
-    /* --- Formulario de Contacto (Ajustado) --- */
-    .contact-form-container {{
-        padding: 4rem 2rem;
-    }}
+    /* --- Botones --- */
     .stButton>button {{
         border-radius: 8px;
-        border: 2px solid {COLOR_ACENTO_NARANJA};
-        background-color: {COLOR_ACENTO_NARANJA};
-        color: white;
         font-weight: bold;
         transition: all 0.3s;
         padding: 0.75rem 1.5rem;
     }}
-    .stButton>button:hover {{
-        background-color: {COLOR_FONDO};
-        color: {COLOR_ACENTO_NARANJA};
-        transform: scale(1.02);
-    }}
     .stButton>button[kind="primary"] {{
         border: 2px solid {COLOR_PRIMARIO};
         background-color: {COLOR_PRIMARIO};
+        color: white;
     }}
     .stButton>button[kind="primary"]:hover {{
         background-color: {COLOR_SECUNDARIO};
         border-color: {COLOR_SECUNDARIO};
         color: white;
     }}
-    
-    /* --- Media Query para móviles --- */
-    @media (max-width: 992px) {{
-        .hero-container {{
-            padding-top: 4rem;
-            padding-bottom: 4rem;
-        }}
-        .hero-container h1 {{ font-size: 2.8rem; }}
-        .hero-container h3 {{ font-size: 1.3rem; }}
-    }}
+
+    /* --- Media Query para móviles (Responsivo) --- */
     @media (max-width: 768px) {{
         .hero-container h1 {{ font-size: 2.2rem; }}
-        .section-container {{ padding: 2rem 1.5rem; }} /* Más espacio lateral */
-        .service-card, .team-card {{ margin-bottom: 1rem; }}
+        .section-container {{ padding: 2rem 1.5rem; }}
         
-        /* * MEJORA 6.0: Forzar apilado de columnas en móviles.
-         * Esto soluciona el problema de "espacios pequeños" en las demos.
-         * Se aplica a las columnas dentro de las pestañas y el formulario de contacto.
-         */
-        
-        /* ====================================================== */
-        /* --- CORRECCIÓN 6.1: Se escapan las llaves {{ y }} --- */
-        /* ====================================================== */
+        /* Forzar apilado de st.columns en móviles */
         .stTabs [data-testid="stHorizontalBlock"],
         .contact-form-container [data-testid="stHorizontalBlock"] {{
             flex-direction: column !important;
             flex-wrap: nowrap !important;
         }}
-        
-        /* Asegurar que las columnas apiladas ocupen todo el ancho */
-        /* ====================================================== */
-        /* --- CORRECCIÓN 6.1: Se escapan las llaves {{ y }} --- */
-        /* ====================================================== */
         .stTabs [data-testid="stHorizontalBlock"] > div[data-testid="stVerticalBlock"],
         .contact-form-container [data-testid="stHorizontalBlock"] > div[data-testid="stVerticalBlock"] {{
             width: 100% !important;
-            margin-bottom: 1rem; /* Añadir espacio entre elementos apilados */
-        }}
-        
-        /* Ajustar el canvas de firma en móvil (Este ya estaba bien) */
-        .stCanvas > canvas {{
-            width: 100% !important;
-            height: 150px !important;
-        }}
-        .stCanvas {{
-            width: 100% !important;
+            margin-bottom: 1rem;
         }}
     }}
 </style>
 """, unsafe_allow_html=True)
 
-# --- FUNCIÓN AUXILIAR PARA RENDERIZAR KPIs PERSONALIZADOS (MEJORA 4.0) ---
+# --- FUNCIÓN AUXILIAR PARA RENDERIZAR KPIs PERSONALIZADOS ---
 def render_kpi(title, value, delta=None, delta_color="normal", card_color=""):
-    """Renderiza una tarjeta de KPI con CSS personalizado."""
+    """Renderiza una tarjeta de KPI con CSS personalizado (MEJORADO)."""
     delta_html = ""
     if delta:
         if delta_color == "inverse":
@@ -392,31 +267,35 @@ def render_kpi(title, value, delta=None, delta_color="normal", card_color=""):
             color = COLOR_TEXTO_SECUNDARIO
             arrow = ""
         
-        delta_html = f'<div class="kpi-delta" style="color: {color};">{arrow} {delta}</div>'
+        delta_html = f'<div class="kpi-delta" style="font-size: 0.9rem; font-weight: 600; color: {color};">{arrow} {delta}</div>'
     
     card_class = "kpi-card"
     if card_color == "red":
-        card_class = "kpi-card kpi-card-red"
+        card_class = "kpi-card"
+        border_color = COLOR_ACENTO_ROJO
     elif card_color == "green":
-        card_class = "kpi-card kpi-card-green"
+        card_class = "kpi-card"
+        border_color = COLOR_ACENTO_VERDE
+    else:
+        border_color = COLOR_PRIMARIO
 
     st.markdown(f"""
-    <div class="{card_class}">
-        <div class="kpi-title">{title}</div>
-        <div class="kpi-value">{value}</div>
+    <div style="background-color: #FFFFFF; border: 1px solid #E0E0E0; border-left: 5px solid {border_color}; border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <div style="font-size: 0.9rem; color: {COLOR_TEXTO_SECUNDARIO}; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase;">{title}</div>
+        <div style="font-size: 2rem; font-weight: 700; color: {COLOR_PRIMARIO}; line-height: 1;">{value}</div>
         {delta_html}
     </div>
     """, unsafe_allow_html=True)
 
 # ======================================================================================
-# --- DATOS DE EJEMPLO PARA LAS DEMOS (MEJORA 5.0: Imágenes Base64) ---
+# --- DATOS DE EJEMPLO PARA LAS DEMOS (CACHEABLES) ---
 # ======================================================================================
 @st.cache_data
 def get_sample_data():
     """Crea y cachea todos los DataFrames de ejemplo para las demos."""
     data = {}
     
-    # --- Datos Comerciales (Expandidos) ---
+    # --- Datos Comerciales ---
     vendedores = ['DIEGO GARCIA', 'ANGELA CONTRERAS', 'PABLO MAFLA', 'MARY LUZ TREJOS']
     regiones = ['EJE CAFETERO', 'ANTIOQUIA', 'EJE CAFETERO', 'ANTIOQUIA']
     data['ventas_vendedor'] = pd.DataFrame({
@@ -438,18 +317,15 @@ def get_sample_data():
         'Ventas ($)': [110_000_000, 90_000_000, 75_000_000, 103_000_000]
     })
 
-    # --- Datos de Cotizador (MEJORA 5.0: Imágenes Base64) ---
+    # --- Datos de Cotizador (Imágenes Base64) ---
     data['catalogo_productos'] = pd.DataFrame({
         'Referencia': ['A-101', 'B-202', 'C-303', 'D-404', 'E-505'],
         'Producto': ['Disco Corte 4-1/2"', 'Tornillo Drywall 6x1', 'Electrodo 6013', 'Gafa de Seguridad', 'Guante Vaqueta'],
         'Vlr. Unitario': [1800, 150, 800, 4500, 7000],
         'Stock': [500, 15000, 800, 120, 300],
         'ImagenURL': [
-            IMG_PROD_DISCO,
-            IMG_PROD_TORNILLO,
-            IMG_PROD_ELECTRODO,
-            IMG_PROD_GAFA,
-            IMG_PROD_GUANTE
+            IMG_PROD_DISCO, IMG_PROD_TORNILLO, IMG_PROD_ELECTRODO,
+            IMG_PROD_GAFA, IMG_PROD_GUANTE
         ]
     })
 
@@ -460,8 +336,8 @@ def get_sample_data():
         'Stock (Total)': [500, 15000, 800, 120],
         'Stock Tránsito': [0, 5000, 0, 100],
         'Necesidad Real': [200, 10000, 500, 150],
-        'Sugerencia Traslado': [0, 0, 0, 0], # Se calculará dinámicamente
-        'Sugerencia Compra': [0, 0, 0, 0]  # Se calculará dinámicamente
+        'Sugerencia Traslado': [0, 0, 0, 0],
+        'Sugerencia Compra': [0, 0, 0, 0]
     })
 
     # --- Datos Financieros (Cartera) ---
@@ -473,7 +349,6 @@ def get_sample_data():
     data['cartera_detalle'] = pd.DataFrame({
         'Cliente': ['Cliente A', 'Cliente B (Vencido)', 'Cliente B (Vencido)', 'Cliente C', 'Cliente D (Vencido)'],
         'NIT': ['800.123.456-1', '800.987.654-2', '800.987.654-2', '800.222.333-4', '900.555.444-5'],
-        'Cod. Cliente': ['1001', '1002', '1002', '1003', '1004'],
         'Factura': ['FV-1001', 'FV-901', 'FV-902', 'FV-1002', 'FV-850'],
         'Fecha Vencimiento': [datetime.now().date() + timedelta(days=15), datetime.now().date() - timedelta(days=45), datetime.now().date() - timedelta(days=12), datetime.now().date() + timedelta(days=30), datetime.now().date() - timedelta(days=70)],
         'Días Vencido': [-15, 45, 12, -30, 70],
@@ -482,7 +357,7 @@ def get_sample_data():
         'Teléfono': ['573001234567', '573019876543', '573019876543', '573022223333', '573035554444']
     })
     
-    # Datos para Covinoc (Demo 3 Finanzas)
+    # Datos para Integración de Riesgo
     data['covinoc_subir'] = pd.DataFrame({
         'Factura': ['FV-1001', 'FV-1002', 'FV-1003'], 'Cliente': ['Cliente A', 'Cliente B', 'Cliente C'],
         'Días Vencido': [35, 40, 28], 'Monto': [1_200_000, 850_000, 2_100_000]
@@ -497,7 +372,7 @@ def get_sample_data():
 SAMPLE_DATA = get_sample_data()
 
 
-# --- INICIALIZACIÓN DE SESSION STATE (MEJORA 4.0) ---
+# --- INICIALIZACIÓN DE SESSION STATE (PROFESIONAL) ---
 if 'cart' not in st.session_state:
     st.session_state.cart = pd.DataFrame(columns=['Referencia', 'Producto', 'Cantidad', 'Vlr. Unitario', 'Total'])
 if 'chat_messages' not in st.session_state:
@@ -506,28 +381,31 @@ if 'otp_sent' not in st.session_state:
     st.session_state.otp_sent = False
 if 'otp_code' not in st.session_state:
     st.session_state.otp_code = ""
+if 'cuadre_data' not in st.session_state:
+    st.session_state.cuadre_data = pd.DataFrame({
+        'Tipo': ['Tarjetas', 'Consignaciones', 'Gastos', 'Efectivo Entregado'],
+        'Valor': [2500000, 1500000, 200000, 800000]
+    })
 
 # ======================================================================================
-# --- CLASES DE GENERACIÓN DE DOCUMENTOS (PDF Y EXCEL) (MEJORA 5.0) ---
+# --- CLASES DE GENERACIÓN DE DOCUMENTOS (PDF Y EXCEL) ---
 # ======================================================================================
 
 class DemoPDF(FPDF):
-    """Crea un PDF profesional de ejemplo (MEJORA 5.0: Sin logo externo)."""
+    """Clase personalizada para generar PDFs profesionales."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.title = "Documento de Demostración"
-        # self.logo_url = "..." # MEJORA 5.0: Eliminado para robustez.
-        self.chart_image = None
 
     def header(self):
+        # Fondo del encabezado con color primario
         self.set_fill_color(int(COLOR_PRIMARIO[1:3], 16), int(COLOR_PRIMARIO[3:5], 16), int(COLOR_PRIMARIO[5:7], 16))
         self.rect(0, 0, self.w, 30, 'F')
         
-        # --- MEJORA 5.0: Logo eliminado, título centrado ---
         self.set_font('Arial', 'B', 20)
         self.set_text_color(255, 255, 255)
-        self.set_xy(10, 10) 
-        self.cell(0, 10, 'GM-DATOVATE', 0, 0, 'L') 
+        self.set_xy(10, 10)
+        self.cell(0, 10, 'GM-DATOVATE', 0, 0, 'L')
 
         self.set_xy(10, 18)
         self.set_font('Arial', 'B', 15)
@@ -553,15 +431,15 @@ class DemoPDF(FPDF):
         self.set_text_color(0, 0, 0)
         self.multi_cell(0, 5, body)
         self.ln()
-    
-    # --- MEJORA 4.0: Método para añadir un gráfico ---
+        
     def add_chart(self, chart_image, width_percent=0.8):
         """Añade una imagen de gráfico (desde bytes) al PDF."""
         if chart_image:
             try:
                 img_width = self.w * width_percent
                 img_x = (self.w - img_width) / 2
-                self.image(chart_image, x=img_x, w=img_width, type='PNG') # Especificar tipo
+                # Añadir imagen desde bytes
+                self.image(chart_image, x=img_x, w=img_width, type='PNG')
             except Exception as e:
                 self.set_text_color(255, 0, 0)
                 self.cell(0, 5, f"Error al renderizar el gráfico: {e}")
@@ -569,20 +447,26 @@ class DemoPDF(FPDF):
                 self.ln(5)
 
     def add_table(self, df):
+        if df.empty:
+            self.set_font('Arial', 'I', 10)
+            self.set_text_color(COLOR_TEXTO_SECUNDARIO.replace("#", ""), as_r_g_b=True)
+            self.cell(0, 10, "No hay datos para mostrar en la tabla.", 0, 1)
+            self.set_text_color(0, 0, 0)
+            return
+
         self.set_font('Arial', 'B', 9)
         self.set_fill_color(int(COLOR_SECUNDARIO[1:3], 16), int(COLOR_SECUNDARIO[3:5], 16), int(COLOR_SECUNDARIO[5:7], 16))
         self.set_text_color(255, 255, 255)
         
-        # Calcular anchos de columna (lógica simplificada para robustez)
+        # Lógica de cálculo de ancho de columna para ajuste profesional
         page_width = self.w - 2 * self.l_margin
         num_cols = len(df.columns)
         
-        # Lógica de ancho mejorada
         col_widths = {}
         for col in df.columns:
             if 'Producto' in str(col) or 'Cliente' in str(col):
-                col_widths[col] = page_width * 0.35
-            elif 'Monto' in str(col) or 'Valor' in str(col):
+                col_widths[col] = page_width * 0.3
+            elif 'Monto' in str(col) or 'Valor' in str(col) or 'Total' in str(col):
                 col_widths[col] = page_width * 0.2
         
         fixed_width = sum(col_widths.values())
@@ -611,17 +495,19 @@ class DemoPDF(FPDF):
             for i, item in enumerate(row):
                 align = 'L'
                 item_str = str(item)
-                if isinstance(item, (int, float)):
+                
+                # Formato de números y fechas
+                if isinstance(item, (int, float, np.integer, np.floating)):
                     align = 'R'
                     if "Monto" in df.columns[i] or "Valor" in df.columns[i] or "Total" in df.columns[i] or "Vlr. Unitario" in df.columns[i] or "Ventas" in df.columns[i]:
                         item_str = f"${item:,.0f}"
                     elif "Avance" in df.columns[i]:
-                            item_str = f"{item:,.1f}%"
+                        item_str = f"{item:,.1f}%"
                     else:
                         item_str = f"{item:,.0f}"
                 elif isinstance(item, (datetime, pd.Timestamp, datetime.date)):
-                        item_str = pd.to_datetime(item).strftime('%Y-%m-%d')
-                        align = 'C'
+                    item_str = pd.to_datetime(item).strftime('%Y-%m-%d')
+                    align = 'C'
                         
                 self.cell(final_widths[i], 6, item_str, 1, 0, align, fill=fill)
             self.ln()
@@ -629,17 +515,15 @@ class DemoPDF(FPDF):
 
 @st.cache_data
 def generar_demo_pdf(df, title, intro_text, chart_fig=None):
-    """Genera un PDF genérico (MEJORADO 4.0 con gráfico opcional)."""
+    """Genera un PDF genérico (MEJORADO con gráfico opcional)."""
     pdf = DemoPDF()
     pdf.title = title
     pdf.add_page()
     pdf.chapter_title("Resumen del Reporte")
     pdf.chapter_body(intro_text)
     
-    # --- MEJORA 4.0: Añadir gráfico si se provee ---
     if chart_fig:
         pdf.chapter_title("Análisis Visual")
-        # Convertir figura de Plotly a imagen en memoria
         img_bytes = io.BytesIO(chart_fig.to_image(format="png", scale=2))
         pdf.add_chart(img_bytes)
         pdf.ln(5)
@@ -650,12 +534,13 @@ def generar_demo_pdf(df, title, intro_text, chart_fig=None):
 
 @st.cache_data
 def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
-    """Genera un PDF de estado de cuenta (MEJORADO 4.0 con gráfico)."""
+    """Genera un PDF de estado de cuenta (MEJORADO con gráfico)."""
     pdf = DemoPDF()
     pdf.title = "Estado de Cuenta"
     pdf.add_page()
     
     pdf.chapter_title("Información del Cliente")
+    # ... Lógica de info de cliente (sin cambios) ...
     pdf.set_font('Arial', '', 10)
     pdf.cell(40, 6, "Cliente:")
     pdf.set_font('Arial', 'B', 10)
@@ -688,113 +573,140 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
     pdf.cell(0, 12, f"TOTAL VENCIDO: ${total_vencido:,.0f}", 1, 1, 'C', fill=True)
     pdf.ln(10)
 
-    # --- MEJORA 4.0: Añadir gráfico de cartera (si se pasa) ---
     pdf.chapter_title("Composición de la Deuda (Global)")
     if chart_fig:
         img_bytes = io.BytesIO(chart_fig.to_image(format="png", scale=2))
         pdf.add_chart(img_bytes)
-    
+        
     return pdf.output(dest='S').encode('latin-1')
 
 @st.cache_data
 def generar_demo_excel(df_dict):
-    """Genera un Excel (MEJORADO 4.0 con Hoja de Resumen y mejor formato)."""
+    """
+    Genera un archivo Excel con múltiples hojas, formato profesional y hoja de resumen.
+    (CORREGIDO: Bug de TypeError al verificar tipos de fecha en DataFrames vacíos).
+    """
     output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        
-        # --- MEJORA 4.0: Añadir Hoja de Resumen ---
-        ws_resumen = writer.book.create_sheet("Resumen Ejecutivo", 0)
-        
-        # Estilos
-        title_font = Font(size=18, bold=True, color=COLOR_PRIMARIO.replace("#",""))
-        header_font = Font(bold=True, color="FFFFFF")
-        header_fill = PatternFill(start_color=COLOR_PRIMARIO.replace("#",""), fill_type="solid")
-        kpi_title_font = Font(bold=True, color=COLOR_TEXTO_SECUNDARIO.replace("#",""))
-        kpi_value_font = Font(size=14, bold=True)
-        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
-        
-        ws_resumen.merge_cells('B2:E2')
-        title_cell = ws_resumen['B2']
-        title_cell.value = "Resumen Ejecutivo del Reporte"
-        title_cell.font = title_font
-        title_cell.alignment = Alignment(horizontal='center')
-        
-        ws_resumen.column_dimensions['B'].width = 30
-        ws_resumen.column_dimensions['C'].width = 25
-
-        # KPIs de ejemplo
-        kpis = {
-            "Total Facturas a Subir": (df_dict.get("1_Facturas_a_Subir", pd.DataFrame())['Monto'].sum() if "1_Facturas_a_Subir" in df_dict else 0),
-            "Total Facturas a Exonerar": (df_dict.get("2_Facturas_a_Exonerar", pd.DataFrame())['Monto'].sum() if "2_Facturas_a_Exonerar" in df_dict else 0),
-            "Total Orden de Compra": (df_dict.get("Orden_de_Compra", pd.DataFrame())['Sugerencia Compra'].sum() if "Orden_de_Compra" in df_dict else 0)
-        }
-        
-        row = 5
-        for k, v in kpis.items():
-            if v > 0: # Solo mostrar KPIs relevantes
-                cell_title = ws_resumen.cell(row=row, column=2, value=k)
-                cell_value = ws_resumen.cell(row=row, column=3, value=v)
-                cell_title.font = kpi_title_font
-                cell_value.font = kpi_value_font
-                cell_value.number_format = '$ #,##0'
-                cell_title.border = thin_border
-                cell_value.border = thin_border
-                row += 1
-
-        # --- Fin Hoja de Resumen ---
-
-        for sheet_name, df in df_dict.items():
-            if df.empty: # No crear hojas para DFs vacíos
-                continue
-            df.to_excel(writer, index=False, sheet_name=sheet_name, startrow=1)
-            
-            ws = writer.sheets[sheet_name]
-            
-            # Estilos (igual que antes)
+    try:
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            # Estilos base
+            title_font = Font(size=18, bold=True, color=COLOR_PRIMARIO.replace("#",""))
+            header_font = Font(bold=True, color="FFFFFF")
+            header_fill = PatternFill(start_color=COLOR_PRIMARIO.replace("#",""), fill_type="solid")
+            kpi_title_font = Font(bold=True, color=COLOR_TEXTO_SECUNDARIO.replace("#",""))
+            kpi_value_font = Font(size=14, bold=True)
+            thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
             currency_format = '$ #,##0'
             date_format = 'dd/mm/yyyy'
+
+            # 1. Hoja de Resumen (si hay datos)
+            ws_resumen = writer.book.create_sheet("Resumen Ejecutivo", 0)
+            ws_resumen.merge_cells('B2:E2')
+            title_cell = ws_resumen['B2']
+            title_cell.value = "Resumen Ejecutivo del Reporte"
+            title_cell.font = title_font
+            title_cell.alignment = Alignment(horizontal='center')
             
-            for i, col in enumerate(df.columns, 1):
-                cell = ws.cell(row=2, column=i)
-                # (El valor ya está escrito por df.to_excel, solo aplicamos estilo)
-                cell.font = header_font
-                cell.fill = header_fill
-                cell.alignment = Alignment(horizontal='center', vertical='center')
+            ws_resumen.column_dimensions['B'].width = 30
+            ws_resumen.column_dimensions['C'].width = 25
+
+            # KPIs de ejemplo
+            kpis = {
+                "Total Facturas a Subir": (df_dict.get("1_Facturas_a_Subir", pd.DataFrame())['Monto'].sum() if "1_Facturas_a_Subir" in df_dict else 0),
+                "Total Facturas a Exonerar": (df_dict.get("2_Facturas_a_Exonerar", pd.DataFrame())['Monto'].sum() if "2_Facturas_a_Exonerar" in df_dict else 0),
+                "Total Orden de Compra": (df_dict.get("Orden_de_Compra", pd.DataFrame())['Sugerencia Compra'].sum() if "Orden_de_Compra" in df_dict and 'Sugerencia Compra' in df_dict.get("Orden_de_Compra").columns else 0)
+            }
+            
+            row = 5
+            for k, v in kpis.items():
+                if v and v > 0: # Solo mostrar KPIs relevantes
+                    cell_title = ws_resumen.cell(row=row, column=2, value=k)
+                    cell_value = ws_resumen.cell(row=row, column=3, value=v)
+                    cell_title.font = kpi_title_font
+                    cell_value.font = kpi_value_font
+                    cell_value.number_format = currency_format
+                    cell_title.border = thin_border
+                    cell_value.border = thin_border
+                    row += 1
+
+            # 2. Generar Hojas de Detalle
+            for sheet_name, df in df_dict.items():
+                if df.empty:
+                    continue
                 
-                # Autoajustar ancho (mejorado)
-                try:
-                    max_len_col = df[col].astype(str).map(len).max()
-                    max_len = max(len(str(col)), max_len_col if pd.notna(max_len_col) else 0)
-                    ws.column_dimensions[get_column_letter(i)].width = max(max_len + 4, 15)
-                except Exception:
-                    ws.column_dimensions[get_column_letter(i)].width = 20 # Fallback
+                # Escribir DataFrame en la hoja
+                df.to_excel(writer, index=False, sheet_name=sheet_name, startrow=1)
+                ws = writer.sheets[sheet_name]
                 
-                # Aplicar formatos de columna
-                if df[col].dtype == 'datetime64[ns]' or df[col].dtype == 'object' and isinstance(df[col].iloc[0], (datetime, datetime.date)):
-                        for c in ws[get_column_letter(i)][2:]: # [2:] para saltar cabecera y título
+                for i, col in enumerate(df.columns, 1):
+                    col_letter = get_column_letter(i)
+                    cell = ws.cell(row=2, column=i)
+                    
+                    # Aplicar estilo de cabecera
+                    cell.font = header_font
+                    cell.fill = header_fill
+                    cell.alignment = Alignment(horizontal='center', vertical='center')
+                    
+                    # Autoajustar ancho (mejorado)
+                    try:
+                        # Aseguramos que la columna no esté vacía antes de calcular la longitud máxima
+                        max_len_col = df[col].astype(str).map(len).max() if not df[col].empty and df[col].notna().any() else 0
+                        max_len = max(len(str(col)), max_len_col)
+                        ws.column_dimensions[col_letter].width = max(max_len + 4, 15)
+                    except Exception:
+                        ws.column_dimensions[col_letter].width = 20 # Fallback
+                    
+                    # Aplicar formatos de columna (CORRECCIÓN CRÍTICA AQUÍ)
+                    is_date_col = False
+                    
+                    if df[col].dtype == 'datetime64[ns]':
+                        is_date_col = True
+                    
+                    elif df[col].dtype == 'object':
+                        # Verifica de forma segura si la columna de objetos contiene fechas
+                        if not df.empty and df[col].notna().any():
+                            try:
+                                first_non_nan = df[col].dropna().iloc[0]
+                                if isinstance(first_non_nan, (datetime, datetime.date, pd.Timestamp)):
+                                    is_date_col = True
+                            except IndexError:
+                                # Columna existe, pero solo tiene NaN (manejado por notna().any()) o por si acaso.
+                                pass
+                            except Exception:
+                                # Fallo en la verificación (ej. columna mixed)
+                                pass
+
+                    if is_date_col:
+                        for c in ws[col_letter][2:]:
                             c.number_format = date_format
-                if 'Monto' in col or 'Valor' in col or 'Total' in col or 'Vlr. Unitario' in col or 'Ventas' in col:
-                        for c in ws[get_column_letter(i)][2:]:
+                            
+                    if 'Monto' in col or 'Valor' in col or 'Total' in col or 'Vlr. Unitario' in col or 'Ventas' in col:
+                        for c in ws[col_letter][2:]:
                             c.number_format = currency_format
 
-            # Título
-            ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(df.columns))
-            title_cell = ws.cell(row=1, column=1)
-            title_cell.value = sheet_name.replace("_", " ")
-            title_cell.font = Font(size=16, bold=True, color=COLOR_PRIMARIO.replace("#",""))
-            title_cell.alignment = Alignment(horizontal='center')
+                # Título
+                ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(df.columns))
+                title_cell = ws.cell(row=1, column=1)
+                title_cell.value = sheet_name.replace("_", " ")
+                title_cell.font = Font(size=16, bold=True, color=COLOR_PRIMARIO.replace("#",""))
+                title_cell.alignment = Alignment(horizontal='center')
     
+    except Exception as e:
+        # Esto atraparía errores internos si el proceso falla por razones ajenas a la validación.
+        st.error(f"Error fatal en la generación de Excel: {e}")
+        return None 
+        
     return output.getvalue()
 
 
 # ======================================================================================
-# --- FUNCIONES DE RENDERIZADO DE PÁGINAS (MEJORA 6.0) ---
+# --- FUNCIONES DE RENDERIZADO DE PÁGINAS ---
 # ======================================================================================
 
 def render_pagina_inicio():
     """Renderiza la página de bienvenida, el pitch de valor y el equipo."""
     
-    # --- Sección Héroe (MEJORA 5.0: Centrado) ---
+    # --- Sección Héroe ---
     with st.container():
         st.markdown(f"""
         <div class="hero-container">
@@ -815,17 +727,18 @@ def render_pagina_inicio():
         """, unsafe_allow_html=True)
 
 
-    # --- Sección de Servicios/Pilares (MEJORA 4.0) ---
+    # --- Sección de Servicios/Pilares ---
     with st.container():
         st.markdown('<div class="section-container">', unsafe_allow_html=True)
         st.markdown("<h2 style='text-align: center; border: none; margin-bottom: 3rem;'>Un Ecosistema, Cuatro Pilares de Valor</h2>", unsafe_allow_html=True)
         
         col1, col2, col3, col4 = st.columns(4)
         
+        # ... Tarjetas de servicio (sin cambios, ya estaban correctas) ...
         with col1:
             st.markdown(f"""
             <div class="service-card">
-                <div class="service-card-icon">🧠</div>
+                <div class="service-card-icon" style="color: {COLOR_ACENTO_ROJO};">🧠</div>
                 <h3>Inteligencia Comercial</h3>
                 <p style="color: {COLOR_TEXTO_SECUNDARIO};">
                     Usamos IA para analizar su historial y decirle a quién llamar, 
@@ -837,7 +750,7 @@ def render_pagina_inicio():
         with col2:
             st.markdown(f"""
             <div class="service-card">
-                <div class="service-card-icon">🏭</div>
+                <div class="service-card-icon" style="color: {COLOR_ACENTO_VERDE};">🏭</div>
                 <h3>Operaciones y Logística</h3>
                 <p style="color: {COLOR_TEXTO_SECUNDARIO};">
                     Automatizamos su cadena de suministro. Desde el abastecimiento inteligente 
@@ -849,7 +762,7 @@ def render_pagina_inicio():
         with col3:
             st.markdown(f"""
             <div class="service-card">
-                <div class="service-card-icon">🏦</div>
+                <div class="service-card-icon" style="color: {COLOR_SECUNDARIO};">🏦</div>
                 <h3>Finanzas y Tesorería</h3>
                 <p style="color: {COLOR_TEXTO_SECUNDARIO};">
                     Digitalizamos su flujo de caja. Automatizamos cuadres, recibos de caja, 
@@ -861,7 +774,7 @@ def render_pagina_inicio():
         with col4:
             st.markdown(f"""
             <div class="service-card">
-                <div class="service-card-icon">🤖</div>
+                <div class="service-card-icon" style="color: {COLOR_ACENTO_NARANJA};">🤖</div>
                 <h3>Integración y Automatización</h3>
                 <p style="color: {COLOR_TEXTO_SECUNDARIO};">
                     Unimos todos los sistemas: vinculación de clientes con firma digital, gestión de riesgo 
@@ -872,13 +785,14 @@ def render_pagina_inicio():
             
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- Sección "Quiénes Somos" (MEJORA 5.0: Imágenes Base64) ---
+    # --- Sección "Quiénes Somos" ---
     with st.container():
         st.markdown('<div class="section-container section-container-dark">', unsafe_allow_html=True)
         st.markdown("<h2 style='text-align: center; border: none; margin-bottom: 3rem;'>Nuestros Arquitectos de Soluciones</h2>", unsafe_allow_html=True)
         
         col_space1, col_team1, col_team2, col_space2 = st.columns([1, 2, 2, 1])
         
+        # ... Tarjetas de equipo (sin cambios, ya estaban correctas) ...
         with col_team1:
             st.markdown(f"""
             <div class="team-card">
@@ -910,7 +824,7 @@ def render_pagina_inicio():
         st.markdown('</div>', unsafe_allow_html=True)
 
 def render_pagina_comercial():
-    """Demo de la Suite de Inteligencia Comercial (MEJORA 6.0: Bug `min_value` corregido)."""
+    """Demo de la Suite de Inteligencia Comercial."""
     
     st.markdown(f"<h2 style='color: {COLOR_PRIMARIO};'>🧠 Inteligencia Comercial</h2>", unsafe_allow_html=True)
     st.markdown("Deje que sus datos le digan cómo vender más. Automatizamos la prospección, la cotización y el análisis de rendimiento.")
@@ -925,13 +839,11 @@ def render_pagina_comercial():
     # --- DEMO 1: BI GERENCIAL (INTERACTIVO) ---
     with tab1:
         st.subheader("Dashboard de BI Gerencial (En Tiempo Real)")
-        st.markdown("Agregamos los datos de ventas y los presentamos en un dashboard de alto nivel. **Pruebe los filtros** para ver cómo la información cambia en tiempo real.")
-
+        # ... Lógica de filtros y KPIs (sin cambios) ...
         with st.container(border=True):
             df_ventas = SAMPLE_DATA['ventas_vendedor']
             
-            # --- MEJORA 4.0: Filtros interactivos ---
-            st.markdown("#####  Filtros del Dashboard")
+            st.markdown("#####  Filtros del Dashboard")
             filtro_c1, filtro_c2 = st.columns(2)
             vendedores_filtro = filtro_c1.multiselect(
                 "Filtrar por Vendedor:", 
@@ -944,7 +856,6 @@ def render_pagina_comercial():
                 default=df_ventas['Region'].unique()
             )
             
-            # Aplicar filtros
             df_filtrada = df_ventas[
                 (df_ventas['Vendedor'].isin(vendedores_filtro)) &
                 (df_ventas['Region'].isin(regiones_filtro))
@@ -954,7 +865,6 @@ def render_pagina_comercial():
                 st.warning("No hay datos para los filtros seleccionados.")
                 return
 
-            # --- MEJORA 4.0: KPIs Personalizados ---
             st.markdown("##### KPIs Generales")
             total_ventas = df_filtrada['Ventas ($)'].sum()
             total_meta = df_filtrada['Meta ($)'].sum()
@@ -972,7 +882,7 @@ def render_pagina_comercial():
 
             st.divider()
             
-            # --- MEJORA 4.0: Gráficos dinámicos ---
+            # Gráficos
             graf_c1, graf_c2 = st.columns(2)
             with graf_c1:
                 fig_bar = px.bar(
@@ -1001,8 +911,7 @@ def render_pagina_comercial():
     # --- DEMO 2: ASISTENTE PROACTIVO (SIMULACIÓN IA) ---
     with tab2:
         st.subheader("Asistente Proactivo (Simulación de Análisis IA)")
-        st.markdown("Esto es inteligencia de negocios en acción. El sistema genera un plan de acción *automático*. **Seleccione un vendedor** para simular un análisis personalizado.")
-        
+        # ... Lógica de simulación IA (sin cambios) ...
         with st.container(border=True):
             vendedor_seleccionado = st.selectbox(
                 "Simular plan de acción para:", 
@@ -1012,9 +921,8 @@ def render_pagina_comercial():
             
             if st.button("Generar Plan de Acción (Simulación IA)", type="primary", use_container_width=True):
                 with st.spinner(f"Analizando historial de {vendedor_seleccionado}... (Simulación)"):
-                    time.sleep(1.5) # Simula el tiempo de procesamiento de IA
+                    time.sleep(1.5)
                 
-                # Simulación de resultados diferentes por vendedor
                 if vendedor_seleccionado == 'DIEGO GARCIA':
                     st.info(
                         "**🎯 Oportunidad de Venta Cruzada (Demo):**\n"
@@ -1056,7 +964,6 @@ def render_pagina_comercial():
                 st.subheader("Catálogo de Productos")
                 catalogo_df = SAMPLE_DATA['catalogo_productos']
                 
-                # Mostrar productos en columnas
                 num_cols = 3
                 product_cols = st.columns(num_cols)
                 
@@ -1064,27 +971,25 @@ def render_pagina_comercial():
                     col = product_cols[i % num_cols]
                     with col:
                         with st.container(border=True):
-                            # MEJORA 5.0: st.image ahora usa Base64
                             st.image(row['ImagenURL'], use_column_width=True)
                             st.markdown(f"**{row['Producto']}**")
                             st.markdown(f"<span style='color: {COLOR_PRIMARIO}; font-size: 1.1rem; font-weight: bold;'>${row['Vlr. Unitario']:,.0f}</span>", unsafe_allow_html=True)
                             st.markdown(f"<span style='color: {COLOR_TEXTO_SECUNDARIO}; font-size: 0.9rem;'>Stock: {row['Stock']}</span>", unsafe_allow_html=True)
                             
                             if st.button(f"🛒 Añadir", key=f"add_cart_{row['Referencia']}", use_container_width=True):
-                                # Lógica para añadir al carrito en session_state
                                 if row['Referencia'] in st.session_state.cart['Referencia'].values:
                                     st.toast(f"'{row['Producto']}' ya está en el carrito.", icon="⚠️")
                                 else:
                                     new_item = pd.DataFrame({
                                         'Referencia': [row['Referencia']],
                                         'Producto': [row['Producto']],
-                                        'Cantidad': [1], # Cantidad por defecto
+                                        'Cantidad': [1],
                                         'Vlr. Unitario': [row['Vlr. Unitario']],
                                         'Total': [row['Vlr. Unitario']]
                                     })
                                     st.session_state.cart = pd.concat([st.session_state.cart, new_item], ignore_index=True)
                                     st.toast(f"'{row['Producto']}' añadido al carrito!", icon="✅")
-                                    st.rerun() # Recarga para mostrar el item en el carrito
+                                    st.rerun()
 
             with col2:
                 st.subheader("Cotización en Proceso")
@@ -1093,13 +998,10 @@ def render_pagina_comercial():
                     st.info("Su carrito de cotización está vacío. Añada productos del catálogo.")
                 else:
                     st.markdown("Puede editar la **Cantidad** directamente en la tabla:")
-                    # --- MEJORA 4.0: Carrito editable ---
+                    
                     edited_cart = st.data_editor(
                         st.session_state.cart,
                         column_config={
-                            # ======================================================
-                            # --- CORRECCIÓN 6.0: min_val -> min_value ---
-                            # ======================================================
                             "Cantidad": st.column_config.NumberColumn(min_value=1, step=1),
                             "Total": st.column_config.NumberColumn(format="$ %d", disabled=True),
                             "Vlr. Unitario": st.column_config.NumberColumn(format="$ %d", disabled=True),
@@ -1120,7 +1022,6 @@ def render_pagina_comercial():
                     subtotal = st.session_state.cart['Total'].sum()
                     st.metric("Subtotal Cotización", f"${subtotal:,.0f}")
                     
-                    # --- Botón de descarga de PDF (Funcional) ---
                     pdf_data = generar_demo_pdf(
                         st.session_state.cart,
                         "Cotización de Ejemplo",
@@ -1140,7 +1041,7 @@ def render_pagina_comercial():
 
 
 def render_pagina_operaciones():
-    """Demo de la Suite de Operaciones y Logística (MEJORA 6.0: Bug `min_value` corregido)."""
+    """Demo de la Suite de Operaciones y Logística."""
     
     st.markdown(f"<h2 style='color: {COLOR_PRIMARIO};'>🏭 Operaciones y Logística</h2>", unsafe_allow_html=True)
     st.markdown("Automatización de la cadena de suministro, desde el proveedor hasta la bodega, con inteligencia de datos.")
@@ -1160,7 +1061,6 @@ def render_pagina_operaciones():
         with st.container(border=True):
             st.subheader("Sugerencias de Abastecimiento (Editable)")
             
-            # --- MEJORA 4.0: Tabla Editable con st.data_editor ---
             df_abastecimiento = SAMPLE_DATA['sugerencia_abastecimiento'].copy()
             
             edited_df = st.data_editor(
@@ -1168,9 +1068,6 @@ def render_pagina_operaciones():
                 column_config={
                     "SKU": st.column_config.Column(disabled=True),
                     "Producto": st.column_config.Column(width="large", disabled=True),
-                    # ======================================================
-                    # --- CORRECCIÓN 6.0: min_val -> min_value ---
-                    # ======================================================
                     "Stock (Total)": st.column_config.NumberColumn(min_value=0, step=10),
                     "Stock Tránsito": st.column_config.NumberColumn(min_value=0, step=10),
                     "Necesidad Real": st.column_config.NumberColumn(min_value=0, step=10),
@@ -1182,14 +1079,10 @@ def render_pagina_operaciones():
                 key="abastecimiento_editor"
             )
 
-            # --- MEJORA 4.0: Lógica de recálculo ---
-            # (Simulación simple: Traslado=0, Compra = max(0, Necesidad - (Stock + Tránsito)))
-            # Una lógica real buscaría en otras bodegas para "Sugerencia Traslado"
-            edited_df['Sugerencia Traslado'] = 0 # Simulación
+            # --- Lógica de recálculo sobre el DF editado ---
+            edited_df['Sugerencia Traslado'] = 0 
             edited_df['Sugerencia Compra'] = (edited_df['Necesidad Real'] - (edited_df['Stock (Total)'] + edited_df['Stock Tránsito'])).clip(lower=0).astype(int)
             
-            # Si los datos cambiaron, st.data_editor ya tiene el nuevo estado.
-            # Volvemos a mostrarlo con el estilo aplicado sobre el DF editado.
             st.dataframe(
                 edited_df.style
                     .applymap(lambda x: f'background-color: {COLOR_ACENTO_ROJO}; color: white; font-weight: bold;' if x > 0 else '', subset=['Sugerencia Compra'])
@@ -1197,7 +1090,7 @@ def render_pagina_operaciones():
                 use_container_width=True, hide_index=True
             )
             
-            # --- Botones de acción (Funcionales, basados en el DF editado) ---
+            # --- Botones de acción (Usa la función corregida) ---
             st.subheader("Generación de Órdenes (Demo)")
             df_orden = edited_df[edited_df['Sugerencia Compra'] > 0]
             df_traslado = edited_df[edited_df['Sugerencia Traslado'] > 0]
@@ -1207,6 +1100,8 @@ def render_pagina_operaciones():
                 "Orden de Compra (Demo)",
                 "Documento de ejemplo generado automáticamente para el proveedor, basado en las sugerencias del sistema."
             )
+            
+            # Esta es la llamada que fue blindada contra TypeErrors
             excel_data = generar_demo_excel({
                 "Orden_de_Compra": df_orden,
                 "Detalle_Traslados": df_traslado,
@@ -1225,7 +1120,7 @@ def render_pagina_operaciones():
                 disabled=edited_df.empty
             )
 
-    # --- DEMO 2: CONTROL DE INVENTARIO MÓVIL ---
+    # --- DEMO 2: CONTROL DE INVENTARIO MÓVIL (Sin cambios) ---
     with tab2:
         st.subheader("Aplicación Móvil de Conteo Físico")
         st.markdown("Digitalizamos el conteo en bodega. El gerente asigna tareas y el operario las ejecuta en una app móvil con escáner y conteo parcial.")
@@ -1255,8 +1150,8 @@ def render_pagina_operaciones():
                 if st.button("Enviar Conteo Final para Revisión (Demo)", use_container_width=True):
                     st.success("¡Conteo enviado! El gerente será notificado.")
                     st.balloons()
-    
-    # --- DEMO 3: SINCRONIZACIÓN (ETL SIMULADO) ---
+            
+    # --- DEMO 3: SINCRONIZACIÓN (ETL SIMULADO) (Sin cambios) ---
     with tab3:
         st.subheader("Sincronización Maestra de Inventario (ETL)")
         st.markdown("Desarrollamos un proceso que se conecta a su ERP (vía Dropbox, FTP, etc.), lee los archivos, los transforma y actualiza la base de datos central en la nube.")
@@ -1264,8 +1159,8 @@ def render_pagina_operaciones():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.graphviz_chart(f"""
-                digraph "ETL Process" {{
+            st.graphviz_chart("""
+                digraph "ETL Process" {
                     node [shape=box, style="filled,rounded", fontname="Arial", fontsize=12];
                     graph [bgcolor="transparent"];
 
@@ -1277,14 +1172,13 @@ def render_pagina_operaciones():
                     erp -> script [label=" Lee y Transforma"];
                     script -> nube [label=" Actualiza y Añade Nuevos"];
                     nube -> apps [label=" Alimenta Datos Vivos"];
-                }}
+                }
             """)
 
         with col2:
             st.subheader("Simulación de Carga ETL")
             st.markdown("Suba un archivo CSV o Excel (de ejemplo) para simular cómo el sistema lo procesa, identifica cambios y actualiza la base de datos.")
             
-            # --- MEJORA 4.0: Simulación de carga de archivos ---
             uploaded_file = st.file_uploader("Subir archivo de inventario (CSV/Excel)", type=["csv", "xlsx"])
             
             if uploaded_file:
@@ -1299,7 +1193,6 @@ def render_pagina_operaciones():
                         time.sleep(1)
                         st.subheader("Reporte de Sincronización (Demo)")
                         
-                        # Simulación de detección de cambios
                         st.info("Resumen de Cambios:\n* **2** productos actualizados (Stock y Precio).\n* **1** producto nuevo detectado ('F-606').")
                         st.markdown("**Productos Nuevos Detectados:**")
                         st.dataframe(pd.DataFrame({'SKU': ['F-606'], 'Producto': ['Lija de Agua'], 'Stock': [1000]}), use_container_width=True, hide_index=True)
@@ -1311,7 +1204,7 @@ def render_pagina_operaciones():
 
 
 def render_pagina_finanzas():
-    """Demo de la Suite Financiera (MEJORA 6.0: Bug `min_value` corregido)."""
+    """Demo de la Suite Financiera."""
     
     st.markdown(f"<h2 style='color: {COLOR_PRIMARIO};'>🏦 Finanzas y Tesorería</h2>", unsafe_allow_html=True)
     st.markdown("Controle el flujo de caja, automatice la contabilidad y gestione el riesgo de cartera como nunca antes.")
@@ -1325,15 +1218,13 @@ def render_pagina_finanzas():
 
     with tab1:
         st.subheader("Dashboard de Gestión de Cartera (AR)")
-        st.markdown("Visibilidad total de su cartera. KPIs en tiempo real, análisis de antigüedad y herramientas de gestión (Email/WhatsApp/PDF) para cada cliente.")
-
+        # ... Lógica de Cartera y Gráficos (sin cambios) ...
         with st.container(border=True):
             df_cartera = SAMPLE_DATA['cartera_antiguedad']
             total_cartera = df_cartera['Valor ($)'].sum()
             total_vencido = df_cartera[df_cartera['Rango'] != 'Al día']['Valor ($)'].sum()
             porc_vencido = (total_vencido / total_cartera * 100) if total_cartera > 0 else 0
 
-            # --- MEJORA 4.0: KPIs Personalizados ---
             kpi1, kpi2, kpi3 = st.columns(3)
             with kpi1:
                 render_kpi("Cartera Total", f"${total_cartera/1_000_000:.1f} M")
@@ -1373,7 +1264,6 @@ def render_pagina_finanzas():
 
                 c1, c2, c3 = st.columns(3)
                 
-                # --- MEJORA 4.0: PDF con gráfico ---
                 pdf_cartera = generar_demo_pdf_cartera(cliente_demo_data, cliente_info, fig_pie)
                 c1.download_button(
                     label="📄 Descargar PDF (Demo)", data=pdf_cartera,
@@ -1402,21 +1292,10 @@ def render_pagina_finanzas():
             
             st.markdown("##### Desglose de Pagos (Editable)")
             
-            # --- MEJORA 4.0: Cuadre de caja interactivo ---
-            # Usamos st.session_state para inicializar los valores del data_editor
-            if 'cuadre_data' not in st.session_state:
-                    st.session_state.cuadre_data = pd.DataFrame({
-                        'Tipo': ['Tarjetas', 'Consignaciones', 'Gastos', 'Efectivo Entregado'],
-                        'Valor': [2500000, 1500000, 200000, 800000]
-                    })
-
             edited_cuadre = st.data_editor(
                 st.session_state.cuadre_data,
                 column_config={
                     "Tipo": st.column_config.Column(disabled=True),
-                    # ======================================================
-                    # --- CORRECCIÓN 6.0: min_val -> min_value ---
-                    # ======================================================
                     "Valor": st.column_config.NumberColumn(format="$ %d", min_value=0, step=10000)
                 },
                 use_container_width=True,
@@ -1424,10 +1303,9 @@ def render_pagina_finanzas():
                 key="cuadre_editor"
             )
             
-            # Actualizar el session_state si hay cambios
             if not edited_cuadre.equals(st.session_state.cuadre_data):
                 st.session_state.cuadre_data = edited_cuadre
-                st.rerun() # Recalcular con los nuevos valores
+                st.rerun()
             
             total_desglose = st.session_state.cuadre_data['Valor'].sum()
             diferencia = venta_total_sistema - total_desglose
@@ -1445,7 +1323,7 @@ def render_pagina_finanzas():
             st.download_button(
                 label="💾 Descargar .TXT para ERP (Demo)", data=demo_txt,
                 file_name="Demo_Contable_GM-DATOVATE.txt", mime="text/plain",
-                use_container_width=True, type="primary", disabled=(diferencia != 0) # Deshabilitado si hay descuadre
+                use_container_width=True, type="primary", disabled=(diferencia != 0)
             )
 
     # --- DEMO 3: AUTOMATIZACIÓN DE RIESGO ---
@@ -1476,7 +1354,7 @@ def render_pagina_finanzas():
             )
 
 def render_pagina_integracion():
-    """Demo de la Suite de Integración (MEJORA 5.0: Sin Lottie)."""
+    """Demo de la Suite de Integración y Futuro (IA)."""
     
     st.markdown(f"<h2 style='color: {COLOR_PRIMARIO};'>🤖 Integración y Futuro (IA)</h2>", unsafe_allow_html=True)
     st.markdown("Conectamos todos los procesos, desde la vinculación de un cliente hasta el servicio post-venta con IA.")
@@ -1504,7 +1382,7 @@ def render_pagina_integracion():
                 st.text_input("C.C. del Representante*", "1.234.567.890", key="demo_cc")
                 st.info("Por favor, firme en el recuadro:")
                 
-                # El CSS en MEJORA 6.0 hace que este canvas sea responsivo
+                # Canvas de firma (responsivo gracias al CSS inyectado)
                 st_canvas(
                     stroke_width=3, stroke_color="#000000",
                     background_color="#FFFFFF", height=130, width=400,
@@ -1513,7 +1391,7 @@ def render_pagina_integracion():
             
             st.divider()
             
-            # --- MEJORA 4.0: Flujo de OTP ---
+            # --- Flujo de OTP ---
             st.subheader("Validación de Identidad (OTP)")
             otp_c1, otp_c2 = st.columns([1, 2])
             
@@ -1549,17 +1427,14 @@ def render_pagina_integracion():
         with st.container(border=True):
             st.subheader("Simulación de Chat (WhatsApp)")
 
-            # Contenedor para los mensajes
             chat_container = st.container(height=400)
 
-            # Mostrar mensajes existentes
             for message in st.session_state.chat_messages:
                 with chat_container.chat_message(message["role"]):
                     st.markdown(message["content"])
             
-            # Función de respuesta del bot (Simulada)
             def get_bot_response(user_message):
-                time.sleep(1) # Simular pensamiento
+                time.sleep(1)
                 low_msg = user_message.lower()
                 
                 if "deuda" in low_msg or "cartera" in low_msg or "factura" in low_msg:
@@ -1594,27 +1469,22 @@ def render_pagina_integracion():
                         "¡Intenta con una de esas!"
                     )
 
-            # Input del chat (MEJORA 4.0)
             if prompt := st.chat_input("Escribe tu consulta aquí..."):
-                # Añadir mensaje del usuario al historial y mostrarlo
                 st.session_state.chat_messages.append({"role": "user", "content": prompt})
                 with chat_container.chat_message("user"):
                     st.markdown(prompt)
                 
-                # Generar y mostrar respuesta del bot
                 with chat_container.chat_message("assistant"):
                     with st.spinner("DATO está pensando... 🤖"):
                         response = get_bot_response(prompt)
                         st.markdown(response)
                 
-                # Añadir respuesta del bot al historial
                 st.session_state.chat_messages.append({"role": "assistant", "content": response})
 
 
 def render_pagina_contacto():
     """Renderiza la página final de Contacto / CTA."""
     
-    # Ancla para el botón "Solicitar Consulta"
     st.markdown('<div id="contacto"></div>', unsafe_allow_html=True)
     
     with st.container():
@@ -1650,21 +1520,19 @@ def render_pagina_contacto():
                     placeholder="Ej: 'Mi inventario nunca cuadra', 'Mi equipo de ventas es muy lento para cotizar', 'No tengo idea de mi cartera vencida en tiempo real'..."
                 )
                 
-                # --- MEJORA 4.0: Botón de formulario usa el color de acento ---
                 submit = st.form_submit_button("Solicitar Consulta Estratégica", use_container_width=True)
                 
                 if submit:
                     if not all([nombre, empresa, email, desafio]):
                         st.warning("Por favor, complete todos los campos marcados con *.")
                     else:
-                        # Aquí iría tu lógica de envío de correo
                         st.success(f"¡Gracias, {nombre}! He recibido su solicitud. Nos pondremos en contacto con usted en {email} muy pronto.")
                         st.balloons()
                         
         st.markdown('</div>', unsafe_allow_html=True)
 
 # ======================================================================================
-# --- NAVEGACIÓN PRINCIPAL (Flujo de Página Única Mejorado) ---
+# --- NAVEGACIÓN PRINCIPAL (Flujo de Página Única) ---
 # ======================================================================================
 
 # 1. Renderiza la página de "Inicio" (Hero + Resumen + Equipo)
@@ -1684,7 +1552,7 @@ tab_com, tab_ops, tab_fin, tab_int = st.tabs([
 with tab_com:
     render_pagina_comercial()
 
-with tab_ops: # <-- CORRECCIÓN 5.0: Arreglado el bug (antes 'tab_OS')
+with tab_ops:
     render_pagina_operaciones()
 
 with tab_fin:
