@@ -9,3 +9,4 @@ streamlit-drawable-canvas
 streamlit-lottie
 requests
 Pillow
+kaleido
