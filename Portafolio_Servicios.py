@@ -1,16 +1,16 @@
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 7.1 (Edición "Blindaje de Tipos")
+# VERSIÓN: 7.2 (Edición "Carga de Imágenes Locales")
 # CORRECCIÓN CRÍTICA:
-# 1. (BUG FIX 7.1) Corregido 'StreamlitAPIException: Invalid binary data format: <class 'bytearray'>'.
+# 1. (BUG FIX 7.2) Corregido el enlace de imágenes locales (assets).
+#    Se añadió la carga de imágenes a Base64 para que el HTML renderice
+#    las fotos del equipo correctamente en Streamlit Cloud.
+# 2. (BUG FIX 7.1) Corregido 'StreamlitAPIException: Invalid binary data format: <class 'bytearray'>'.
 #    Se descubrió que pdf.output() devuelve 'bytearray', no 'bytes'.
-#    Streamlit requiere 'bytes'. Se añadió un cast explícito 'bytes(pdf.output())'
-#    en 'generar_demo_pdf' y 'generar_demo_pdf_cartera'.
-# 2. (BUG FIX 7.0) Reforzado 'StreamlitAPIException: Invalid binary data format: <class 'NoneType'>'.
-#    Se reforzó el parámetro 'data' para que pase 'b""' (bytes vacíos)
-#    en lugar de 'None' si la generación falla.
-# 3. (BUG FIX 6.9) Blindados los generadores de PDF con try...except.
-# 4. (BUG FIX 6.8) Corregido 'TypeError' en 'st.button' (Demo Catálogo).
+#    Se añadió un cast explícito 'bytes(pdf.output())'.
+# 3. (BUG FIX 7.0) Reforzado 'StreamlitAPIException: <class 'NoneType'>'.
+#    Se reforzó el parámetro 'data' para que pase 'b""' (bytes vacíos).
+# 4. (BUG FIX 6.9) Blindados los generadores de PDF con try...except.
 #
 # NOTA DE ENTORNO: Esta app requiere 'kaleido' en requirements.txt
 # Y las dependencias de sistema en 'packages.txt' para Streamlit Cloud
@@ -33,6 +33,33 @@ from PIL import Image
 import base64
 from streamlit_drawable_canvas import st_canvas
 import time
+import os # <-- AÑADIDO EN 7.2
+
+# --- FUNCIÓN AUXILIAR PARA CARGAR IMÁGENES LOCALES A BASE64 ---
+@st.cache_data # Cachear la imagen para no leerla del disco cada vez
+def get_image_base64(file_path):
+    """Abre una imagen local y la convierte a string Base64."""
+    try:
+        with open(file_path, "rb") as img_file:
+            # Detectar el tipo de imagen desde la extensión
+            extension = file_path.split('.')[-1].lower()
+            if extension == 'jpg' or extension == 'jpeg':
+                mime_type = 'image/jpeg'
+            elif extension == 'png':
+                mime_type = 'image/png'
+            else:
+                mime_type = 'image/png' # Default a png
+                
+            return f"data:{mime_type};base64,{base64.b64encode(img_file.read()).decode('utf-8')}"
+    except FileNotFoundError:
+        # No usar st.error aquí, puede crashear la app en el build.
+        # Imprimir en los logs de Streamlit Cloud para depuración.
+        print(f"ADVERTENCIA: Archivo de imagen no encontrado en: {file_path}")
+        # Devolver el placeholder SVG original si la foto no se encuentra
+        return "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNy41IDEyLjVMMTcgMTAuNWwyLTVoNGwxLjUgMyI+PC9wYXRoPjwvc3ZnPg=="
+    except Exception as e:
+        print(f"ADVERTENCIA: No se pudo cargar la imagen {file_path}: {e}")
+        return "" # Retornar vacío si hay otro error
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
@@ -53,9 +80,25 @@ COLOR_FONDO_SECUNDARIO = "#F7F9FC" # Fondo gris muy claro para secciones
 COLOR_TEXTO = "#2F2F2F"
 COLOR_TEXTO_SECUNDARIO = "#555555"
 
-# --- IMÁGENES EMBEBIDAS EN BASE64 (SVG Placeholders) ---
-IMG_TEAM_DIEGO = "assets/foto_diego.png"
-IMG_TEAM_PABLO = "assets/foto_pablo.png"
+
+# --- OBTENER LA RUTA DEL DIRECTORIO DEL SCRIPT (AÑADIDO EN 7.2) ---
+# Esto nos da la ruta a la carpeta donde se está ejecutando Portafolio_Servicios.py
+try:
+    _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+except NameError:
+     # Fallback para entornos donde __file__ no está definido (ej. notebooks)
+    _SCRIPT_DIR = os.path.abspath(os.getcwd())
+    
+# Construimos la ruta a la carpeta 'assets' (asumiendo que se llama 'assets')
+_ASSETS_PATH = os.path.join(_SCRIPT_DIR, "assets")
+
+# --- IMÁGENES DEL EQUIPO (CONVERSIÓN A BASE64 - CORREGIDO EN 7.2) ---
+# (Asegúrate de que tu carpeta se llame 'assets' y los archivos 'foto_diego.png' y 'foto_pablo.png')
+IMG_TEAM_DIEGO = get_image_base64(os.path.join(_ASSETS_PATH, "foto_diego.png"))
+IMG_TEAM_PABLO = get_image_base64(os.path.join(_ASSETS_PATH, "foto_pablo.png"))
+
+# --- IMÁGENES EMBEBIDAS EN BASE64 (SVG Placeholders de Productos) ---
+# (Estas ya están en Base64, así que se quedan igual)
 IMG_PROD_DISCO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtdGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI5Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIj48L2NpcmNsZT48L3N2Zz4="
 IMG_PROD_TORNILLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOC4zNCA1LjY2YTIuMTIgMi4xMiAwIDAgMSAwIDNMNi4yMSAxOS44M2wtMi0yTDExLjM0IDguNjZhMi4xMiAyLjEyIDAgMCAxIDMtM3oiPjwvcGF0aD48bGluZSB4MT0iMyIgeTE9IjE0IiB4Mj0iMTAiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSI3IiB5MT0iMTIiIHgyPSIxMiIgeTI9IjE3Ij48L2xpbmU+PGxpbmUgeDE9IjExIiB5MT0iOCIgeDI9IjE2IiB5Mj0iMTMiPjwvbGluZT48L3N2Zz4="
 IMG_PROD_ELECTRODO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yIDE4SDVhMyAzIDAgMCAwIDMtM1Y5YTMgMyAwIDAgMCAzLTNoM2EzIDMgMCAwIDAgMy0zVjIiPjwvcGF0aD48bGluZSB4MT0iMTIiIHkxPSI2IiB4Mj0iOCIgeTI9IjEwIj48L2xpbmU+PGxpbmUgeDE9IjgiIHkxPSIxNCIgeDI9IjEwIiB5Mj0iMTIiPjwvbGluZT48bGluZSB4MT0iMTYiIHkxPSI0IiB4Mj0iMTQiIHkyPSI2Ij48L2xpbmU+PGxpbmUgeDE9IjUiIHkxPSIyMiIgeDI9IjIiIHkyPSIxOCI+PC9saW5lPjxsaW5lIHgxPSI5IiB5MT0iMTgiIHgyPSI1IiB5Mj0iMTQiPjwvbGluZT48L3N2Zz4="
