@@ -1,17 +1,16 @@
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 6.5 (Edición "Compatibilidad Futura")
+# VERSIÓN: 6.6 (Edición "Corrección Frontend")
 # CORRECCIÓN CRÍTICA:
-# 1. (BUG FIX 6.5) Actualizados todos los parámetros deprecados:
-#    - use_container_width=True -> width='stretch'
-#    - use_column_width=True -> width='stretch'
-#    - Styler.applymap -> Styler.map
-# 2. (BUG FIX 6.4) Blindado DemoPDF.add_table() para tipos de fecha (previo fix).
-# 3. (BUG FIX 6.3) Corregido set_text_color() (previo fix).
-# 4. (BUG FIX 6.2) Corregido TypeError en generar_demo_excel (previo fix).
+# 1. (BUG FIX 6.6) Eliminado 'st.rerun()' explícito después de 'st.toast()'
+#    en 'render_pagina_comercial' para prevenir el error 'NotFoundError: removeChild'
+#    (un 'rerun' implícito ocurre de todos modos al modificar session_state).
+# 2. (BUG FIX 6.5) Actualizados todos los parámetros deprecados.
+# 3. (BUG FIX 6.4) Blindado DemoPDF.add_table() para tipos de fecha (previo fix).
 #
 # NOTA DE ENTORNO: Esta app requiere 'kaleido' en requirements.txt
-# $ pip install kaleido
+# Y las dependencias de sistema en 'packages.txt' para Streamlit Cloud
+# (ver notas de la solución anterior).
 # ======================================================================================
 
 import streamlit as st
@@ -43,10 +42,10 @@ st.set_page_config(
 # --- PALETA DE COLORES Y ESTILOS ---
 COLOR_PRIMARIO = "#0D3B66"       # Azul profundo (Confianza, Inteligencia)
 COLOR_SECUNDARIO = "#1A73E8"      # Azul brillante (Tecnología, Innovación)
-COLOR_ACENTO_ROJO = "#F94144"         # Rojo vivo (Acción, Alerta)
-COLOR_ACENTO_VERDE = "#43AA8B"        # Verde (Finanzas, Crecimiento)
+COLOR_ACENTO_ROJO = "#F94144"        # Rojo vivo (Acción, Alerta)
+COLOR_ACENTO_VERDE = "#43AA8B"       # Verde (Finanzas, Crecimiento)
 COLOR_ACENTO_NARANJA = "#F8961E" # Naranja (Energía, CTA)
-COLOR_FONDO = "#FFFFFF"          # Fondo Blanco Limpio
+COLOR_FONDO = "#FFFFFF"       # Fondo Blanco Limpio
 COLOR_FONDO_SECUNDARIO = "#F7F9FC" # Fondo gris muy claro para secciones
 COLOR_TEXTO = "#2F2F2F"
 COLOR_TEXTO_SECUNDARIO = "#555555"
@@ -58,7 +57,7 @@ IMG_PROD_DISCO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5v
 IMG_PROD_TORNILLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOC4zNCA1LjY2YTIuMTIgMi4xMiAwIDAgMSAwIDNMNi4yMSAxOS44M2wtMi0yTDExLjM0IDguNjZhMi4xMiAyLjEyIDAgMCAxIDMtM3oiPjwvcGF0aD48bGluZSB4MT0iMyIgeTE9IjE0IiB4Mj0iMTAiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSI3IiB5MT0iMTIiIHgyPSIxMiIgeTI9IjE3Ij48L2xpbmU+PGxpbmUgeDE9IjExIiB5MT0iOCIgeDI9IjE2IiB5Mj0iMTMiPjwvbGluZT48L3N2Zz4="
 IMG_PROD_ELECTRODO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yIDE4SDVhMyAzIDAgMCAwIDMtM1Y5YTMgMyAwIDAgMCAzLTNoM2EzIDMgMCAwIDAgMy0zVjIiPjwvcGF0aD48bGluZSB4MT0iMTIiIHkxPSI2IiB4Mj0iOCIgeTI9IjEwIj48L2xpbmU+PGxpbmUgeDE9IjgiIHkxPSIxNCIgeDI9IjEwIiB5Mj0iMTIiPjwvbGluZT48bGluZSB4MT0iMTYiIHkxPSI0IiB4Mj0iMTQiIHkyPSI2Ij48L2xpbmU+PGxpbmUgeDE9IjUiIHkxPSIyMiIgeDI9IjIiIHkyPSIxOCI+PC9saW5lPjxsaW5lIHgxPSI5IiB5MT0iMTgiIHgyPSI1IiB5Mj0iMTQiPjwvbGluZT48L3N2Zz4="
 IMG_PROD_GAFA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjYuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMTcuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PHBhdGggZD0iTTIgMTUuNWE0LjUgNC41IDAgMCAwIDQuNSA0LjVoMTFBNi41IDYuNSAwIDAgMCAyMiAxNS41Ij48L3BhdGg+PHBhdGggZD0iTTYuNSAxMS41YTQuNSAzMCAwIDEgMC05bTEuMiAzLjJsMS4zLTEuNW04LjUgNy4zbDEuNSAxLjUiPjwvcGF0aD48L3N2Zz4="
-IMG_PROD_GUANTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxNGExMiAxMiAwIDAgMS04IDhIMWwtMy04VjZhNCA0IDAgMCAxIDQtNGg1LjVMMTAgNyI+PC9wYXRoPjxwYXRoIGQ9Ik0xMS41IDZhNC41IDQuNSAwIDEgMSAwIDlWNmEiPjwvcGF0aD48cGF0aCBkPSJNMTYgNmE0IDQgMCAwIDEgMCA4VjYiPjwvcGF0aD48cGFhdGggZD0iJNTE5IDZhMyAzIDAgMCAxIDAgNlY2Ij48L3BhdGg+PC9zdmc+"
+IMG_PROD_GUANTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxNGExMiAxMiAwIDAgMS04IDhIMWwtMy04VjZhNCA0IDAgMCAxIDQtNGg1LjVMMTAgNyI+PC9wYXRoPjxwYXRoIGQ9Ik0xMS41IDZhNC41IDQuNSAwIDEgMSAwIDlWNmEiPjwvcGF0aD48cGFhdGggZD0iJNMTYgNmE0IDQgMCAwIDEgMCA4VjYiPjwvcGF0aD48cGFhdGggZD0iJNTE5IDZhMyAzIDAgMCAxIDAgNlY2Ij48L3BhdGg+PC9zdmc+"
 
 # --- INYECCIÓN DE CSS GLOBAL (PROFESIONAL) ---
 st.markdown(f"""
@@ -596,6 +595,7 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
     pdf.chapter_title("Composición de la Deuda (Global)")
     if chart_fig:
         # Esta es la línea que falla si 'kaleido' no está instalado
+        # o si faltan las dependencias del sistema (ver packages.txt)
         img_bytes = io.BytesIO(chart_fig.to_image(format="png", scale=2))
         pdf.add_chart(img_bytes)
         
@@ -859,7 +859,7 @@ def render_pagina_comercial():
         with st.container(border=True):
             df_ventas = SAMPLE_DATA['ventas_vendedor']
             
-            st.markdown("#####  Filtros del Dashboard")
+            st.markdown("#####  Filtros del Dashboard")
             filtro_c1, filtro_c2 = st.columns(2)
             vendedores_filtro = filtro_c1.multiselect(
                 "Filtrar por Vendedor:", 
@@ -1005,7 +1005,9 @@ def render_pagina_comercial():
                                     })
                                     st.session_state.cart = pd.concat([st.session_state.cart, new_item], ignore_index=True)
                                     st.toast(f"'{row['Producto']}' añadido al carrito!", icon="✅")
-                                    st.rerun()
+                                    # --- CORRECCIÓN (BUG FIX 6.6) ---
+                                    # st.rerun() # Esta línea se elimina. Causa el error 'NotFoundError: removeChild'.
+                                    # El 'rerun' implícito de la actualización de session_state es suficiente.
 
             with col2:
                 st.subheader("Cotización en Proceso")
@@ -1281,7 +1283,9 @@ def render_pagina_finanzas():
 
                 c1, c2, c3 = st.columns(3)
                 
+                # Esta es la línea que genera el error si falta la dependencia del sistema
                 pdf_cartera = generar_demo_pdf_cartera(cliente_demo_data, cliente_info, fig_pie)
+                
                 c1.download_button(
                     label="📄 Descargar PDF (Demo)", data=pdf_cartera,
                     file_name=f"Cartera_{cliente_info['Cliente']}.pdf", mime="application/pdf",
