@@ -1,14 +1,16 @@
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 6.7 (Edición "Corrección FPDF Output")
+# VERSIÓN: 6.8 (Edición "Corrección TypeError en st.button")
 # CORRECCIÓN CRÍTICA:
-# 1. (BUG FIX 6.7) Corregido 'AttributeError' en 'pdf.output()'.
-#    El método '.output(dest='S')' en fpdf2 devuelve 'bytes', no 'str'.
-#    Se eliminó la llamada redundante a '.encode('latin-1')'.
-# 2. (BUG FIX 6.6) Eliminado 'st.rerun()' explícito después de 'st.toast()'
+# 1. (BUG FIX 6.8) Corregido 'TypeError' en 'st.button' (Demo Catálogo).
+#    Se cambió el parámetro incorrecto 'use_column_width' por
+#    el parámetro correcto 'use_container_width'.
+# 2. (BUG FIX 6.7) Corregido 'AttributeError' en 'pdf.output()'.
+#    El método '.output()' en fpdf2 devuelve 'bytes', no 'str'.
+# 3. (BUG FIX 6.6) Eliminado 'st.rerun()' explícito después de 'st.toast()'
 #    en 'render_pagina_comercial' para prevenir el error 'NotFoundError: removeChild'.
-# 3. (BUG FIX 6.5) Actualizados todos los parámetros deprecados.
-# 4. (BUG FIX 6.4) Blindado DemoPDF.add_table() para tipos de fecha (previo fix).
+# 4. (BUG FIX 6.5) Actualizados todos los parámetros deprecados.
+# 5. (BUG FIX 6.4) Blindado DemoPDF.add_table() para tipos de fecha (previo fix).
 #
 # NOTA DE ENTORNO: Esta app requiere 'kaleido' en requirements.txt
 # Y las dependencias de sistema en 'packages.txt' para Streamlit Cloud
@@ -1001,7 +1003,9 @@ def render_pagina_comercial():
                             st.markdown(f"<span style='color: {COLOR_PRIMARIO}; font-size: 1.1rem; font-weight: bold;'>${row['Vlr. Unitario']:,.0f}</span>", unsafe_allow_html=True)
                             st.markdown(f"<span style='color: {COLOR_TEXTO_SECUNDARIO}; font-size: 0.9rem;'>Stock: {row['Stock']}</span>", unsafe_allow_html=True)
                             
-                            if st.button(f"🛒 Añadir", key=f"add_cart_{row['Referencia']}", use_column_width=True):
+                            # --- CORRECCIÓN (BUG FIX 6.8) ---
+                            # 'use_column_width' es incorrecto para st.button. Se cambia a 'use_container_width'.
+                            if st.button(f"🛒 Añadir", key=f"add_cart_{row['Referencia']}", use_container_width=True):
                                 if row['Referencia'] in st.session_state.cart['Referencia'].values:
                                     st.toast(f"'{row['Producto']}' ya está en el carrito.", icon="⚠️")
                                 else:
