@@ -1,16 +1,18 @@
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 6.8 (Edición "Corrección TypeError en st.button")
+# VERSIÓN: 6.9 (Edición "Blindaje de Generadores de Archivos")
 # CORRECCIÓN CRÍTICA:
-# 1. (BUG FIX 6.8) Corregido 'TypeError' en 'st.button' (Demo Catálogo).
-#    Se cambió el parámetro incorrecto 'use_column_width' por
-#    el parámetro correcto 'use_container_width'.
-# 2. (BUG FIX 6.7) Corregido 'AttributeError' en 'pdf.output()'.
-#    El método '.output()' en fpdf2 devuelve 'bytes', no 'str'.
-# 3. (BUG FIX 6.6) Eliminado 'st.rerun()' explícito después de 'st.toast()'
-#    en 'render_pagina_comercial' para prevenir el error 'NotFoundError: removeChild'.
-# 4. (BUG FIX 6.5) Actualizados todos los parámetros deprecados.
-# 5. (BUG FIX 6.4) Blindado DemoPDF.add_table() para tipos de fecha (previo fix).
+# 1. (BUG FIX 6.9) Corregido 'StreamlitAPIException: Invalid binary data format'.
+#    Se blindaron 'generar_demo_pdf' y 'generar_demo_pdf_cartera' con
+#    bloques try...except para que retornen 'None' en caso de fallo.
+#    Se actualizaron todos los st.download_button de PDF para incluir
+#    la comprobación 'is None' en su parámetro 'disabled'.
+# 2. (BUG FIX 6.8) Corregido 'TypeError' en 'st.button' (Demo Catálogo).
+#    Se cambió 'use_column_width' por 'use_container_width'.
+# 3. (BUG FIX 6.7) Corregido 'AttributeError' en 'pdf.output()'.
+# 4. (BUG FIX 6.6) Eliminado 'st.rerun()' explícito en 'render_pagina_comercial'.
+# 5. (BUG FIX 6.5) Actualizados todos los parámetros deprecados.
+# 6. (BUG FIX 6.4) Blindado DemoPDF.add_table() para tipos de fecha.
 #
 # NOTA DE ENTORNO: Esta app requiere 'kaleido' en requirements.txt
 # Y las dependencias de sistema en 'packages.txt' para Streamlit Cloud
@@ -535,82 +537,97 @@ class DemoPDF(FPDF):
 
 @st.cache_data
 def generar_demo_pdf(df, title, intro_text, chart_fig=None):
-    """Genera un PDF genérico (MEJORADO con gráfico opcional)."""
-    pdf = DemoPDF()
-    pdf.title = title
-    pdf.add_page()
-    pdf.chapter_title("Resumen del Reporte")
-    pdf.chapter_body(intro_text)
-    
-    if chart_fig:
-        pdf.chapter_title("Análisis Visual")
-        img_bytes = io.BytesIO(chart_fig.to_image(format="png", scale=2))
-        pdf.add_chart(img_bytes)
-        pdf.ln(5)
+    """
+    Genera un PDF genérico (MEJORADO con gráfico opcional).
+    --- (BUG FIX 6.9) BLINDADO CON TRY...EXCEPT ---
+    """
+    try:
+        pdf = DemoPDF()
+        pdf.title = title
+        pdf.add_page()
+        pdf.chapter_title("Resumen del Reporte")
+        pdf.chapter_body(intro_text)
+        
+        if chart_fig:
+            pdf.chapter_title("Análisis Visual")
+            img_bytes = io.BytesIO(chart_fig.to_image(format="png", scale=2))
+            pdf.add_chart(img_bytes)
+            pdf.ln(5)
 
-    pdf.chapter_title("Datos Detallados")
-    pdf.add_table(df)
-    
-    # --- CORRECCIÓN (BUG FIX 6.7) ---
-    # .output() sin 'dest' (o con dest='S') en fpdf2 devuelve bytes.
-    # No se debe llamar a .encode() sobre un objeto bytes.
-    return pdf.output()
+        pdf.chapter_title("Datos Detallados")
+        pdf.add_table(df)
+        
+        # --- CORRECCIÓN (BUG FIX 6.7) ---
+        # .output() sin 'dest' (o con dest='S') en fpdf2 devuelve bytes.
+        # No se debe llamar a .encode() sobre un objeto bytes.
+        return pdf.output()
+    except Exception as e:
+        st.error(f"Error fatal en la generación de PDF: {e}")
+        return None # Devuelve None en caso de fallo
 
 @st.cache_data
 def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
-    """Genera un PDF de estado de cuenta (MEJORADO con gráfico)."""
-    pdf = DemoPDF()
-    pdf.title = "Estado de Cuenta"
-    pdf.add_page()
-    
-    pdf.chapter_title("Información del Cliente")
-    # ... Lógica de info de cliente (usa set_text_color(r, g, b) ya corregido en los estilos) ...
-    pdf.set_font('Arial', '', 10)
-    pdf.set_text_color(0, 0, 0) # Asegurar color de texto
-    pdf.cell(40, 6, "Cliente:")
-    pdf.set_font('Arial', 'B', 10)
-    pdf.cell(0, 6, cliente_info['Cliente'])
-    pdf.ln()
-    pdf.set_font('Arial', '', 10)
-    pdf.cell(40, 6, "NIT:")
-    pdf.set_font('Arial', 'B', 10)
-    pdf.cell(0, 6, cliente_info['NIT'])
-    pdf.ln()
-    pdf.set_font('Arial', '', 10)
-    pdf.cell(40, 6, "Teléfono:")
-    pdf.set_font('Arial', 'B', 10)
-    pdf.cell(0, 6, cliente_info['Teléfono'])
-    pdf.ln()
-    pdf.set_font('Arial', '', 10)
-    pdf.cell(40, 6, "Email:")
-    pdf.set_font('Arial', 'B', 10)
-    pdf.cell(0, 6, cliente_info['Email'])
-    pdf.ln(10)
-
-    pdf.chapter_title("Detalle de Facturas Vencidas")
-    pdf.add_table(df[['Factura', 'Fecha Vencimiento', 'Días Vencido', 'Monto']])
-    pdf.ln(5)
-    
-    total_vencido = df['Monto'].sum()
-    pdf.set_font('Arial', 'B', 12)
-    # Convertir HEX a RGB para acento rojo
-    hex_rojo = COLOR_ACENTO_ROJO.replace("#", "")
-    pdf.set_fill_color(int(hex_rojo[0:2], 16), int(hex_rojo[2:4], 16), int(hex_rojo[4:6], 16))
-    pdf.set_text_color(255, 255, 255)
-    pdf.cell(0, 12, f"TOTAL VENCIDO: ${total_vencido:,.0f}", 1, 1, 'C', fill=True)
-    pdf.ln(10)
-
-    pdf.chapter_title("Composición de la Deuda (Global)")
-    if chart_fig:
-        # Esta es la línea que falla si 'kaleido' no está instalado
-        # o si faltan las dependencias del sistema (ver packages.txt)
-        img_bytes = io.BytesIO(chart_fig.to_image(format="png", scale=2))
-        pdf.add_chart(img_bytes)
+    """
+    Genera un PDF de estado de cuenta (MEJORADO con gráfico).
+    --- (BUG FIX 6.9) BLINDADO CON TRY...EXCEPT ---
+    """
+    try:
+        pdf = DemoPDF()
+        pdf.title = "Estado de Cuenta"
+        pdf.add_page()
         
-    # --- CORRECCIÓN (BUG FIX 6.7) ---
-    # .output() sin 'dest' (o con dest='S') en fpdf2 devuelve bytes.
-    # No se debe llamar a .encode() sobre un objeto bytes.
-    return pdf.output()
+        pdf.chapter_title("Información del Cliente")
+        # ... Lógica de info de cliente (usa set_text_color(r, g, b) ya corregido en los estilos) ...
+        pdf.set_font('Arial', '', 10)
+        pdf.set_text_color(0, 0, 0) # Asegurar color de texto
+        pdf.cell(40, 6, "Cliente:")
+        pdf.set_font('Arial', 'B', 10)
+        pdf.cell(0, 6, cliente_info['Cliente'])
+        pdf.ln()
+        pdf.set_font('Arial', '', 10)
+        pdf.cell(40, 6, "NIT:")
+        pdf.set_font('Arial', 'B', 10)
+        pdf.cell(0, 6, cliente_info['NIT'])
+        pdf.ln()
+        pdf.set_font('Arial', '', 10)
+        pdf.cell(40, 6, "Teléfono:")
+        pdf.set_font('Arial', 'B', 10)
+        pdf.cell(0, 6, cliente_info['Teléfono'])
+        pdf.ln()
+        pdf.set_font('Arial', '', 10)
+        pdf.cell(40, 6, "Email:")
+        pdf.set_font('Arial', 'B', 10)
+        pdf.cell(0, 6, cliente_info['Email'])
+        pdf.ln(10)
+
+        pdf.chapter_title("Detalle de Facturas Vencidas")
+        pdf.add_table(df[['Factura', 'Fecha Vencimiento', 'Días Vencido', 'Monto']])
+        pdf.ln(5)
+        
+        total_vencido = df['Monto'].sum()
+        pdf.set_font('Arial', 'B', 12)
+        # Convertir HEX a RGB para acento rojo
+        hex_rojo = COLOR_ACENTO_ROJO.replace("#", "")
+        pdf.set_fill_color(int(hex_rojo[0:2], 16), int(hex_rojo[2:4], 16), int(hex_rojo[4:6], 16))
+        pdf.set_text_color(255, 255, 255)
+        pdf.cell(0, 12, f"TOTAL VENCIDO: ${total_vencido:,.0f}", 1, 1, 'C', fill=True)
+        pdf.ln(10)
+
+        pdf.chapter_title("Composición de la Deuda (Global)")
+        if chart_fig:
+            # Esta es la línea que falla si 'kaleido' no está instalado
+            # o si faltan las dependencias del sistema (ver packages.txt)
+            img_bytes = io.BytesIO(chart_fig.to_image(format="png", scale=2))
+            pdf.add_chart(img_bytes)
+            
+        # --- CORRECCIÓN (BUG FIX 6.7) ---
+        # .output() sin 'dest' (o con dest='S') en fpdf2 devuelve bytes.
+        # No se debe llamar a .encode() sobre un objeto bytes.
+        return pdf.output()
+    except Exception as e:
+        st.error(f"Error fatal en la generación de PDF Cartera: {e}")
+        st.error("Esto suele ocurrir si 'kaleido' o sus dependencias de sistema (packages.txt) no están instalados.")
+        return None # Devuelve None en caso de fallo
 
 @st.cache_data
 def generar_demo_excel(df_dict):
@@ -1058,13 +1075,16 @@ def render_pagina_comercial():
                         "Cotización de Ejemplo",
                         "Este es un ejemplo de cotización profesional generada automáticamente por el sistema de GM-DATOVATE con los productos seleccionados."
                     )
+                    
+                    # --- (BUG FIX 6.9) Añadida comprobación de 'is None' ---
                     st.download_button(
                         label="📄 Descargar PDF Profesional (Demo)",
                         data=pdf_data,
                         file_name="Demo_Cotizacion_GM-DATOVATE.pdf",
                         mime="application/pdf",
                         use_container_width=True,
-                        type="primary"
+                        type="primary",
+                        disabled=(pdf_data is None) # Corrección
                     )
                     if st.button("Vaciar Carrito", use_container_width=True):
                         st.session_state.cart = pd.DataFrame(columns=['Referencia', 'Producto', 'Cantidad', 'Vlr. Unitario', 'Total'])
@@ -1140,15 +1160,18 @@ def render_pagina_operaciones():
             })
 
             c1, c2 = st.columns(2)
+            
+            # --- (BUG FIX 6.9) Añadida comprobación de 'is None' ---
+            # Esta es la línea del traceback
             c1.download_button(
                 label="📄 Descargar Orden de Compra PDF (Demo)", data=pdf_data,
                 file_name="Demo_Orden_de_Compra.pdf", mime="application/pdf", use_container_width=True, type="primary",
-                disabled=df_orden.empty
+                disabled=df_orden.empty or pdf_data is None # Corrección
             )
             c2.download_button(
                 label="📊 Descargar Reporte Excel (Demo)", data=excel_data,
                 file_name="Demo_Reporte_Abastecimiento.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True,
-                disabled=edited_df.empty or excel_data is None # Deshabilitar si falla la generación
+                disabled=edited_df.empty or excel_data is None # Esta ya estaba correcta
             )
 
     # --- DEMO 2: CONTROL DE INVENTARIO MÓVIL ---
@@ -1299,10 +1322,12 @@ def render_pagina_finanzas():
                 # Esta es la línea que genera el error si falta la dependencia del sistema
                 pdf_cartera = generar_demo_pdf_cartera(cliente_demo_data, cliente_info, fig_pie)
                 
+                # --- (BUG FIX 6.9) Añadida comprobación de 'is None' ---
                 c1.download_button(
                     label="📄 Descargar PDF (Demo)", data=pdf_cartera,
                     file_name=f"Cartera_{cliente_info['Cliente']}.pdf", mime="application/pdf",
-                    use_container_width=True
+                    use_container_width=True,
+                    disabled=(pdf_cartera is None) # Corrección
                 )
                 
                 if c2.button("✉️ Enviar Email (Demo)", use_container_width=True):
@@ -1384,7 +1409,8 @@ def render_pagina_finanzas():
                 excel_demo_data, 
                 file_name="Demo_Reporte_Riesgo_GM-DATOVATE.xlsx", 
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-                use_container_width=True, type="primary"
+                use_container_width=True, type="primary",
+                disabled=(excel_demo_data is None) # Comprobación de seguridad
             )
 
 def render_pagina_integracion():
