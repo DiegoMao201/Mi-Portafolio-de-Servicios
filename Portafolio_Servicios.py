@@ -1,11 +1,17 @@
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 6.4 (Edición "Máxima Estabilidad de Documentos")
+# VERSIÓN: 6.5 (Edición "Compatibilidad Futura")
 # CORRECCIÓN CRÍTICA:
-# 1. (BUG FIX 6.4) Blindado el DemoPDF.add_table() para manejar correctamente
-#    los tipos de fecha/timestamp, resolviendo potencial TypeError.
-# 2. (BUG FIX 6.3) Corregido el uso de set_text_color() en DemoPDF.add_table (previo fix).
-# 3. (BUG FIX 6.2) Corregido TypeError en generar_demo_excel al acceder a iloc[0] (previo fix).
+# 1. (BUG FIX 6.5) Actualizados todos los parámetros deprecados:
+#    - use_container_width=True -> width='stretch'
+#    - use_column_width=True -> width='stretch'
+#    - Styler.applymap -> Styler.map
+# 2. (BUG FIX 6.4) Blindado DemoPDF.add_table() para tipos de fecha (previo fix).
+# 3. (BUG FIX 6.3) Corregido set_text_color() (previo fix).
+# 4. (BUG FIX 6.2) Corregido TypeError en generar_demo_excel (previo fix).
+#
+# NOTA DE ENTORNO: Esta app requiere 'kaleido' en requirements.txt
+# $ pip install kaleido
 # ======================================================================================
 
 import streamlit as st
@@ -439,7 +445,6 @@ class DemoPDF(FPDF):
                 self.set_text_color(0,0,0)
                 self.ln(5)
 
-    # --- MÉTODO CORREGIDO/BLINDADO ---
     def add_table(self, df):
         if df.empty:
             # Uso correcto de RGB para texto secundario
@@ -590,6 +595,7 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
 
     pdf.chapter_title("Composición de la Deuda (Global)")
     if chart_fig:
+        # Esta es la línea que falla si 'kaleido' no está instalado
         img_bytes = io.BytesIO(chart_fig.to_image(format="png", scale=2))
         pdf.add_chart(img_bytes)
         
@@ -873,7 +879,6 @@ def render_pagina_comercial():
             
             if df_filtrada.empty:
                 st.warning("No hay datos para los filtros seleccionados.")
-                # st.stop() # No se usa st.stop() para permitir que el resto del código se renderice
                 
             else:
                 st.markdown("##### KPIs Generales")
@@ -901,14 +906,14 @@ def render_pagina_comercial():
                         title='Rendimiento de Ventas vs. Meta (Filtrado)',
                         color_discrete_map={'Ventas ($)': COLOR_SECUNDARIO, 'Meta ($)': COLOR_ACENTO_ROJO}
                     )
-                    st.plotly_chart(fig_bar, use_container_width=True)
+                    st.plotly_chart(fig_bar, width='stretch')
                     
                     fig_donut = px.pie(
                         SAMPLE_DATA['ventas_categoria'], values='Ventas ($)', names='Categoria', 
                         title='Ventas por Categoría (Global)', hole=0.4,
                         color_discrete_sequence=px.colors.sequential.Blues_r
                     )
-                    st.plotly_chart(fig_donut, use_container_width=True)
+                    st.plotly_chart(fig_donut, width='stretch')
 
                 with graf_c2:
                     fig_line = px.line(
@@ -917,7 +922,7 @@ def render_pagina_comercial():
                         markers=True
                     )
                     fig_line.update_traces(line_color=COLOR_PRIMARIO)
-                    st.plotly_chart(fig_line, use_container_width=True)
+                    st.plotly_chart(fig_line, width='stretch')
 
     # --- DEMO 2: ASISTENTE PROACTIVO (SIMULACIÓN IA) ---
     with tab2:
@@ -930,7 +935,7 @@ def render_pagina_comercial():
                 index=0
             )
             
-            if st.button("Generar Plan de Acción (Simulación IA)", type="primary", use_container_width=True):
+            if st.button("Generar Plan de Acción (Simulación IA)", type="primary", width='stretch'):
                 with st.spinner(f"Analizando historial de {vendedor_seleccionado}... (Simulación)"):
                     time.sleep(1.5)
                 
@@ -982,12 +987,12 @@ def render_pagina_comercial():
                     col = product_cols[i % num_cols]
                     with col:
                         with st.container(border=True):
-                            st.image(row['ImagenURL'], use_column_width=True)
+                            st.image(row['ImagenURL'], width='stretch')
                             st.markdown(f"**{row['Producto']}**")
                             st.markdown(f"<span style='color: {COLOR_PRIMARIO}; font-size: 1.1rem; font-weight: bold;'>${row['Vlr. Unitario']:,.0f}</span>", unsafe_allow_html=True)
                             st.markdown(f"<span style='color: {COLOR_TEXTO_SECUNDARIO}; font-size: 0.9rem;'>Stock: {row['Stock']}</span>", unsafe_allow_html=True)
                             
-                            if st.button(f"🛒 Añadir", key=f"add_cart_{row['Referencia']}", use_container_width=True):
+                            if st.button(f"🛒 Añadir", key=f"add_cart_{row['Referencia']}", width='stretch'):
                                 if row['Referencia'] in st.session_state.cart['Referencia'].values:
                                     st.toast(f"'{row['Producto']}' ya está en el carrito.", icon="⚠️")
                                 else:
@@ -1019,7 +1024,7 @@ def render_pagina_comercial():
                             "Referencia": st.column_config.Column(disabled=True),
                             "Producto": st.column_config.Column(disabled=True),
                         },
-                        use_container_width=True, 
+                        width='stretch', 
                         hide_index=True,
                         key="cart_editor"
                     )
@@ -1043,10 +1048,10 @@ def render_pagina_comercial():
                         data=pdf_data,
                         file_name="Demo_Cotizacion_GM-DATOVATE.pdf",
                         mime="application/pdf",
-                        use_container_width=True,
+                        width='stretch',
                         type="primary"
                     )
-                    if st.button("Vaciar Carrito", use_container_width=True):
+                    if st.button("Vaciar Carrito", width='stretch'):
                         st.session_state.cart = pd.DataFrame(columns=['Referencia', 'Producto', 'Cantidad', 'Vlr. Unitario', 'Total'])
                         st.rerun()
 
@@ -1085,7 +1090,7 @@ def render_pagina_operaciones():
                     "Sugerencia Traslado": st.column_config.NumberColumn(format="%d", disabled=True),
                     "Sugerencia Compra": st.column_config.NumberColumn(format="%d", disabled=True)
                 },
-                use_container_width=True, 
+                width='stretch', 
                 hide_index=True,
                 key="abastecimiento_editor"
             )
@@ -1094,11 +1099,12 @@ def render_pagina_operaciones():
             edited_df['Sugerencia Traslado'] = 0 
             edited_df['Sugerencia Compra'] = (edited_df['Necesidad Real'] - (edited_df['Stock (Total)'] + edited_df['Stock Tránsito'])).clip(lower=0).astype(int)
             
+            # --- CORRECCIÓN DE DEPRECACIÓN: .applymap -> .map ---
             st.dataframe(
                 edited_df.style
-                    .applymap(lambda x: f'background-color: {COLOR_ACENTO_ROJO}; color: white; font-weight: bold;' if x > 0 else '', subset=['Sugerencia Compra'])
+                    .map(lambda x: f'background-color: {COLOR_ACENTO_ROJO}; color: white; font-weight: bold;' if x > 0 else '', subset=['Sugerencia Compra'])
                     .format({"Stock (Total)": "{:,.0f}", "Stock Tránsito": "{:,.0f}", "Necesidad Real": "{:,.0f}", "Sugerencia Traslado": "{:,.0f}", "Sugerencia Compra": "{:,.0f}"}),
-                use_container_width=True, hide_index=True
+                width='stretch', hide_index=True
             )
             
             # --- Botones de acción (Usa la función corregida) ---
@@ -1121,12 +1127,12 @@ def render_pagina_operaciones():
             c1, c2 = st.columns(2)
             c1.download_button(
                 label="📄 Descargar Orden de Compra PDF (Demo)", data=pdf_data,
-                file_name="Demo_Orden_de_Compra.pdf", mime="application/pdf", use_container_width=True, type="primary",
+                file_name="Demo_Orden_de_Compra.pdf", mime="application/pdf", width='stretch', type="primary",
                 disabled=df_orden.empty
             )
             c2.download_button(
                 label="📊 Descargar Reporte Excel (Demo)", data=excel_data,
-                file_name="Demo_Reporte_Abastecimiento.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True,
+                file_name="Demo_Reporte_Abastecimiento.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", width='stretch',
                 disabled=edited_df.empty or excel_data is None # Deshabilitar si falla la generación
             )
 
@@ -1145,7 +1151,7 @@ def render_pagina_operaciones():
                 
                 st.markdown("**Conteo Parcial (Calculadora):**")
                 qty = st.number_input("Añadir cantidad:", value=0, step=1, key="demo_qty")
-                if st.button("Registrar Cantidad", type="primary", use_container_width=True):
+                if st.button("Registrar Cantidad", type="primary", width='stretch'):
                     st.toast(f"Se registraron {qty} unidades. El total se actualizará.", icon="✅")
 
             with col2:
@@ -1156,8 +1162,8 @@ def render_pagina_operaciones():
                     'Contado': [118, 505],
                     'Historial Conteo': ["+50, +50, +10, +8", "+500, +5"],
                     'Diferencia': [-2, 5]
-                }), use_container_width=True, hide_index=True)
-                if st.button("Enviar Conteo Final para Revisión (Demo)", use_container_width=True):
+                }), width='stretch', hide_index=True)
+                if st.button("Enviar Conteo Final para Revisión (Demo)", width='stretch'):
                     st.success("¡Conteo enviado! El gerente será notificado.")
                     st.balloons()
             
@@ -1205,9 +1211,9 @@ def render_pagina_operaciones():
                         
                         st.info("Resumen de Cambios:\n* **2** productos actualizados (Stock y Precio).\n* **1** producto nuevo detectado ('F-606').")
                         st.markdown("**Productos Nuevos Detectados:**")
-                        st.dataframe(pd.DataFrame({'SKU': ['F-606'], 'Producto': ['Lija de Agua'], 'Stock': [1000]}), use_container_width=True, hide_index=True)
+                        st.dataframe(pd.DataFrame({'SKU': ['F-606'], 'Producto': ['Lija de Agua'], 'Stock': [1000]}), width='stretch', hide_index=True)
                         st.markdown("**Muestra de Datos Cargados:**")
-                        st.dataframe(df_nuevo.head(3), use_container_width=True)
+                        st.dataframe(df_nuevo.head(3), width='stretch')
 
                 except Exception as e:
                     st.error(f"Error al procesar el archivo: {e}")
@@ -1247,7 +1253,7 @@ def render_pagina_finanzas():
                 df_cartera, values='Valor ($)', names='Rango', title='Deuda por Antigüedad',
                 hole=0.4, color='Rango', color_discrete_map=dict(zip(df_cartera['Rango'], df_cartera['Color']))
             )
-            st.plotly_chart(fig_pie, use_container_width=True)
+            st.plotly_chart(fig_pie, width='stretch')
             
             st.divider()
             
@@ -1263,7 +1269,7 @@ def render_pagina_finanzas():
                 st.dataframe(cliente_demo_data[['Factura', 'Fecha Vencimiento', 'Días Vencido', 'Monto']].style.format({
                     "Días Vencido": "{:,.0f}",
                     "Monto": "${:,.0f}"
-                }), use_container_width=True, hide_index=True)
+                }), width='stretch', hide_index=True)
                 
                 mensaje_wa = (
                     f"👋 ¡Hola {cliente_info['Cliente']}! Te saludamos desde GM-DATOVATE (Demo).\n\n"
@@ -1279,13 +1285,13 @@ def render_pagina_finanzas():
                 c1.download_button(
                     label="📄 Descargar PDF (Demo)", data=pdf_cartera,
                     file_name=f"Cartera_{cliente_info['Cliente']}.pdf", mime="application/pdf",
-                    use_container_width=True
+                    width='stretch'
                 )
                 
-                if c2.button("✉️ Enviar Email (Demo)", use_container_width=True):
+                if c2.button("✉️ Enviar Email (Demo)", width='stretch'):
                     st.toast("Simulación: Email enviado a " + cliente_info['Email'], icon="✉️")
 
-                c3.link_button("📲 Enviar WhatsApp (Demo)", url_wa, use_container_width=True)
+                c3.link_button("📲 Enviar WhatsApp (Demo)", url_wa, width='stretch')
 
     # --- DEMO 2: AUTOMATIZACIÓN CONTABLE (INTERACTIVO) ---
     with tab2:
@@ -1309,7 +1315,7 @@ def render_pagina_finanzas():
                     "Tipo": st.column_config.Column(disabled=True),
                     "Valor": st.column_config.NumberColumn(format="$ %d", min_value=0, step=10000)
                 },
-                use_container_width=True,
+                width='stretch',
                 hide_index=True,
                 key="cuadre_editor"
             )
@@ -1334,7 +1340,7 @@ def render_pagina_finanzas():
             st.download_button(
                 label="💾 Descargar .TXT para ERP (Demo)", data=demo_txt,
                 file_name="Demo_Contable_GM-DATOVATE.txt", mime="text/plain",
-                use_container_width=True, type="primary", disabled=(diferencia != 0)
+                width='stretch', type="primary", disabled=(diferencia != 0)
             )
 
     # --- DEMO 3: AUTOMATIZACIÓN DE RIESGO ---
@@ -1351,17 +1357,17 @@ def render_pagina_finanzas():
             })
             
             st.warning("**Acción: Estas facturas están en nuestra cartera pero no en la agencia. Deben subirse.**")
-            st.dataframe(SAMPLE_DATA['covinoc_subir'], use_container_width=True, hide_index=True)
+            st.dataframe(SAMPLE_DATA['covinoc_subir'], width='stretch', hide_index=True)
             
             st.success("**Acción: Estas facturas ya fueron pagadas (no están en cartera) pero siguen activas en la agencia. Deben exonerarse.**")
-            st.dataframe(SAMPLE_DATA['covinoc_exonerar'], use_container_width=True, hide_index=True)
+            st.dataframe(SAMPLE_DATA['covinoc_exonerar'], width='stretch', hide_index=True)
 
             st.download_button(
                 "📥 Descargar Reporte de Acciones (Excel Demo)", 
                 excel_demo_data, 
                 file_name="Demo_Reporte_Riesgo_GM-DATOVATE.xlsx", 
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-                use_container_width=True, type="primary"
+                width='stretch', type="primary"
             )
 
 def render_pagina_integracion():
@@ -1407,7 +1413,7 @@ def render_pagina_integracion():
             otp_c1, otp_c2 = st.columns([1, 2])
             
             with otp_c1:
-                if st.button("Enviar Código OTP (Simulación)", use_container_width=True, disabled=st.session_state.otp_sent):
+                if st.button("Enviar Código OTP (Simulación)", width='stretch', disabled=st.session_state.otp_sent):
                     with st.spinner(f"Enviando código a {email_otp}..."):
                         st.session_state.otp_code = str(np.random.randint(100000, 999999))
                         time.sleep(1)
@@ -1423,7 +1429,7 @@ def render_pagina_integracion():
             if st.session_state.otp_sent and not otp_validado and len(otp_input) == 6:
                 st.warning("Código OTP incorrecto. Intente de nuevo.")
 
-            if st.button("Finalizar Vinculación y Generar PDF (Demo)", use_container_width=True, type="primary", disabled=not otp_validado):
+            if st.button("Finalizar Vinculación y Generar PDF (Demo)", width='stretch', type="primary", disabled=not otp_validado):
                 st.success("¡Vinculación Simulada! En una implementación real, esto generaría un PDF legal y lo archivaría en la nube.")
                 st.balloons()
                 # Resetear OTP
@@ -1532,7 +1538,7 @@ def render_pagina_contacto():
                     placeholder="Ej: 'Mi inventario nunca cuadra', 'Mi equipo de ventas es muy lento para cotizar', 'No tengo idea de mi cartera vencida en tiempo real'..."
                 )
                 
-                submit = st.form_submit_button("Solicitar Consulta Estratégica", use_container_width=True)
+                submit = st.form_submit_button("Solicitar Consulta Estratégica", width='stretch')
                 
                 if submit:
                     if not all([nombre, empresa, email, desafio]):
