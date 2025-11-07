@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 6.2 (Edición "Estabilidad Total y Estética Móvil")
+# VERSIÓN: 6.3 (Edición "Máxima Estabilidad de Documentos")
 # CORRECCIÓN CRÍTICA:
-# 1. (BUG FIX 6.2) Corregido TypeError en generar_demo_excel al acceder a df[col].iloc[0]
-#    sin validar si el DataFrame o la columna están vacíos o contienen solo NaN.
-# 2. (BUG FIX 6.2) Corregido error 'NameError' en CSS de media query al escapar
-#    llaves ({}) en f-string (corrección aplicada en la versión anterior).
+# 1. (BUG FIX 6.3) Corregido TypeError: FPDF.set_text_color() got an unexpected 
+#    keyword argument 'as_r_g_b' en DemoPDF.add_table.
+# 2. (BUG FIX 6.2) Corregido TypeError en generar_demo_excel al acceder a iloc[0].
 # ======================================================================================
 
 import streamlit as st
@@ -34,7 +33,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed" # La barra lateral se oculta por defecto
 )
 
-# --- PALETA DE COLORES Y ESTILOS (Ajustada) ---
+# --- PALETA DE COLORES Y ESTILOS ---
 COLOR_PRIMARIO = "#0D3B66"       # Azul profundo (Confianza, Inteligencia)
 COLOR_SECUNDARIO = "#1A73E8"     # Azul brillante (Tecnología, Innovación)
 COLOR_ACENTO_ROJO = "#F94144"        # Rojo vivo (Acción, Alerta)
@@ -46,16 +45,13 @@ COLOR_TEXTO = "#2F2F2F"
 COLOR_TEXTO_SECUNDARIO = "#555555"
 
 # --- IMÁGENES EMBEBIDAS EN BASE64 (SVG Placeholders) ---
-# Esto asegura que el demo nunca falle por problemas de red o URLs de imágenes.
-
 IMG_TEAM_DIEGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNy41IDEyLjVMMTcgMTAuNWwyLTVoNGwxLjUgMyI+PC9wYXRoPjwvc3ZnPg=="
-IMG_TEAM_PABLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNyAxMGwxLjUgMS41TDYgMjFIMTciPjwvcGF0aD48L3N2Zz4="
-
+IMG_TEAM_PABLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNyAxMGwxLjUgMS41TDYgMjFIMTciPjwvcGF0aD48L3N2Zz4=="
 IMG_PROD_DISCO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtdGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI5Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIj48L2NpcmNsZT48L3N2Zz4="
 IMG_PROD_TORNILLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOC4zNCA1LjY2YTIuMTIgMi4xMiAwIDAgMSAwIDNMNi4yMSAxOS44M2wtMi0yTDExLjM0IDguNjZhMi4xMiAyLjEyIDAgMCAxIDMtM3oiPjwvcGF0aD48bGluZSB4MT0iMyIgeTE9IjE0IiB4Mj0iMTAiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSI3IiB5MT0iMTIiIHgyPSIxMiIgeTI9IjE3Ij48L2xpbmU+PGxpbmUgeDE9IjExIiB5MT0iOCIgeDI9IjE2IiB5Mj0iMTMiPjwvbGluZT48L3N2Zz4="
 IMG_PROD_ELECTRODO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yIDE4SDVhMyAzIDAgMCAwIDMtM1Y5YTMgMyAwIDAgMCAzLTNoM2EzIDMgMCAwIDAgMy0zVjIiPjwvcGF0aD48bGluZSB4MT0iMTIiIHkxPSI2IiB4Mj0iOCIgeTI9IjEwIj48L2xpbmU+PGxpbmUgeDE9IjgiIHkxPSIxNCIgeDI9IjEwIiB5Mj0iMTIiPjwvbGluZT48bGluZSB4MT0iMTYiIHkxPSI0IiB4Mj0iMTQiIHkyPSI2Ij48L2xpbmU+PGxpbmUgeDE9IjUiIHkxPSIyMiIgeDI9IjIiIHkyPSIxOCI+PC9saW5lPjxsaW5lIHgxPSI5IiB5MT0iMTgiIHgyPSI1IiB5Mj0iMTQiPjwvbGluZT48L3N2Zz4="
 IMG_PROD_GAFA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjYuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMTcuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PHBhdGggZD0iTTIgMTUuNWE0LjUgNC41IDAgMCAwIDQuNSA0LjVoMTFBNi41IDYuNSAwIDAgMCAyMiAxNS41Ij48L3BhdGg+PHBhdGggZD0iTTYuNSAxMS41YTQuNSA0LjUgMCAwIDEgMC05bTEuMiAzLjJsMS4zLTEuNW04LjUgNy4zbDEuNSAxLjUiPjwvcGF0aD48L3N2Zz4="
-IMG_PROD_GUANTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxNGExMiAxMiAwIDAgMS04IDhIMWwtMy04VjZhNCA0IDAgMCAxIDQtNGg1LjVMMTAgNyI+PC9wYXRoPjxwYXRoIGQ9Ik0xMS41IDZhNC41IDQuNSAwIDEgMSAwIDlWNmEiPjwvcGF0aD48cGF0aCBkPSJNMTYgNmE0IDQgMCAwIDEgMCA4VjYiPjwvcGF0aD48cGF0aCBkPSJNMTkgNmEzIDMgMCAwIDEgMCA2VjYiPjwvcGF0aD48L3N2Zz4="
+IMG_PROD_GUANTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxNGExMiAxMiAwIDAgMS04IDhIMWwtMy04VjZhNCA0IDAgMCAxIDQtNGg1LjVMMTAgNyI+PC9wYXRoPjxwYXRoIGQ9Ik0xMS41IDZhNC41IDQuNSAwIDEgMSAwIDlWNmEiPjwvcGF0aD48cGF0aCBkPSJNMTYgNmE0IDQgMCAwIDEgMCA4VjYiPjwvcGF0aD48cGFhdGggZD0iJNTE5IDZhMyAzIDAgMCAxIDAgNlY2Ij48L3BhdGg+PC9zdmc+"
 
 # --- INYECCIÓN DE CSS GLOBAL (PROFESIONAL) ---
 st.markdown(f"""
@@ -77,7 +73,7 @@ st.markdown(f"""
         padding: 0rem;
     }}
     
-    /* MEJORA 6.0: Forzar Fondo Claro (Evita "modo combinado" en móviles) */
+    /* Forzar Fondo Claro */
     .stApp {{
         background-color: {COLOR_FONDO} !important;
     }}
@@ -85,7 +81,7 @@ st.markdown(f"""
         background-color: {COLOR_FONDO} !important;
     }}
 
-    /* --- Animaciones (MEJORA 4.0) --- */
+    /* --- Animaciones --- */
     @keyframes fadeIn {{
         from {{ opacity: 0; transform: translateY(20px); }}
         to {{ opacity: 1; transform: translateY(0); }}
@@ -103,27 +99,20 @@ st.markdown(f"""
         border-top: 1px solid #E0E0E0;
         border-bottom: 1px solid #E0E0E0;
     }}
-    .section-container-darker {{
-        background-color: {COLOR_PRIMARIO};
-        color: white;
-    }}
-    .section-container-darker h1, .section-container-darker h2, .section-container-darker h3, .section-container-darker p {{
-        color: white;
-    }}
     
-    /* --- Héroe (Banner Principal) - Centrado y Limpio --- */
+    /* --- Héroe (Banner Principal) --- */
     .hero-container {{
         display: flex;
         align-items: center;
         justify-content: center;
-        text-align: center; /* Centrado */
+        text-align: center;
         padding: 6rem 2rem;
         background: linear-gradient(135deg, {COLOR_PRIMARIO} 0%, {COLOR_SECUNDARIO} 100%);
         color: white;
         min-height: 70vh;
     }}
     .hero-content {{
-        max-width: 800px; /* Más ancho para el texto */
+        max-width: 800px;
         animation: fadeIn 1s ease-out;
     }}
     .hero-container h1 {{
@@ -136,7 +125,7 @@ st.markdown(f"""
     .hero-container h3 {{
         font-size: 1.6rem;
         font-weight: 400;
-        color: {COLOR_ACENTO_NARANJA}; /* Color más vibrante */
+        color: {COLOR_ACENTO_NARANJA};
         margin-top: 1rem;
     }}
     .hero-container p {{
@@ -254,7 +243,7 @@ st.markdown(f"""
 
 # --- FUNCIÓN AUXILIAR PARA RENDERIZAR KPIs PERSONALIZADOS ---
 def render_kpi(title, value, delta=None, delta_color="normal", card_color=""):
-    """Renderiza una tarjeta de KPI con CSS personalizado (MEJORADO)."""
+    """Renderiza una tarjeta de KPI con CSS personalizado."""
     delta_html = ""
     if delta:
         if delta_color == "inverse":
@@ -269,12 +258,9 @@ def render_kpi(title, value, delta=None, delta_color="normal", card_color=""):
         
         delta_html = f'<div class="kpi-delta" style="font-size: 0.9rem; font-weight: 600; color: {color};">{arrow} {delta}</div>'
     
-    card_class = "kpi-card"
     if card_color == "red":
-        card_class = "kpi-card"
         border_color = COLOR_ACENTO_ROJO
     elif card_color == "green":
-        card_class = "kpi-card"
         border_color = COLOR_ACENTO_VERDE
     else:
         border_color = COLOR_PRIMARIO
@@ -317,7 +303,7 @@ def get_sample_data():
         'Ventas ($)': [110_000_000, 90_000_000, 75_000_000, 103_000_000]
     })
 
-    # --- Datos de Cotizador (Imágenes Base64) ---
+    # --- Datos de Cotizador ---
     data['catalogo_productos'] = pd.DataFrame({
         'Referencia': ['A-101', 'B-202', 'C-303', 'D-404', 'E-505'],
         'Producto': ['Disco Corte 4-1/2"', 'Tornillo Drywall 6x1', 'Electrodo 6013', 'Gafa de Seguridad', 'Guante Vaqueta'],
@@ -372,7 +358,7 @@ def get_sample_data():
 SAMPLE_DATA = get_sample_data()
 
 
-# --- INICIALIZACIÓN DE SESSION STATE (PROFESIONAL) ---
+# --- INICIALIZACIÓN DE SESSION STATE ---
 if 'cart' not in st.session_state:
     st.session_state.cart = pd.DataFrame(columns=['Referencia', 'Producto', 'Cantidad', 'Vlr. Unitario', 'Total'])
 if 'chat_messages' not in st.session_state:
@@ -398,7 +384,7 @@ class DemoPDF(FPDF):
         self.title = "Documento de Demostración"
 
     def header(self):
-        # Fondo del encabezado con color primario
+        # Fondo del encabezado con color primario (convertir HEX a RGB)
         self.set_fill_color(int(COLOR_PRIMARIO[1:3], 16), int(COLOR_PRIMARIO[3:5], 16), int(COLOR_PRIMARIO[5:7], 16))
         self.rect(0, 0, self.w, 30, 'F')
         
@@ -407,9 +393,11 @@ class DemoPDF(FPDF):
         self.set_xy(10, 10)
         self.cell(0, 10, 'GM-DATOVATE', 0, 0, 'L')
 
+        # Título del documento (convertir HEX a RGB)
+        hex_acento = COLOR_ACENTO_NARANJA.replace("#", "")
+        self.set_text_color(int(hex_acento[0:2], 16), int(hex_acento[2:4], 16), int(hex_acento[4:6], 16))
         self.set_xy(10, 18)
         self.set_font('Arial', 'B', 15)
-        self.set_text_color(int(COLOR_ACENTO_NARANJA[1:3], 16), int(COLOR_ACENTO_NARANJA[3:5], 16), int(COLOR_ACENTO_NARANJA[5:7], 16))
         self.cell(0, 10, self.title, 0, 1, 'R')
         self.ln(15)
 
@@ -421,8 +409,13 @@ class DemoPDF(FPDF):
 
     def chapter_title(self, title):
         self.set_font('Arial', 'B', 12)
-        self.set_fill_color(int(COLOR_FONDO_SECUNDARIO[1:3], 16), int(COLOR_FONDO_SECUNDARIO[3:5], 16), int(COLOR_FONDO_SECUNDARIO[5:7], 16))
-        self.set_text_color(int(COLOR_PRIMARIO[1:3], 16), int(COLOR_PRIMARIO[3:5], 16), int(COLOR_PRIMARIO[5:7], 16))
+        # Convertir HEX a RGB para fondo secundario
+        hex_fondo = COLOR_FONDO_SECUNDARIO.replace("#", "")
+        self.set_fill_color(int(hex_fondo[0:2], 16), int(hex_fondo[2:4], 16), int(hex_fondo[4:6], 16))
+        # Convertir HEX a RGB para color primario
+        hex_primario = COLOR_PRIMARIO.replace("#", "")
+        self.set_text_color(int(hex_primario[0:2], 16), int(hex_primario[2:4], 16), int(hex_primario[4:6], 16))
+        
         self.cell(0, 10, f" {title}", 0, 1, 'L', fill=True)
         self.ln(4)
         
@@ -438,7 +431,6 @@ class DemoPDF(FPDF):
             try:
                 img_width = self.w * width_percent
                 img_x = (self.w - img_width) / 2
-                # Añadir imagen desde bytes
                 self.image(chart_image, x=img_x, w=img_width, type='PNG')
             except Exception as e:
                 self.set_text_color(255, 0, 0)
@@ -448,17 +440,25 @@ class DemoPDF(FPDF):
 
     def add_table(self, df):
         if df.empty:
+            # --- CORRECCIÓN CRÍTICA 6.3: USO CORRECTO DE RGB ---
+            hex_texto_sec = COLOR_TEXTO_SECUNDARIO.replace("#", "")
+            r = int(hex_texto_sec[0:2], 16)
+            g = int(hex_texto_sec[2:4], 16)
+            b = int(hex_texto_sec[4:6], 16)
+            self.set_text_color(r, g, b) 
+            
             self.set_font('Arial', 'I', 10)
-            self.set_text_color(COLOR_TEXTO_SECUNDARIO.replace("#", ""), as_r_g_b=True)
             self.cell(0, 10, "No hay datos para mostrar en la tabla.", 0, 1)
             self.set_text_color(0, 0, 0)
             return
 
         self.set_font('Arial', 'B', 9)
-        self.set_fill_color(int(COLOR_SECUNDARIO[1:3], 16), int(COLOR_SECUNDARIO[3:5], 16), int(COLOR_SECUNDARIO[5:7], 16))
+        # Convertir HEX a RGB para cabecera de tabla
+        hex_sec = COLOR_SECUNDARIO.replace("#", "")
+        self.set_fill_color(int(hex_sec[0:2], 16), int(hex_sec[2:4], 16), int(hex_sec[4:6], 16))
         self.set_text_color(255, 255, 255)
         
-        # Lógica de cálculo de ancho de columna para ajuste profesional
+        # Lógica de cálculo de ancho de columna
         page_width = self.w - 2 * self.l_margin
         num_cols = len(df.columns)
         
@@ -540,7 +540,7 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
     pdf.add_page()
     
     pdf.chapter_title("Información del Cliente")
-    # ... Lógica de info de cliente (sin cambios) ...
+    # ... Lógica de info de cliente (sin cambios, usa set_text_color(r, g, b)) ...
     pdf.set_font('Arial', '', 10)
     pdf.cell(40, 6, "Cliente:")
     pdf.set_font('Arial', 'B', 10)
@@ -568,7 +568,9 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
     
     total_vencido = df['Monto'].sum()
     pdf.set_font('Arial', 'B', 12)
-    pdf.set_fill_color(int(COLOR_ACENTO_ROJO[1:3], 16), int(COLOR_ACENTO_ROJO[3:5], 16), int(COLOR_ACENTO_ROJO[5:7], 16))
+    # Convertir HEX a RGB para acento rojo
+    hex_rojo = COLOR_ACENTO_ROJO.replace("#", "")
+    pdf.set_fill_color(int(hex_rojo[0:2], 16), int(hex_rojo[2:4], 16), int(hex_rojo[4:6], 16))
     pdf.set_text_color(255, 255, 255)
     pdf.cell(0, 12, f"TOTAL VENCIDO: ${total_vencido:,.0f}", 1, 1, 'C', fill=True)
     pdf.ln(10)
@@ -584,7 +586,7 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
 def generar_demo_excel(df_dict):
     """
     Genera un archivo Excel con múltiples hojas, formato profesional y hoja de resumen.
-    (CORREGIDO: Bug de TypeError al verificar tipos de fecha en DataFrames vacíos).
+    (BLINDADO: Bug de TypeError al verificar tipos de fecha en DataFrames vacíos).
     """
     output = io.BytesIO()
     try:
@@ -649,14 +651,13 @@ def generar_demo_excel(df_dict):
                     
                     # Autoajustar ancho (mejorado)
                     try:
-                        # Aseguramos que la columna no esté vacía antes de calcular la longitud máxima
                         max_len_col = df[col].astype(str).map(len).max() if not df[col].empty and df[col].notna().any() else 0
                         max_len = max(len(str(col)), max_len_col)
                         ws.column_dimensions[col_letter].width = max(max_len + 4, 15)
                     except Exception:
                         ws.column_dimensions[col_letter].width = 20 # Fallback
                     
-                    # Aplicar formatos de columna (CORRECCIÓN CRÍTICA AQUÍ)
+                    # Aplicar formatos de columna (BLINDADO)
                     is_date_col = False
                     
                     if df[col].dtype == 'datetime64[ns]':
@@ -666,14 +667,13 @@ def generar_demo_excel(df_dict):
                         # Verifica de forma segura si la columna de objetos contiene fechas
                         if not df.empty and df[col].notna().any():
                             try:
+                                # Acceder de forma segura al primer elemento no nulo
                                 first_non_nan = df[col].dropna().iloc[0]
                                 if isinstance(first_non_nan, (datetime, datetime.date, pd.Timestamp)):
                                     is_date_col = True
                             except IndexError:
-                                # Columna existe, pero solo tiene NaN (manejado por notna().any()) o por si acaso.
                                 pass
                             except Exception:
-                                # Fallo en la verificación (ej. columna mixed)
                                 pass
 
                     if is_date_col:
@@ -692,7 +692,6 @@ def generar_demo_excel(df_dict):
                 title_cell.alignment = Alignment(horizontal='center')
     
     except Exception as e:
-        # Esto atraparía errores internos si el proceso falla por razones ajenas a la validación.
         st.error(f"Error fatal en la generación de Excel: {e}")
         return None 
         
@@ -734,7 +733,6 @@ def render_pagina_inicio():
         
         col1, col2, col3, col4 = st.columns(4)
         
-        # ... Tarjetas de servicio (sin cambios, ya estaban correctas) ...
         with col1:
             st.markdown(f"""
             <div class="service-card">
@@ -792,7 +790,6 @@ def render_pagina_inicio():
         
         col_space1, col_team1, col_team2, col_space2 = st.columns([1, 2, 2, 1])
         
-        # ... Tarjetas de equipo (sin cambios, ya estaban correctas) ...
         with col_team1:
             st.markdown(f"""
             <div class="team-card">
@@ -839,7 +836,7 @@ def render_pagina_comercial():
     # --- DEMO 1: BI GERENCIAL (INTERACTIVO) ---
     with tab1:
         st.subheader("Dashboard de BI Gerencial (En Tiempo Real)")
-        # ... Lógica de filtros y KPIs (sin cambios) ...
+        
         with st.container(border=True):
             df_ventas = SAMPLE_DATA['ventas_vendedor']
             
@@ -911,7 +908,7 @@ def render_pagina_comercial():
     # --- DEMO 2: ASISTENTE PROACTIVO (SIMULACIÓN IA) ---
     with tab2:
         st.subheader("Asistente Proactivo (Simulación de Análisis IA)")
-        # ... Lógica de simulación IA (sin cambios) ...
+        
         with st.container(border=True):
             vendedor_seleccionado = st.selectbox(
                 "Simular plan de acción para:", 
@@ -1101,7 +1098,6 @@ def render_pagina_operaciones():
                 "Documento de ejemplo generado automáticamente para el proveedor, basado en las sugerencias del sistema."
             )
             
-            # Esta es la llamada que fue blindada contra TypeErrors
             excel_data = generar_demo_excel({
                 "Orden_de_Compra": df_orden,
                 "Detalle_Traslados": df_traslado,
@@ -1120,7 +1116,7 @@ def render_pagina_operaciones():
                 disabled=edited_df.empty
             )
 
-    # --- DEMO 2: CONTROL DE INVENTARIO MÓVIL (Sin cambios) ---
+    # --- DEMO 2: CONTROL DE INVENTARIO MÓVIL ---
     with tab2:
         st.subheader("Aplicación Móvil de Conteo Físico")
         st.markdown("Digitalizamos el conteo en bodega. El gerente asigna tareas y el operario las ejecuta en una app móvil con escáner y conteo parcial.")
@@ -1151,7 +1147,7 @@ def render_pagina_operaciones():
                     st.success("¡Conteo enviado! El gerente será notificado.")
                     st.balloons()
             
-    # --- DEMO 3: SINCRONIZACIÓN (ETL SIMULADO) (Sin cambios) ---
+    # --- DEMO 3: SINCRONIZACIÓN (ETL SIMULADO) ---
     with tab3:
         st.subheader("Sincronización Maestra de Inventario (ETL)")
         st.markdown("Desarrollamos un proceso que se conecta a su ERP (vía Dropbox, FTP, etc.), lee los archivos, los transforma y actualiza la base de datos central en la nube.")
@@ -1218,7 +1214,7 @@ def render_pagina_finanzas():
 
     with tab1:
         st.subheader("Dashboard de Gestión de Cartera (AR)")
-        # ... Lógica de Cartera y Gráficos (sin cambios) ...
+        
         with st.container(border=True):
             df_cartera = SAMPLE_DATA['cartera_antiguedad']
             total_cartera = df_cartera['Valor ($)'].sum()
