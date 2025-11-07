@@ -1,18 +1,16 @@
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 7.0 (Edición "Blindaje Definitivo de Generadores")
+# VERSIÓN: 7.1 (Edición "Blindaje de Tipos")
 # CORRECCIÓN CRÍTICA:
-# 1. (BUG FIX 7.0) Reforzado 'StreamlitAPIException: Invalid binary data format'.
-#    Aunque el (FIX 6.9) añadía 'is None' al 'disabled', esta versión
-#    refuerza el parámetro 'data' para que pase 'b""' (bytes vacíos)
+# 1. (BUG FIX 7.1) Corregido 'StreamlitAPIException: Invalid binary data format: <class 'bytearray'>'.
+#    Se descubrió que pdf.output() devuelve 'bytearray', no 'bytes'.
+#    Streamlit requiere 'bytes'. Se añadió un cast explícito 'bytes(pdf.output())'
+#    en 'generar_demo_pdf' y 'generar_demo_pdf_cartera'.
+# 2. (BUG FIX 7.0) Reforzado 'StreamlitAPIException: Invalid binary data format: <class 'NoneType'>'.
+#    Se reforzó el parámetro 'data' para que pase 'b""' (bytes vacíos)
 #    en lugar de 'None' si la generación falla.
-#    Esto evita que Streamlit intente procesar un tipo 'NoneType'.
-# 2. (BUG FIX 6.9) Corregido 'StreamlitAPIException'.
-#    Se blindaron 'generar_demo_pdf' y 'generar_demo_pdf_cartera' con
-#    bloques try...except para que retornen 'None' en caso de fallo.
-# 3. (BUG FIX 6.8) Corregido 'TypeError' en 'st.button' (Demo Catálogo).
-#    Se cambió 'use_column_width' por 'use_container_width'.
-# 4. (BUG FIX 6.7) Corregido 'AttributeError' en 'pdf.output()'.
+# 3. (BUG FIX 6.9) Blindados los generadores de PDF con try...except.
+# 4. (BUG FIX 6.8) Corregido 'TypeError' en 'st.button' (Demo Catálogo).
 #
 # NOTA DE ENTORNO: Esta app requiere 'kaleido' en requirements.txt
 # Y las dependencias de sistema en 'packages.txt' para Streamlit Cloud
@@ -556,10 +554,9 @@ def generar_demo_pdf(df, title, intro_text, chart_fig=None):
         pdf.chapter_title("Datos Detallados")
         pdf.add_table(df)
         
-        # --- CORRECCIÓN (BUG FIX 6.7) ---
-        # .output() sin 'dest' (o con dest='S') en fpdf2 devuelve bytes.
-        # No se debe llamar a .encode() sobre un objeto bytes.
-        return pdf.output()
+        # --- CORRECCIÓN (BUG FIX 7.1) ---
+        # Forzar la salida a 'bytes' en lugar de 'bytearray'
+        return bytes(pdf.output())
     except Exception as e:
         st.error(f"Error fatal en la generación de PDF: {e}")
         return None # Devuelve None en caso de fallo
@@ -576,7 +573,6 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
         pdf.add_page()
         
         pdf.chapter_title("Información del Cliente")
-        # ... Lógica de info de cliente (usa set_text_color(r, g, b) ya corregido en los estilos) ...
         pdf.set_font('Arial', '', 10)
         pdf.set_text_color(0, 0, 0) # Asegurar color de texto
         pdf.cell(40, 6, "Cliente:")
@@ -615,14 +611,12 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
         pdf.chapter_title("Composición de la Deuda (Global)")
         if chart_fig:
             # Esta es la línea que falla si 'kaleido' no está instalado
-            # o si faltan las dependencias del sistema (ver packages.txt)
             img_bytes = io.BytesIO(chart_fig.to_image(format="png", scale=2))
             pdf.add_chart(img_bytes)
             
-        # --- CORRECCIÓN (BUG FIX 6.7) ---
-        # .output() sin 'dest' (o con dest='S') en fpdf2 devuelve bytes.
-        # No se debe llamar a .encode() sobre un objeto bytes.
-        return pdf.output()
+        # --- CORRECCIÓN (BUG FIX 7.1) ---
+        # Forzar la salida a 'bytes' en lugar de 'bytearray'
+        return bytes(pdf.output())
     except Exception as e:
         st.error(f"Error fatal en la generación de PDF Cartera: {e}")
         st.error("Esto suele ocurrir si 'kaleido' o sus dependencias de sistema (packages.txt) no están instalados.")
@@ -632,7 +626,6 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
 def generar_demo_excel(df_dict):
     """
     Genera un archivo Excel con múltiples hojas, formato profesional y hoja de resumen.
-    (BLINDADO: Bug de TypeError al verificar tipos de fecha en DataFrames vacíos).
     """
     output = io.BytesIO()
     try:
@@ -741,6 +734,7 @@ def generar_demo_excel(df_dict):
         st.error(f"Error fatal en la generación de Excel: {e}")
         return None 
         
+    # .getvalue() de BytesIO SÍ devuelve 'bytes', así que está bien.
     return output.getvalue()
 
 
@@ -1020,7 +1014,6 @@ def render_pagina_comercial():
                             st.markdown(f"<span style='color: {COLOR_TEXTO_SECUNDARIO}; font-size: 0.9rem;'>Stock: {row['Stock']}</span>", unsafe_allow_html=True)
                             
                             # --- CORRECCIÓN (BUG FIX 6.8) ---
-                            # 'use_column_width' es incorrecto para st.button. Se cambia a 'use_container_width'.
                             if st.button(f"🛒 Añadir", key=f"add_cart_{row['Referencia']}", use_container_width=True):
                                 if row['Referencia'] in st.session_state.cart['Referencia'].values:
                                     st.toast(f"'{row['Producto']}' ya está en el carrito.", icon="⚠️")
@@ -1034,9 +1027,7 @@ def render_pagina_comercial():
                                     })
                                     st.session_state.cart = pd.concat([st.session_state.cart, new_item], ignore_index=True)
                                     st.toast(f"'{row['Producto']}' añadido al carrito!", icon="✅")
-                                    # --- CORRECCIÓN (BUG FIX 6.6) ---
-                                    # st.rerun() # Esta línea se elimina. Causa el error 'NotFoundError: removeChild'.
-                                    # El 'rerun' implícito de la actualización de session_state es suficiente.
+                                    # No se necesita st.rerun() explícito aquí
 
             with col2:
                 st.subheader("Cotización en Proceso")
@@ -1078,12 +1069,12 @@ def render_pagina_comercial():
                     # --- (BUG FIX 7.0) Blindaje de 'data=None' ---
                     st.download_button(
                         label="📄 Descargar PDF Profesional (Demo)",
-                        data=pdf_data if pdf_data is not None else b"", # Corrección
+                        data=pdf_data if pdf_data is not None else b"", # Corrección 7.0
                         file_name="Demo_Cotizacion_GM-DATOVATE.pdf",
                         mime="application/pdf",
                         use_container_width=True,
                         type="primary",
-                        disabled=(pdf_data is None) # Corrección (6.9)
+                        disabled=(pdf_data is None) # Corrección 6.9
                     )
                     if st.button("Vaciar Carrito", use_container_width=True):
                         st.session_state.cart = pd.DataFrame(columns=['Referencia', 'Producto', 'Cantidad', 'Vlr. Unitario', 'Total'])
@@ -1161,7 +1152,6 @@ def render_pagina_operaciones():
             c1, c2 = st.columns(2)
             
             # --- (BUG FIX 7.0) Blindaje de 'data=None' ---
-            # Esta es la línea del traceback original
             c1.download_button(
                 label="📄 Descargar Orden de Compra PDF (Demo)", 
                 data=pdf_data if pdf_data is not None else b"", # Corrección 7.0
@@ -1308,8 +1298,7 @@ def render_pagina_finanzas():
             cliente_demo_nombre = st.selectbox("Seleccione un cliente para gestionar:", df_detalle['Cliente'].unique())
             
             if cliente_demo_nombre:
-                cliente_demo_data = df_detalle[df_detalle['Cliente'] == cliente_demo_nombre].copy() # Usar copia para evitar SettingWithCopyWarning
-                # Se asegura de que se selecciona la primera fila si hay múltiples facturas del mismo cliente para la info de contacto
+                cliente_demo_data = df_detalle[df_detalle['Cliente'] == cliente_demo_nombre].copy() # Usar copia
                 cliente_info = cliente_demo_data.iloc[0] 
                 
                 st.dataframe(cliente_demo_data[['Factura', 'Fecha Vencimiento', 'Días Vencido', 'Monto']].style.format({
@@ -1327,7 +1316,6 @@ def render_pagina_finanzas():
 
                 c1, c2, c3 = st.columns(3)
                 
-                # Esta es la línea que genera el error si falta la dependencia del sistema
                 pdf_cartera = generar_demo_pdf_cartera(cliente_demo_data, cliente_info, fig_pie)
                 
                 # --- (BUG FIX 7.0) Blindaje de 'data=None' ---
@@ -1417,7 +1405,7 @@ def render_pagina_finanzas():
             # --- (BUG FIX 7.0) Blindaje de 'data=None' ---
             st.download_button(
                 "📥 Descargar Reporte de Acciones (Excel Demo)", 
-                data=excel_demo_data if excel_demo_data is not None else b"", # Corrección 7.0 
+                data=excel_demo_data if excel_demo_data is not None else b"", # Corrección 7.0
                 file_name="Demo_Reporte_Riesgo_GM-DATOVATE.xlsx", 
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
                 use_container_width=True, type="primary",
@@ -1489,7 +1477,7 @@ def render_pagina_integracion():
                 # Resetear OTP
                 st.session_state.otp_sent = False
                 st.session_state.otp_code = ""
-                st.rerun() # Opcional: recargar para resetear el formulario
+                st.rerun() 
 
     # --- DEMO 2: AGENTE IA (CHATBOT INTERACTIVO) ---
     with tab2:
