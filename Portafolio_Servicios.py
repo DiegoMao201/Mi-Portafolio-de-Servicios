@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
 # ======================================================================================
 # PORTAFOLIO DE SERVICIOS ESTRATÉGICOS: GM-DATOVATE
-# VERSIÓN: 6.3 (Edición "Máxima Estabilidad de Documentos")
+# VERSIÓN: 6.4 (Edición "Máxima Estabilidad de Documentos")
 # CORRECCIÓN CRÍTICA:
-# 1. (BUG FIX 6.3) Corregido TypeError: FPDF.set_text_color() got an unexpected 
-#    keyword argument 'as_r_g_b' en DemoPDF.add_table.
-# 2. (BUG FIX 6.2) Corregido TypeError en generar_demo_excel al acceder a iloc[0].
+# 1. (BUG FIX 6.4) Blindado el DemoPDF.add_table() para manejar correctamente
+#    los tipos de fecha/timestamp, resolviendo potencial TypeError.
+# 2. (BUG FIX 6.3) Corregido el uso de set_text_color() en DemoPDF.add_table (previo fix).
+# 3. (BUG FIX 6.2) Corregido TypeError en generar_demo_excel al acceder a iloc[0] (previo fix).
 # ======================================================================================
 
 import streamlit as st
@@ -14,6 +14,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
+import datetime as dt # Importación explícita para evitar conflictos y mejorar claridad
 import io
 import urllib.parse
 from fpdf import FPDF
@@ -35,9 +36,9 @@ st.set_page_config(
 
 # --- PALETA DE COLORES Y ESTILOS ---
 COLOR_PRIMARIO = "#0D3B66"       # Azul profundo (Confianza, Inteligencia)
-COLOR_SECUNDARIO = "#1A73E8"     # Azul brillante (Tecnología, Innovación)
-COLOR_ACENTO_ROJO = "#F94144"        # Rojo vivo (Acción, Alerta)
-COLOR_ACENTO_VERDE = "#43AA8B"       # Verde (Finanzas, Crecimiento)
+COLOR_SECUNDARIO = "#1A73E8"      # Azul brillante (Tecnología, Innovación)
+COLOR_ACENTO_ROJO = "#F94144"         # Rojo vivo (Acción, Alerta)
+COLOR_ACENTO_VERDE = "#43AA8B"        # Verde (Finanzas, Crecimiento)
 COLOR_ACENTO_NARANJA = "#F8961E" # Naranja (Energía, CTA)
 COLOR_FONDO = "#FFFFFF"          # Fondo Blanco Limpio
 COLOR_FONDO_SECUNDARIO = "#F7F9FC" # Fondo gris muy claro para secciones
@@ -46,11 +47,11 @@ COLOR_TEXTO_SECUNDARIO = "#555555"
 
 # --- IMÁGENES EMBEBIDAS EN BASE64 (SVG Placeholders) ---
 IMG_TEAM_DIEGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNy41IDEyLjVMMTcgMTAuNWwyLTVoNGwxLjUgMyI+PC9wYXRoPjwvc3ZnPg=="
-IMG_TEAM_PABLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNyAxMGwxLjUgMS41TDYgMjFIMTciPjwvcGF0aD48L3N2Zz4=="
+IMG_TEAM_PABLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNGRjdGOUZDIiBzdHJva2U9IiMwRDNCNjYiIHN0cm9rZS13aWR0aD0iMSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjdGOUZDIj48L3JlY3Q+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINWE0IDQgMCAwIDAtNCA0djJNNCA3YTYgNiAwIDEgMSAxMiAwIDYgNiAwIDAgMS0xMiAwWk0xNyAxMGwxLjUgMS41TDYgMjFIMTciPjwvc3ZnPg=="
 IMG_PROD_DISCO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtdGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI5Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIj48L2NpcmNsZT48L3N2Zz4="
 IMG_PROD_TORNILLO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOC4zNCA1LjY2YTIuMTIgMi4xMiAwIDAgMSAwIDNMNi4yMSAxOS44M2wtMi0yTDExLjM0IDguNjZhMi4xMiAyLjEyIDAgMCAxIDMtM3oiPjwvcGF0aD48bGluZSB4MT0iMyIgeTE9IjE0IiB4Mj0iMTAiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSI3IiB5MT0iMTIiIHgyPSIxMiIgeTI9IjE3Ij48L2xpbmU+PGxpbmUgeDE9IjExIiB5MT0iOCIgeDI9IjE2IiB5Mj0iMTMiPjwvbGluZT48L3N2Zz4="
 IMG_PROD_ELECTRODO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yIDE4SDVhMyAzIDAgMCAwIDMtM1Y5YTMgMyAwIDAgMCAzLTNoM2EzIDMgMCAwIDAgMy0zVjIiPjwvcGF0aD48bGluZSB4MT0iMTIiIHkxPSI2IiB4Mj0iOCIgeTI9IjEwIj48L2xpbmU+PGxpbmUgeDE9IjgiIHkxPSIxNCIgeDI9IjEwIiB5Mj0iMTIiPjwvbGluZT48bGluZSB4MT0iMTYiIHkxPSI0IiB4Mj0iMTQiIHkyPSI2Ij48L2xpbmU+PGxpbmUgeDE9IjUiIHkxPSIyMiIgeDI9IjIiIHkyPSIxOCI+PC9saW5lPjxsaW5lIHgxPSI5IiB5MT0iMTgiIHgyPSI1IiB5Mj0iMTQiPjwvbGluZT48L3N2Zz4="
-IMG_PROD_GAFA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjYuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMTcuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PHBhdGggZD0iTTIgMTUuNWE0LjUgNC41IDAgMCAwIDQuNSA0LjVoMTFBNi41IDYuNSAwIDAgMCAyMiAxNS41Ij48L3BhdGg+PHBhdGggZD0iTTYuNSAxMS41YTQuNSA0LjUgMCAwIDEgMC05bTEuMiAzLjJsMS4zLTEuNW04LjUgNy4zbDEuNSAxLjUiPjwvcGF0aD48L3N2Zz4="
+IMG_PROD_GAFA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjYuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMTcuNSIgY3k9IjE1LjUiIHI9IjQuNSI+PC9jaXJjbGU+PHBhdGggZD0iTTIgMTUuNWE0LjUgNC41IDAgMCAwIDQuNSA0LjVoMTFBNi41IDYuNSAwIDAgMCAyMiAxNS41Ij48L3BhdGg+PHBhdGggZD0iTTYuNSAxMS41YTQuNSAzMCAwIDEgMC05bTEuMiAzLjJsMS4zLTEuNW04LjUgNy4zbDEuNSAxLjUiPjwvcGF0aD48L3N2Zz4="
 IMG_PROD_GUANTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MjQyNDIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxNGExMiAxMiAwIDAgMS04IDhIMWwtMy04VjZhNCA0IDAgMCAxIDQtNGg1LjVMMTAgNyI+PC9wYXRoPjxwYXRoIGQ9Ik0xMS41IDZhNC41IDQuNSAwIDEgMSAwIDlWNmEiPjwvcGF0aD48cGF0aCBkPSJNMTYgNmE0IDQgMCAwIDEgMCA4VjYiPjwvcGF0aD48cGFhdGggZD0iJNTE5IDZhMyAzIDAgMCAxIDAgNlY2Ij48L3BhdGg+PC9zdmc+"
 
 # --- INYECCIÓN DE CSS GLOBAL (PROFESIONAL) ---
@@ -248,7 +249,7 @@ def render_kpi(title, value, delta=None, delta_color="normal", card_color=""):
     if delta:
         if delta_color == "inverse":
             color = COLOR_ACENTO_VERDE
-            arrow = "↑" if delta.startswith('-') else "↓"
+            arrow = "↑" if delta.startswith('+') or not delta.startswith('-') else "↓"
         elif delta_color == "normal":
             color = COLOR_ACENTO_ROJO
             arrow = "↓" if delta.startswith('-') else "↑"
@@ -438,9 +439,10 @@ class DemoPDF(FPDF):
                 self.set_text_color(0,0,0)
                 self.ln(5)
 
+    # --- MÉTODO CORREGIDO/BLINDADO ---
     def add_table(self, df):
         if df.empty:
-            # --- CORRECCIÓN CRÍTICA 6.3: USO CORRECTO DE RGB ---
+            # Uso correcto de RGB para texto secundario
             hex_texto_sec = COLOR_TEXTO_SECUNDARIO.replace("#", "")
             r = int(hex_texto_sec[0:2], 16)
             g = int(hex_texto_sec[2:4], 16)
@@ -505,9 +507,19 @@ class DemoPDF(FPDF):
                         item_str = f"{item:,.1f}%"
                     else:
                         item_str = f"{item:,.0f}"
-                elif isinstance(item, (datetime, pd.Timestamp, datetime.date)):
-                    item_str = pd.to_datetime(item).strftime('%Y-%m-%d')
-                    align = 'C'
+                
+                # --- VERIFICACIÓN DE TIPO DE FECHA BLINDADA ---
+                # Verifica instancias de tipos de fecha/tiempo de Python y Pandas.
+                elif isinstance(item, (dt.datetime, pd.Timestamp, dt.date)):
+                    try:
+                        # Convertir a pd.Timestamp de forma segura para usar strftime
+                        timestamp = pd.to_datetime(item)
+                        item_str = timestamp.strftime('%Y-%m-%d')
+                        align = 'C'
+                    except Exception:
+                        # Fallback a string si la conversión falla
+                        item_str = str(item)
+                        align = 'L'
                         
                 self.cell(final_widths[i], 6, item_str, 1, 0, align, fill=fill)
             self.ln()
@@ -540,8 +552,9 @@ def generar_demo_pdf_cartera(df, cliente_info, chart_fig):
     pdf.add_page()
     
     pdf.chapter_title("Información del Cliente")
-    # ... Lógica de info de cliente (sin cambios, usa set_text_color(r, g, b)) ...
+    # ... Lógica de info de cliente (usa set_text_color(r, g, b) ya corregido en los estilos) ...
     pdf.set_font('Arial', '', 10)
+    pdf.set_text_color(0, 0, 0) # Asegurar color de texto
     pdf.cell(40, 6, "Cliente:")
     pdf.set_font('Arial', 'B', 10)
     pdf.cell(0, 6, cliente_info['Cliente'])
@@ -614,9 +627,9 @@ def generar_demo_excel(df_dict):
 
             # KPIs de ejemplo
             kpis = {
-                "Total Facturas a Subir": (df_dict.get("1_Facturas_a_Subir", pd.DataFrame())['Monto'].sum() if "1_Facturas_a_Subir" in df_dict else 0),
-                "Total Facturas a Exonerar": (df_dict.get("2_Facturas_a_Exonerar", pd.DataFrame())['Monto'].sum() if "2_Facturas_a_Exonerar" in df_dict else 0),
-                "Total Orden de Compra": (df_dict.get("Orden_de_Compra", pd.DataFrame())['Sugerencia Compra'].sum() if "Orden_de_Compra" in df_dict and 'Sugerencia Compra' in df_dict.get("Orden_de_Compra").columns else 0)
+                "Total Facturas a Subir": (df_dict.get("1_Facturas_a_Subir", pd.DataFrame())['Monto'].sum() if "1_Facturas_a_Subir" in df_dict and not df_dict.get("1_Facturas_a_Subir").empty else 0),
+                "Total Facturas a Exonerar": (df_dict.get("2_Facturas_a_Exonerar", pd.DataFrame())['Monto'].sum() if "2_Facturas_a_Exonerar" in df_dict and not df_dict.get("2_Facturas_a_Exonerar").empty else 0),
+                "Total Orden de Compra": (df_dict.get("Orden_de_Compra", pd.DataFrame())['Sugerencia Compra'].sum() if "Orden_de_Compra" in df_dict and 'Sugerencia Compra' in df_dict.get("Orden_de_Compra").columns and not df_dict.get("Orden_de_Compra").empty else 0)
             }
             
             row = 5
@@ -660,7 +673,7 @@ def generar_demo_excel(df_dict):
                     # Aplicar formatos de columna (BLINDADO)
                     is_date_col = False
                     
-                    if df[col].dtype == 'datetime64[ns]':
+                    if pd.api.types.is_datetime64_any_dtype(df[col]):
                         is_date_col = True
                     
                     elif df[col].dtype == 'object':
@@ -669,7 +682,7 @@ def generar_demo_excel(df_dict):
                             try:
                                 # Acceder de forma segura al primer elemento no nulo
                                 first_non_nan = df[col].dropna().iloc[0]
-                                if isinstance(first_non_nan, (datetime, datetime.date, pd.Timestamp)):
+                                if isinstance(first_non_nan, (datetime, dt.date, pd.Timestamp)):
                                     is_date_col = True
                             except IndexError:
                                 pass
@@ -860,50 +873,51 @@ def render_pagina_comercial():
             
             if df_filtrada.empty:
                 st.warning("No hay datos para los filtros seleccionados.")
-                return
-
-            st.markdown("##### KPIs Generales")
-            total_ventas = df_filtrada['Ventas ($)'].sum()
-            total_meta = df_filtrada['Meta ($)'].sum()
-            avg_avance = (total_ventas / total_meta) * 100 if total_meta > 0 else 0
-            delta_avance = avg_avance - 100
-
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                render_kpi("Ventas Totales", f"${total_ventas/1_000_000:.1f} M", f"{delta_avance:+.1f}% vs Meta", "normal" if delta_avance >= 0 else "inverse")
-            with col2:
-                render_kpi("Meta de Ventas", f"${total_meta/1_000_000:.1f} M")
-            with col3:
-                card_color = "green" if avg_avance >= 100 else ("red" if avg_avance < 80 else "")
-                render_kpi("Avance General", f"{avg_avance:.1f}%", card_color=card_color)
-
-            st.divider()
-            
-            # Gráficos
-            graf_c1, graf_c2 = st.columns(2)
-            with graf_c1:
-                fig_bar = px.bar(
-                    df_filtrada, x='Vendedor', y=['Ventas ($)', 'Meta ($)'], barmode='group',
-                    title='Rendimiento de Ventas vs. Meta (Filtrado)',
-                    color_discrete_map={'Ventas ($)': COLOR_SECUNDARIO, 'Meta ($)': COLOR_ACENTO_ROJO}
-                )
-                st.plotly_chart(fig_bar, use_container_width=True)
+                # st.stop() # No se usa st.stop() para permitir que el resto del código se renderice
                 
-                fig_donut = px.pie(
-                    SAMPLE_DATA['ventas_categoria'], values='Ventas ($)', names='Categoria', 
-                    title='Ventas por Categoría (Global)', hole=0.4,
-                    color_discrete_sequence=px.colors.sequential.Blues_r
-                )
-                st.plotly_chart(fig_donut, use_container_width=True)
+            else:
+                st.markdown("##### KPIs Generales")
+                total_ventas = df_filtrada['Ventas ($)'].sum()
+                total_meta = df_filtrada['Meta ($)'].sum()
+                avg_avance = (total_ventas / total_meta) * 100 if total_meta > 0 else 0
+                delta_avance = avg_avance - 100
 
-            with graf_c2:
-                fig_line = px.line(
-                    SAMPLE_DATA['ventas_dia'], x='Fecha', y='Ventas ($)',
-                    title='Tendencia de Ventas (Últimos 30 días)',
-                    markers=True
-                )
-                fig_line.update_traces(line_color=COLOR_PRIMARIO)
-                st.plotly_chart(fig_line, use_container_width=True)
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    render_kpi("Ventas Totales", f"${total_ventas/1_000_000:.1f} M", f"{delta_avance:+.1f}% vs Meta", "normal" if delta_avance >= 0 else "inverse")
+                with col2:
+                    render_kpi("Meta de Ventas", f"${total_meta/1_000_000:.1f} M")
+                with col3:
+                    card_color = "green" if avg_avance >= 100 else ("red" if avg_avance < 80 else "")
+                    render_kpi("Avance General", f"{avg_avance:.1f}%", card_color=card_color)
+
+                st.divider()
+                
+                # Gráficos
+                graf_c1, graf_c2 = st.columns(2)
+                with graf_c1:
+                    fig_bar = px.bar(
+                        df_filtrada, x='Vendedor', y=['Ventas ($)', 'Meta ($)'], barmode='group',
+                        title='Rendimiento de Ventas vs. Meta (Filtrado)',
+                        color_discrete_map={'Ventas ($)': COLOR_SECUNDARIO, 'Meta ($)': COLOR_ACENTO_ROJO}
+                    )
+                    st.plotly_chart(fig_bar, use_container_width=True)
+                    
+                    fig_donut = px.pie(
+                        SAMPLE_DATA['ventas_categoria'], values='Ventas ($)', names='Categoria', 
+                        title='Ventas por Categoría (Global)', hole=0.4,
+                        color_discrete_sequence=px.colors.sequential.Blues_r
+                    )
+                    st.plotly_chart(fig_donut, use_container_width=True)
+
+                with graf_c2:
+                    fig_line = px.line(
+                        SAMPLE_DATA['ventas_dia'], x='Fecha', y='Ventas ($)',
+                        title='Tendencia de Ventas (Últimos 30 días)',
+                        markers=True
+                    )
+                    fig_line.update_traces(line_color=COLOR_PRIMARIO)
+                    st.plotly_chart(fig_line, use_container_width=True)
 
     # --- DEMO 2: ASISTENTE PROACTIVO (SIMULACIÓN IA) ---
     with tab2:
@@ -1113,7 +1127,7 @@ def render_pagina_operaciones():
             c2.download_button(
                 label="📊 Descargar Reporte Excel (Demo)", data=excel_data,
                 file_name="Demo_Reporte_Abastecimiento.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True,
-                disabled=edited_df.empty
+                disabled=edited_df.empty or excel_data is None # Deshabilitar si falla la generación
             )
 
     # --- DEMO 2: CONTROL DE INVENTARIO MÓVIL ---
@@ -1242,8 +1256,9 @@ def render_pagina_finanzas():
             cliente_demo_nombre = st.selectbox("Seleccione un cliente para gestionar:", df_detalle['Cliente'].unique())
             
             if cliente_demo_nombre:
-                cliente_demo_data = df_detalle[df_detalle['Cliente'] == cliente_demo_nombre]
-                cliente_info = cliente_demo_data.iloc[0]
+                cliente_demo_data = df_detalle[df_detalle['Cliente'] == cliente_demo_nombre].copy() # Usar copia para evitar SettingWithCopyWarning
+                # Se asegura de que se selecciona la primera fila si hay múltiples facturas del mismo cliente para la info de contacto
+                cliente_info = cliente_demo_data.iloc[0] 
                 
                 st.dataframe(cliente_demo_data[['Factura', 'Fecha Vencimiento', 'Días Vencido', 'Monto']].style.format({
                     "Días Vencido": "{:,.0f}",
@@ -1414,6 +1429,7 @@ def render_pagina_integracion():
                 # Resetear OTP
                 st.session_state.otp_sent = False
                 st.session_state.otp_code = ""
+                st.rerun() # Opcional: recargar para resetear el formulario
 
     # --- DEMO 2: AGENTE IA (CHATBOT INTERACTIVO) ---
     with tab2:
