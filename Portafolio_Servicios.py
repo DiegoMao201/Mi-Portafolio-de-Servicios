@@ -12,16 +12,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Inicializar estado para la navegación
-if "navigate_to_page" not in st.session_state:
-    st.session_state["navigate_to_page"] = None
-
-# --- SOLUCIÓN DE NAVEGACIÓN ---
-if st.session_state["navigate_to_page"]:
-    page_to_go = st.session_state["navigate_to_page"]
-    st.session_state["navigate_to_page"] = None # Resetear el estado
-    st.switch_page(page_to_go)
-
 # ==============================================================================
 # --- 2. FUNCIONES UTILITARIAS (IMÁGENES Y ASSETS) ---
 # ==============================================================================
@@ -37,9 +27,9 @@ def get_img_as_base64(file_path):
         pass
     return None
 
-# Carga de imagen de perfil
+# Carga de imagen de perfil (Ajusta la ruta si es necesario)
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# Asumo que 'assets' y 'foto_diego.png' están en la estructura correcta.
+# Asegúrate de que esta carpeta y archivo existan, si no, usa el fallback
 img_path = os.path.join(current_dir, "assets", "foto_diego.png")
 img_base64 = get_img_as_base64(img_path)
 
@@ -47,8 +37,9 @@ img_base64 = get_img_as_base64(img_path)
 foto_diego_src = f"data:image/png;base64,{img_base64}" if img_base64 else "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 
 # ==============================================================================
-# --- 3. CSS ULTRA-PREMIUM (3D, ANIMACIONES Y EFECTOS VISUALES) ---
+# --- 3. CSS ULTRA-PREMIUM (CORREGIDO PARA F-STRINGS) ---
 # ==============================================================================
+# NOTA: Usamos dobles llaves {{ }} en el CSS para evitar conflictos con f-strings de Python
 st.markdown(f"""
 <style>
     /* IMPORTAR FUENTE FUTURISTA */
@@ -78,20 +69,20 @@ st.markdown(f"""
         to {{ opacity: 1; transform: translateY(0); }}
     }}
     
-    /* NUEVA ANIMACIÓN PARA EL TÍTULO 3D (SHIMMER) */
+    /* ANIMACIÓN SHIMMER (BRILLO QUE PASA) */
     @keyframes text-shimmer {{
         0% {{ background-position: -200% center; }}
         100% {{ background-position: 200% center; }}
     }}
 
-    /* NUEVA ANIMACIÓN DE FLOTACIÓN 3D PARA EL TÍTULO */
+    /* ANIMACIÓN FLOTACIÓN 3D DEL TÍTULO */
     @keyframes title-float-3d {{
-        0% {{ transform: perspective(1000px) rotateX(10deg) translateY(0); }}
-        50% {{ transform: perspective(1000px) rotateX(10deg) translateY(-15px); }}
-        100% {{ transform: perspective(1000px) rotateX(10deg) translateY(0); }}
+        0% {{ transform: perspective(1000px) rotateX(5deg) translateY(0); }}
+        50% {{ transform: perspective(1000px) rotateX(5deg) translateY(-10px); }}
+        100% {{ transform: perspective(1000px) rotateX(5deg) translateY(0); }}
     }}
 
-    /* --- FONDO GENERAL (Living Dark Matter) --- */
+    /* --- FONDO GENERAL --- */
     .stApp {{
         background: linear-gradient(-45deg, #020617, #0f172a, #1e1b4b, #000000);
         background-size: 400% 400%;
@@ -100,12 +91,12 @@ st.markdown(f"""
         font-family: 'Outfit', sans-serif;
     }}
     
-    /* CLASE PARA ANIMAR ENTRADA DE ELEMENTOS */
+    /* CLASE PARA ANIMAR ENTRADA */
     .animate-enter {{
         animation: slide-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }}
 
-    /* --- MODALES (ESTILO CRISTAL) --- */
+    /* --- MODALES --- */
     .custom-modal-box {{
         background: rgba(17, 24, 39, 0.95);
         padding: 25px;
@@ -113,7 +104,6 @@ st.markdown(f"""
         border: 1px solid rgba(6, 182, 212, 0.3);
         box-shadow: 0 0 40px rgba(0,0,0,0.8);
     }}
-    
     .modal-header-icon {{
         font-size: 3.5rem;
         text-align: center;
@@ -121,7 +111,6 @@ st.markdown(f"""
         margin-bottom: 15px;
         animation: float 3s ease-in-out infinite;
     }}
-
     .modal-title {{
         color: #FFFFFF !important;
         font-family: 'Outfit', sans-serif;
@@ -132,9 +121,7 @@ st.markdown(f"""
         background: linear-gradient(90deg, #22d3ee, #818cf8);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
     }}
-
     .modal-body-text {{
         color: #cbd5e1 !important;
         font-size: 1rem;
@@ -143,14 +130,12 @@ st.markdown(f"""
         text-align: justify;
         font-family: 'Inter', sans-serif;
     }}
-
     .modal-list-container {{
         background-color: rgba(0, 0, 0, 0.3);
         border-radius: 12px;
         padding: 20px;
         border-left: 3px solid #06B6D4;
     }}
-
     .modal-item {{
         display: flex;
         align-items: flex-start;
@@ -158,18 +143,15 @@ st.markdown(f"""
         color: #D1D5DB;
         font-size: 0.95rem;
     }}
-
     .modal-bullet {{
         color: #06B6D4;
         font-size: 1.2rem;
         margin-right: 10px;
     }}
-    
     .modal-highlight {{
         color: #38BDF8;
         font-weight: 700;
     }}
-
     .modal-quote {{
         text-align: center; 
         margin-top: 25px; 
@@ -180,16 +162,17 @@ st.markdown(f"""
         padding-top: 15px;
     }}
 
-    /* --- HERO SECTION (IMPACTANTE 3D) --- */
+    /* --- HERO SECTION (EL TÍTULO PRINCIPAL) --- */
     .hero-container {{
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        text-align: center;
         padding: 80px 20px 60px 20px;
         margin-bottom: 40px;
         position: relative;
-        perspective: 1200px; /* Profundidad de escena */
+        perspective: 1200px; 
     }}
 
     /* Efecto de luz detrás del título */
@@ -221,16 +204,16 @@ st.markdown(f"""
         backdrop-filter: blur(5px);
     }}
 
-    /* ESTILOS NUEVOS PARA TÍTULO 3D MASIVO */
+    /* ESTILOS DEL TÍTULO 3D */
     .main-title-3d {{
-        font-size: 6rem; /* Tamaño aumentado */
+        font-size: 6rem;
         font-weight: 900;
         margin: 0;
-        line-height: 1;
+        line-height: 1.1;
         text-transform: uppercase;
         letter-spacing: -2px;
         
-        /* Efecto de Material Metálico/Luz */
+        /* Efecto Metálico */
         background: linear-gradient(
             110deg,
             #94a3b8 15%,
@@ -242,12 +225,10 @@ st.markdown(f"""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         
-        /* Animaciones compuestas */
         animation: 
             title-float-3d 6s ease-in-out infinite,
             text-shimmer 5s linear infinite;
             
-        /* Sombra 3D Profunda */
         filter: drop-shadow(0 15px 25px rgba(0,0,0,0.8));
     }}
 
@@ -264,8 +245,6 @@ st.markdown(f"""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         animation: text-shimmer 3s linear infinite;
-        
-        /* Resplandor específico para la parte DATOVATE */
         filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.6));
     }}
 
@@ -283,14 +262,12 @@ st.markdown(f"""
         text-shadow: 0 2px 10px rgba(0,0,0,0.8);
         position: relative;
         z-index: 1;
-        text-align: center; /* Asegurar centrado del subtítulo */
     }}
 
-    /* --- CARDS 3D (GLASSMORPHISM) --- */
+    /* --- CARDS --- */
     .flow-card {{
         background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.05);
         padding: 35px 25px;
         border-radius: 24px;
@@ -298,56 +275,31 @@ st.markdown(f"""
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transition: all 0.4s ease;
         position: relative;
         overflow: hidden;
     }}
-
-    /* Brillo superior en la tarjeta */
-    .flow-card::before {{
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
-        opacity: 0;
-        transition: opacity 0.4s ease;
-    }}
-    
     .flow-card:hover {{
         transform: translateY(-12px) scale(1.02);
         background: rgba(30, 41, 59, 0.6);
         border-color: rgba(6, 182, 212, 0.5);
-        box-shadow: 
-            0 20px 40px -10px rgba(0, 0, 0, 0.5),
-            0 0 20px rgba(6, 182, 212, 0.2); /* Glow effect */
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.2);
     }}
-
-    .flow-card:hover::before {{
-        opacity: 1;
-    }}
-
     .card-icon {{ 
         font-size: 3.5rem; 
         margin-bottom: 20px; 
         filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
         transition: transform 0.3s ease;
     }}
-
     .flow-card:hover .card-icon {{
         transform: scale(1.1) rotate(5deg);
     }}
-
     .card-title {{ 
         font-size: 1.5rem; 
         font-weight: 700; 
         color: #FFFFFF; 
         margin-bottom: 12px; 
-        letter-spacing: -0.5px;
     }}
-    
     .card-desc {{ 
         font-size: 0.95rem; 
         color: #94a3b8; 
@@ -355,7 +307,7 @@ st.markdown(f"""
         line-height: 1.6; 
     }}
 
-    /* --- PERFIL (RESPONSIVE + 3D) --- */
+    /* --- PERFIL --- */
     .profile-box {{
         background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.8));
         padding: 40px;
@@ -365,24 +317,8 @@ st.markdown(f"""
         display: flex;
         align-items: center;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-        flex-direction: row;
-        position: relative;
         overflow: hidden;
     }}
-
-    /* Decoración de fondo en perfil */
-    .profile-box::after {{
-        content: '';
-        position: absolute;
-        right: -50px;
-        bottom: -50px;
-        width: 200px;
-        height: 200px;
-        background: radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }}
-    
     .profile-img {{
         width: 160px;
         height: 160px;
@@ -391,14 +327,12 @@ st.markdown(f"""
         border: 3px solid #06B6D4;
         margin-right: 40px;
         flex-shrink: 0;
-        animation: pulse-glow 3s infinite; /* Animación de pulso */
+        animation: pulse-glow 3s infinite;
     }}
-
     .profile-content {{
         flex: 1;
         z-index: 1;
     }}
-
     .profile-quote {{
         color: #e2e8f0; 
         font-size: 1.1rem; 
@@ -408,18 +342,15 @@ st.markdown(f"""
         padding-left: 25px;
         font-weight: 300;
         background: linear-gradient(90deg, rgba(6,182,212,0.05) 0%, transparent 100%);
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding-top: 10px; padding-bottom: 10px;
         border-radius: 0 10px 10px 0;
     }}
-
     .profile-tags {{
         margin-top: 25px; 
         display: flex; 
         gap: 12px; 
         flex-wrap: wrap;
     }}
-    
     .tag-pill {{
         background: rgba(15, 23, 42, 0.6);
         border: 1px solid rgba(6, 182, 212, 0.5);
@@ -428,42 +359,22 @@ st.markdown(f"""
         border-radius: 20px;
         font-size: 0.8rem;
         font-weight: 600;
-        letter-spacing: 1px;
         transition: all 0.3s ease;
     }}
-    
     .tag-pill:hover {{
         background: rgba(6, 182, 212, 0.2);
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(6, 182, 212, 0.2);
     }}
-
-    /* --- MEDIA QUERY MÓVIL --- */
+    
+    /* RESPONSIVE */
     @media only screen and (max-width: 768px) {{
-        .profile-box {{
-            flex-direction: column;
-            text-align: center;
-            padding: 30px 20px;
-        }}
-        .profile-img {{
-            margin-right: 0;
-            margin-bottom: 25px;
-            width: 140px;
-            height: 140px;
-        }}
-        .profile-quote {{
-            border-left: none;
-            border-top: 3px solid #06B6D4;
-            padding-left: 0;
-            padding-top: 20px;
-            background: linear-gradient(180deg, rgba(6,182,212,0.05) 0%, transparent 100%);
-        }}
-        .profile-tags {{
-            justify-content: center;
-        }}
+        .profile-box {{ flex-direction: column; text-align: center; }}
+        .profile-img {{ margin-right: 0; margin-bottom: 25px; }}
+        .profile-quote {{ border-left: none; border-top: 3px solid #06B6D4; padding-left: 0; padding-top: 20px; }}
+        .profile-tags {{ justify-content: center; }}
     }}
 
-    /* --- BOTONES (NEÓN) --- */
+    /* BOTONES */
     div.stButton > button {{
         width: 100%;
         background: transparent;
@@ -472,54 +383,24 @@ st.markdown(f"""
         padding: 12px 24px;
         font-weight: 700;
         border-radius: 10px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        position: relative;
-        overflow: hidden;
-        z-index: 1;
+        transition: all 0.3s;
     }}
-    
-    div.stButton > button::before {{
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 0%;
-        height: 100%;
-        background: linear-gradient(90deg, #06B6D4, #3b82f6);
-        z-index: -1;
-        transition: width 0.3s ease;
-    }}
-
     div.stButton > button:hover {{
         color: white;
-        border-color: transparent;
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.6);
+        border-color: #06B6D4;
+        background: rgba(6, 182, 212, 0.2);
+        box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
     }}
-
-    div.stButton > button:hover::before {{
-        width: 100%;
-    }}
-    
-    /* Eliminar padding extra superior de Streamlit */
     .block-container {{
         padding-top: 2rem;
         padding-bottom: 5rem;
     }}
-
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# --- 4. DEFINICIÓN DE MODALES (CONTENIDO) ---
+# --- 4. DEFINICIÓN DE MODALES ---
 # ==============================================================================
-
-def set_page_and_rerun(page_path):
-    """Guarda el estado de la página a navegar y fuerza el re-renderizado."""
-    st.session_state["navigate_to_page"] = page_path
-    st.rerun()
 
 @st.dialog("📊 INVENTARIOS & ESTRATEGIA")
 def open_inventory_modal():
@@ -532,28 +413,16 @@ def open_inventory_modal():
     Este módulo no es solo un registro; es un <b>cerebro financiero</b> que protege su capital.
     </div>
     <div class="modal-list-container">
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Análisis de Capital (IA):</span> Detecta dónde está atrapado el dinero (excedentes) y dónde pierde ventas (quiebres).</div>
+    <div class="modal-item"><span class="modal-bullet">➤</span><div><span class="modal-highlight">Análisis de Capital (IA):</span> Detecta excedentes y quiebres.</div></div>
+    <div class="modal-item"><span class="modal-bullet">➤</span><div><span class="modal-highlight">Predicción de Demanda:</span> Algoritmos que anticipan qué venderá mañana.</div></div>
+    <div class="modal-item"><span class="modal-bullet">➤</span><div><span class="modal-highlight">Visión Gerencial 360°:</span> KPIs financieros en tiempo real.</div></div>
     </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Predicción de Demanda:</span> Algoritmos que anticipan qué venderá mañana, optimizando el flujo de caja hoy.</div>
-    </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Visión Gerencial 360°:</span> KPIs en tiempo real sobre la salud financiera de su stock.</div>
-    </div>
-    </div>
-    <div class="modal-quote">
-    "El resultado: Menos stock obsoleto, más liquidez."
-    </div>
+    <div class="modal-quote">"El resultado: Menos stock obsoleto, más liquidez."</div>
     </div>
     """, unsafe_allow_html=True)
-    
     st.write("") 
     if st.button("🚀 IR AL DEMO: DASHBOARD GERENCIAL", key="btn_go_inv"):
-        set_page_and_rerun("pages/1_Inventario_Nexus.py")
+        st.switch_page("pages/1_Inventario_Nexus.py")
 
 @st.dialog("🚚 LOGÍSTICA & ABASTECIMIENTO")
 def open_logistics_modal():
@@ -562,32 +431,19 @@ def open_logistics_modal():
     <div class="modal-header-icon">⚡</div>
     <h2 class="modal-title">Sistema Nervioso de la Cadena de Suministro</h2>
     <div class="modal-body-text">
-    Convertimos las necesidades en acciones. Este es el motor operativo que asegura 
-    que el producto correcto esté en el lugar correcto, al menor costo posible.
+    Convertimos las necesidades en acciones. Motor operativo que asegura el producto correcto al menor costo.
     </div>
     <div class="modal-list-container">
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Compras Inteligentes:</span> Generación automática de órdenes basadas en consumo real y Lead Time.</div>
+    <div class="modal-item"><span class="modal-bullet">➤</span><div><span class="modal-highlight">Compras Inteligentes:</span> Órdenes basadas en consumo real.</div></div>
+    <div class="modal-item"><span class="modal-bullet">➤</span><div><span class="modal-highlight">Balanceo de Red:</span> Traslados automáticos entre sedes.</div></div>
+    <div class="modal-item"><span class="modal-bullet">➤</span><div><span class="modal-highlight">Torre de Control:</span> Visibilidad total de pedidos.</div></div>
     </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Balanceo de Red:</span> Detecta excesos en la Sede A y faltantes en la Sede B, sugiriendo traslados automáticos.</div>
-    </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Torre de Control:</span> Visibilidad total del estado de pedidos y movimientos en curso.</div>
-    </div>
-    </div>
-    <div class="modal-quote">
-    "El resultado: Compras precisas y agilidad operativa."
-    </div>
+    <div class="modal-quote">"El resultado: Compras precisas y agilidad operativa."</div>
     </div>
     """, unsafe_allow_html=True)
-    
     st.write("")
     if st.button("🚀 IR AL DEMO: CENTRO LOGÍSTICO", key="btn_go_log"):
-        set_page_and_rerun("pages/2_Operaciones_Logistica.py")
+        st.switch_page("pages/2_Operaciones_Logistica.py")
 
 @st.dialog("📥 RECEPCIÓN INTELIGENTE (XML)")
 def open_reception_modal():
@@ -596,38 +452,25 @@ def open_reception_modal():
     <div class="modal-header-icon">🛡️</div>
     <h2 class="modal-title">Blindaje Total de Entrada de Mercancía</h2>
     <div class="modal-body-text">
-    El 80% de los errores de inventario nacen en la recepción. Este módulo elimina la digitación manual 
-    usando la Factura Electrónica (XML DIAN) como única fuente de verdad.
+    El 80% de los errores de inventario nacen en la recepción. Eliminamos la digitación manual usando la Factura Electrónica (XML).
     </div>
     <div class="modal-list-container">
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Homologación Automática:</span> Cruce instantáneo de referencias del proveedor vs. catálogo interno.</div>
+    <div class="modal-item"><span class="modal-bullet">➤</span><div><span class="modal-highlight">Homologación Automática:</span> Cruce proveedor vs catálogo interno.</div></div>
+    <div class="modal-item"><span class="modal-bullet">➤</span><div><span class="modal-highlight">Conciliación Ciega:</span> Conteo físico vs XML digital.</div></div>
+    <div class="modal-item"><span class="modal-bullet">➤</span><div><span class="modal-highlight">Integridad de Datos:</span> Garantía fiscal total.</div></div>
     </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Conciliación Ciega:</span> Compara el conteo físico real contra el XML digital, alertando faltantes al instante.</div>
-    </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Integridad de Datos:</span> Garantiza que lo que paga es exactamente lo que entró a bodega.</div>
-    </div>
-    </div>
-    <div class="modal-quote">
-    "El resultado: Cero errores humanos, control fiscal total."
-    </div>
+    <div class="modal-quote">"El resultado: Cero errores humanos, control fiscal total."</div>
     </div>
     """, unsafe_allow_html=True)
-    
     st.write("")
     if st.button("🚀 IR AL DEMO: RECEPCIÓN XML", key="btn_go_xml"):
-        set_page_and_rerun("pages/3_Recepcion_Inteligente.py")
+        st.switch_page("pages/3_Recepcion_Inteligente.py")
 
 # ==============================================================================
-# --- 5. ESTRUCTURA PRINCIPAL (LAYOUT 3D) ---
+# --- 5. ESTRUCTURA PRINCIPAL (AQUÍ ESTÁ LA CORRECCIÓN DEL TÍTULO) ---
 # ==============================================================================
 
-# >>> HERO SECTION ANIMADA (CON EL HTML 3D SOLICITADO Y CORREGIDO)
+# EL HTML DEBE ESTAR DENTRO DE st.markdown CON unsafe_allow_html=True
 st.markdown("""
 <div class="hero-container animate-enter">
     <div class="company-tag">Arquitectura de Datos Empresarial & IA</div>
@@ -645,13 +488,12 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# >>> GRID DE MÓDULOS (TARJETAS 3D)
+# >>> GRID DE MÓDULOS
 st.write("")
 st.markdown("<h3 class='animate-enter' style='text-align: center; margin-bottom: 50px; font-size: 1.8rem; font-weight: 300; letter-spacing: 2px; color: #94a3b8;'>🚀 ECOSISTEMA NEXUS</h3>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3, gap="medium")
 
-# --- CARD 1 ---
 with col1:
     st.markdown("""
     <div class="flow-card animate-enter" style="animation-delay: 0.1s;">
@@ -665,7 +507,6 @@ with col1:
     if st.button("Explorar Módulo ➝", key="b1"):
         open_inventory_modal()
 
-# --- CARD 2 ---
 with col2:
     st.markdown("""
     <div class="flow-card animate-enter" style="animation-delay: 0.2s;">
@@ -679,7 +520,6 @@ with col2:
     if st.button("Explorar Módulo ➝", key="b2"):
         open_logistics_modal()
 
-# --- CARD 3 ---
 with col3:
     st.markdown("""
     <div class="flow-card animate-enter" style="animation-delay: 0.3s;">
@@ -693,7 +533,7 @@ with col3:
     if st.button("Explorar Módulo ➝", key="b3"):
         open_reception_modal()
 
-# >>> PERFIL LÍDER (ESTILO FUTURISTA)
+# >>> PERFIL LÍDER
 st.write("")
 st.write("")
 
