@@ -115,8 +115,8 @@ df = generar_data_avanzada()
 
 # --- SIDEBAR DE NAVEGACIÓN Y FILTROS ---
 with st.sidebar:
-    # --- CORRECCIÓN CRÍTICA DE NAVEGACIÓN ---
-    # Asegúrate de que "Portafolio_Servicios.py" es el nombre REAL de tu archivo principal
+    # --- ENLACE DE RETORNO ---
+    # Si tu archivo principal se llama diferente (ej: 0_Inicio.py), cambia el nombre aquí.
     st.page_link("Portafolio_Servicios.py", label="Volver al Inicio", icon="🏠")
     
     st.divider()
@@ -134,12 +134,13 @@ with st.sidebar:
 # --- CABECERA ESTRATÉGICA ---
 col_logo, col_title = st.columns([1, 6])
 with col_logo:
-    st.markdown("# ⚡") # Aquí iría tu logo
+    # Logo placeholder
+    st.markdown("<div style='font-size: 60px;'>⚡</div>", unsafe_allow_html=True)
 with col_title:
     st.title("NEXUS PRO | Inteligencia de Inventarios")
     st.markdown("**Vista Ejecutiva:** Análisis de capital, rotación y predicción de demanda.")
 
-# --- 1. DIAGNÓSTICO IA (El Gancho de Venta) ---
+# --- 1. DIAGNÓSTICO IA ---
 total_inv = df['Valor_Inventario'].sum()
 quiebres = df[df['Estado'].str.contains("Quiebre")]
 excedentes = df[df['Estado'].str.contains("Excedente")]
@@ -157,7 +158,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# --- 2. KPIs DE ALTO IMPACTO (Formato Tarjeta) ---
+# --- 2. KPIs DE ALTO IMPACTO ---
 c1, c2, c3, c4 = st.columns(4)
 
 def card(col, title, value, delta, is_good=True):
@@ -176,13 +177,13 @@ card(c2, "Capital Congelado", f"${capital_congelado/1e6:,.1f} M", "▼ Se requie
 card(c3, "Ventas Perdidas (Est)", f"${costo_oportunidad/1e6:,.1f} M", "▼ Por Quiebres de Stock", False)
 card(c4, "Días de Inventario (DSI)", f"{df['Stock'].mean()/df['Demanda_Mes'].mean()*30:.0f} Días", "▲ Dentro del objetivo", True)
 
-# --- 3. VISUALIZACIÓN AVANZADA (Layout Asimétrico) ---
+# --- 3. VISUALIZACIÓN AVANZADA ---
 st.markdown("### 📊 Análisis Visual Profundo")
 
 tab_vis1, tab_vis2, tab_vis3 = st.tabs(["Mapa de Calor Financiero", "Rendimiento de Proveedores", "Distribución de Salud"])
 
 with tab_vis1:
-    # TREEMAP: El mejor gráfico para ver dónde está el dinero
+    # TREEMAP
     st.markdown("##### ¿Dónde está invertido mi dinero? (Tamaño = Valor Inventario, Color = Estado)")
     fig_tree = px.treemap(
         df, 
@@ -201,7 +202,7 @@ with tab_vis1:
     st.plotly_chart(fig_tree, use_container_width=True)
 
 with tab_vis2:
-    # SCATTER: Lead Time vs Valor (Riesgo Proveedor)
+    # SCATTER
     col_prov1, col_prov2 = st.columns([3, 1])
     with col_prov1:
         fig_scatter = px.scatter(
@@ -225,13 +226,13 @@ with tab_vis2:
         """)
 
 with tab_vis3:
-    # SUNBURST: Distribución
+    # SUNBURST
     c_pie1, c_pie2 = st.columns(2)
     with c_pie1:
         fig_sun = px.sunburst(df, path=['Categoria', 'Estado'], values='Valor_Inventario')
         st.plotly_chart(fig_sun, use_container_width=True)
     with c_pie2:
-        # Gauge Chart para nivel de servicio
+        # Gauge Chart
         fig_gauge = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = (1 - (len(quiebres)/len(df))) * 100,
@@ -256,14 +257,22 @@ with col_action_left:
     st.markdown("Estos productos tienen venta activa pero Stock 0. **Estás perdiendo dinero cada hora.**")
     
     df_buy = quiebres[['SKU', 'Producto', 'Proveedor', 'Demanda_Mes', 'Costo']].copy()
-    df_buy['Sugerencia_Compra'] = df_buy['Demanda_Mes'] * 1.5 # Sugerir comprar para mes y medio
+    df_buy['Sugerencia_Compra'] = df_buy['Demanda_Mes'] * 1.5 
     df_buy['Inversion_Req'] = df_buy['Sugerencia_Compra'] * df_buy['Costo']
     
+    # --- CORRECCIÓN DEL BUG AQUI: int(...) ---
+    max_val_demanda = int(df_buy['Demanda_Mes'].max()) if not df_buy.empty else 100
+
     st.dataframe(
         df_buy.sort_values('Demanda_Mes', ascending=False).head(10),
         column_config={
             "Inversion_Req": st.column_config.NumberColumn("Inversión ($)", format="$%d"),
-            "Demanda_Mes": st.column_config.ProgressColumn("Demanda", format="%d", min_value=0, max_value=df_buy['Demanda_Mes'].max()),
+            "Demanda_Mes": st.column_config.ProgressColumn(
+                "Demanda", 
+                format="%d", 
+                min_value=0, 
+                max_value=max_val_demanda  # Convertido a int
+            ),
         },
         hide_index=True,
         use_container_width=True
