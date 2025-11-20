@@ -36,7 +36,7 @@ img_base64 = get_img_as_base64(img_path)
 foto_diego_src = f"data:image/png;base64,{img_base64}" if img_base64 else "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 
 # ==============================================================================
-# --- 3. CSS PREMIUM (ESTILOS + RESPONSIVIDAD) ---
+# --- 3. CSS PREMIUM (ESTILOS AVANZADOS 3D) ---
 # ==============================================================================
 st.markdown(f"""
 <style>
@@ -48,9 +48,33 @@ st.markdown(f"""
         background-color: #0E1117;
         color: #FFFFFF;
         font-family: 'Inter', sans-serif;
+        overflow-x: hidden; /* Evitar scroll horizontal por animaciones */
     }}
     
-    /* MODALES */
+    /* --- ANIMACIONES KEYFRAMES --- */
+    
+    /* 1. Flujo de Gradiente (Liquid Effect) */
+    @keyframes textShine {{
+        0% {{ background-position: 0% 50%; }}
+        50% {{ background-position: 100% 50%; }}
+        100% {{ background-position: 0% 50%; }}
+    }}
+
+    /* 2. Levitación 3D (Floating) */
+    @keyframes float {{
+        0% {{ transform: translateY(0px) perspective(1000px) rotateX(0deg); }}
+        50% {{ transform: translateY(-15px) perspective(1000px) rotateX(2deg); }}
+        100% {{ transform: translateY(0px) perspective(1000px) rotateX(0deg); }}
+    }}
+
+    /* 3. Pulso de Neon */
+    @keyframes glowPulse {{
+        0% {{ filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.3)); }}
+        50% {{ filter: drop-shadow(0 0 35px rgba(6, 182, 212, 0.8)); }}
+        100% {{ filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.3)); }}
+    }}
+
+    /* --- ESTILOS DE MODALES --- */
     .custom-modal-box {{
         background: linear-gradient(145deg, #111827, #1f2937);
         padding: 20px;
@@ -124,68 +148,107 @@ st.markdown(f"""
         padding-top: 10px;
     }}
 
-    /* HERO SECTION */
+    /* --- HERO SECTION MEJORADA (3D & MOVIMIENTO) --- */
     .hero-container {{
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: 50px 20px 30px 20px;
-        background: radial-gradient(circle at center, #1a202c 0%, #0E1117 70%);
+        padding: 70px 20px 50px 20px; /* Más espacio */
+        background: radial-gradient(circle at center, #1e293b 0%, #0E1117 80%);
         border-bottom: 1px solid #2d3748;
         margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
     }}
 
     .company-tag {{
-        background-color: rgba(6, 182, 212, 0.15);
+        background-color: rgba(6, 182, 212, 0.1);
         color: #22d3ee;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-size: 0.8rem;
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-size: 0.85rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-bottom: 15px;
-        border: 1px solid rgba(6, 182, 212, 0.4);
-        box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+        letter-spacing: 3px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(6, 182, 212, 0.3);
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+        backdrop-filter: blur(5px);
     }}
 
-    .main-title {{
-        font-size: 4rem;
+    /* TÍTULO 3D IMPACTANTE */
+    .super-title-container {{
+        perspective: 1000px; /* Da la profundidad 3D */
+    }}
+
+    .super-title {{
+        font-size: 5.5rem; /* Muy grande e impactante */
         font-weight: 900;
         margin: 0;
         line-height: 1.1;
-        background: linear-gradient(90deg, #FFFFFF 20%, #cbd5e1 100%);
+        letter-spacing: -2px;
+        
+        /* Gradiente Metálico Animado */
+        background: linear-gradient(
+            225deg, 
+            #FFFFFF 0%, 
+            #94a3b8 25%, 
+            #FFFFFF 50%, 
+            #94a3b8 75%, 
+            #FFFFFF 100%
+        );
+        background-size: 200% auto;
+        color: #fff;
+        background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        
+        /* Animaciones combinadas */
+        animation: textShine 4s linear infinite, float 6s ease-in-out infinite;
+        
+        /* Sombra 3D CSS pura (simula extrusión) */
+        filter: drop-shadow(0px 0px 0px rgba(0,0,0,0)); /* Reset base */
     }}
 
-    /* Ajuste tamaño título en móvil */
-    @media (max-width: 768px) {{
-        .main-title {{
-            font-size: 2.5rem;
-        }}
-    }}
-
-    .highlight-text {{
-        background: linear-gradient(90deg, #3b82f6, #06B6D4);
+    /* Parte coloreada del título */
+    .super-highlight {{
+        background: linear-gradient(
+            90deg, 
+            #22d3ee 0%, 
+            #3b82f6 50%, 
+            #22d3ee 100%
+        );
+        background-size: 200% auto;
+        background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        animation: textShine 3s linear infinite;
+        
+        /* Glow específico para la parte de color */
+        text-shadow: 0 0 30px rgba(34, 211, 238, 0.5);
+    }}
+
+    /* Subtítulo elegante */
+    .subtitle {{
+        font-size: 1.3rem;
+        color: #cbd5e1;
+        max-width: 750px;
+        margin-top: 30px;
+        line-height: 1.7;
+        font-weight: 300;
+        opacity: 0.9;
     }}
     
-    .subtitle {{
-        font-size: 1.2rem;
-        color: #E2E8F0;
-        max-width: 700px;
-        margin-top: 20px;
-        line-height: 1.6;
-        font-weight: 400;
+    .subtitle b {{
+        color: #38BDF8;
+        font-weight: 600;
     }}
 
-    /* CARDS */
+    /* --- CARDS --- */
     .flow-card {{
-        background: rgba(30, 41, 59, 0.75);
+        background: rgba(30, 41, 59, 0.4);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         padding: 30px;
@@ -195,20 +258,35 @@ st.markdown(f"""
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        position: relative;
+        overflow: hidden;
     }}
     
+    .flow-card::before {{
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, transparent, #06B6D4, transparent);
+        opacity: 0;
+        transition: opacity 0.4s;
+    }}
+
     .flow-card:hover {{
         transform: translateY(-10px) scale(1.02);
-        background: rgba(30, 41, 59, 1);
+        background: rgba(30, 41, 59, 0.8);
         border-color: #3b82f6;
-        box-shadow: 0 20px 40px -12px rgba(37, 99, 235, 0.5);
+        box-shadow: 0 20px 40px -12px rgba(6, 182, 212, 0.3);
+    }}
+    
+    .flow-card:hover::before {{
+        opacity: 1;
     }}
 
     .card-icon {{ font-size: 3rem; margin-bottom: 15px; }}
     .card-title {{ font-size: 1.4rem; font-weight: 700; color: #FFFFFF; margin-bottom: 10px; }}
     .card-desc {{ font-size: 0.95rem; color: #cbd5e1; margin-bottom: 20px; line-height: 1.5; }}
 
-    /* --- PERFIL (RESPONSIVE FIX) --- */
+    /* --- PERFIL --- */
     .profile-box {{
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         padding: 40px;
@@ -216,9 +294,9 @@ st.markdown(f"""
         border: 1px solid rgba(51, 65, 85, 0.7);
         margin-top: 50px;
         display: flex;
-        align-items: center; /* Centrado vertical en desktop */
+        align-items: center;
         box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        flex-direction: row; /* Defecto Desktop: Fila */
+        position: relative;
     }}
     
     .profile-img {{
@@ -229,58 +307,14 @@ st.markdown(f"""
         border: 4px solid #06B6D4;
         margin-right: 30px;
         box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
-        flex-shrink: 0; /* Evita que la imagen se aplaste */
+        transition: transform 0.3s;
+    }}
+    
+    .profile-img:hover {{
+        transform: scale(1.05) rotate(5deg);
     }}
 
-    .profile-content {{
-        flex: 1;
-    }}
-
-    .profile-quote {{
-        color: #E2E8F0; 
-        font-size: 1.1rem; 
-        line-height: 1.8; 
-        font-style: italic; 
-        border-left: 4px solid #06B6D4; 
-        padding-left: 20px;
-    }}
-
-    .profile-tags {{
-        margin-top: 20px; 
-        display: flex; 
-        gap: 10px; 
-        flex-wrap: wrap;
-    }}
-
-    /* --- MEDIA QUERY PARA MÓVILES (Aquí está la magia) --- */
-    @media only screen and (max-width: 768px) {{
-        .profile-box {{
-            flex-direction: column; /* Cambia a columna vertical */
-            text-align: center;     /* Centra todo el texto */
-            padding: 30px 20px;
-        }}
-
-        .profile-img {{
-            margin-right: 0;        /* Quita margen derecho */
-            margin-bottom: 20px;    /* Añade espacio abajo */
-            width: 130px;           /* Un poco más pequeña */
-            height: 130px;
-        }}
-
-        .profile-quote {{
-            border-left: none;      /* Quita la barra lateral */
-            border-top: 3px solid #06B6D4; /* Pone barra arriba */
-            padding-left: 0;
-            padding-top: 15px;
-            font-size: 1rem;
-        }}
-
-        .profile-tags {{
-            justify-content: center; /* Centra las etiquetas */
-        }}
-    }}
-
-    /* BOTONES */
+    /* --- BOTONES --- */
     div.stButton > button {{
         width: 100%;
         background: linear-gradient(90deg, #2563EB 0%, #06B6D4 100%);
@@ -291,11 +325,15 @@ st.markdown(f"""
         border-radius: 8px;
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
     }}
     
     div.stButton > button:hover {{
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(6, 182, 212, 0.6);
+        background: linear-gradient(90deg, #3b82f6 0%, #22d3ee 100%);
     }}
 
 </style>
@@ -411,11 +449,17 @@ def open_reception_modal():
 # --- 5. ESTRUCTURA PRINCIPAL ---
 # ==============================================================================
 
-# >>> HERO SECTION
+# >>> HERO SECTION (NUEVO DISEÑO IMPACTANTE 3D)
 st.markdown("""
 <div class="hero-container">
     <div class="company-tag">Arquitectura de Datos Empresarial & IA</div>
-    <h1 class="main-title">GM-<span class="highlight-text">DATOVATE</span></h1>
+    
+    <div class="super-title-container">
+        <h1 class="super-title">
+            GM-<span class="super-highlight">DATOVATE</span>
+        </h1>
+    </div>
+    
     <p class="subtitle">
         Transformamos el caos operativo en <b>Ventaja Competitiva</b>.
         <br>Una suite integrada que utiliza Inteligencia Artificial para sincronizar Inventarios, Logística y Finanzas en tiempo real.
@@ -425,7 +469,7 @@ st.markdown("""
 
 # >>> GRID DE MÓDULOS
 st.write("")
-st.markdown("<h3 style='text-align: center; margin-bottom: 50px; font-size: 2rem;'>🚀 Ecosistema NEXUS: Explore el Valor de Negocio</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; margin-bottom: 50px; font-size: 2rem; font-weight: 800; letter-spacing: -1px;'>🚀 Ecosistema NEXUS: Explore el Valor de Negocio</h3>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3, gap="medium")
 
@@ -436,7 +480,7 @@ with col1:
         <div>
             <div class="card-icon">📊</div>
             <div class="card-title">1. Control & Estrategia</div>
-            <div class="card-desc">El cerebro financiero. Análisis predictivo de capital, detección de riesgos y optimización con IA.</div>
+            <p class="card-desc">El cerebro financiero. Análisis predictivo de capital, detección de riesgos y optimización con IA.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -450,7 +494,7 @@ with col2:
         <div>
             <div class="card-icon">🚚</div>
             <div class="card-title">2. Logística Inteligente</div>
-            <div class="card-desc">El brazo ejecutor. Automatización de compras y rebalanceo autónomo de stock entre bodegas.</div>
+            <p class="card-desc">El brazo ejecutor. Automatización de compras y rebalanceo autónomo de stock entre bodegas.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -464,32 +508,31 @@ with col3:
         <div>
             <div class="card-icon">📥</div>
             <div class="card-title">3. Recepción Blindada</div>
-            <div class="card-desc">La puerta de entrada. Procesamiento automático de XML (DIAN) y conciliación fiscal vs física.</div>
+            <p class="card-desc">La puerta de entrada. Procesamiento automático de XML (DIAN) y conciliación fiscal vs física.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
     if st.button("Explorar Módulo ➝", key="b3"):
         open_reception_modal()
 
-# >>> PERFIL LÍDER (CORREGIDO PARA MÓVIL)
+# >>> PERFIL LÍDER
 st.write("")
 st.write("")
 
 c_spacer_l, c_profile, c_spacer_r = st.columns([1, 6, 1])
 
 with c_profile:
-    # Nota: He reestructurado el HTML para usar las clases CSS nuevas que manejan la responsividad
     st.markdown(f"""
     <div class="profile-box">
         <img src="{foto_diego_src}" class="profile-img" alt="Diego Mauricio García">
-        <div class="profile-content">
+        <div style="flex: 1;">
             <h4 style="color: #06B6D4; margin:0 0 10px 0; font-weight: 800; letter-spacing:1.5px;">ARQUITECTURA & VISIÓN</h4>
-            <h2 style="color: white; margin: 0 0 20px 0; font-size: 2.5rem;">Diego Mauricio García</h2>
-            <p class="profile-quote">
+            <h2 style="color: white; margin: 0 0 20px 0; font-size: 2.5rem; text-shadow: 0 0 20px rgba(0,0,0,0.5);">Diego Mauricio García</h2>
+            <p style="color: #E2E8F0; font-size: 1.1rem; line-height: 1.8; font-style: italic; border-left: 4px solid #06B6D4; padding-left: 20px;">
                 "En GM-Datovate no vendemos software, diseñamos el sistema nervioso de su organización. 
                 Mi obsesión es eliminar la fricción operativa mediante arquitecturas de datos que piensan, aprenden y actúan por sí mismas."
             </p>
-            <div class="profile-tags">
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">CEO & Founder</span>
                 <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Data Architect</span>
                 <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Python Expert</span>
