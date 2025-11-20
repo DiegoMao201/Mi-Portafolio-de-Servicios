@@ -8,3 +8,4 @@ openpyxl
 streamlit-drawable-canvas
 Pillow
 kaleido
+xlsxwriter
