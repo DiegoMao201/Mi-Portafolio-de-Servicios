@@ -16,7 +16,7 @@ st.set_page_config(
 if "navigate_to_page" not in st.session_state:
     st.session_state["navigate_to_page"] = None
 
-# --- SOLUCIÓN: Lógica de navegación fuera del diálogo ---
+# --- SOLUCIÓN DE NAVEGACIÓN ---
 if st.session_state["navigate_to_page"]:
     page_to_go = st.session_state["navigate_to_page"]
     st.session_state["navigate_to_page"] = None # Resetear el estado
@@ -29,8 +29,6 @@ if st.session_state["navigate_to_page"]:
 def get_img_as_base64(file_path):
     """Convierte imágenes locales a base64 para usar en HTML/CSS."""
     try:
-        # Asegúrate de que 'assets' esté en el mismo directorio que este script.
-        # Si 'foto_diego.png' no existe, la función devolverá None.
         if os.path.exists(file_path):
             with open(file_path, "rb") as f:
                 data = f.read()
@@ -41,6 +39,7 @@ def get_img_as_base64(file_path):
 
 # Carga de imagen de perfil
 current_dir = os.path.dirname(os.path.abspath(__file__))
+# Asumo que 'assets' y 'foto_diego.png' están en la estructura correcta.
 img_path = os.path.join(current_dir, "assets", "foto_diego.png")
 img_base64 = get_img_as_base64(img_path)
 
@@ -50,7 +49,6 @@ foto_diego_src = f"data:image/png;base64,{img_base64}" if img_base64 else "https
 # ==============================================================================
 # --- 3. CSS ULTRA-PREMIUM (3D, ANIMACIONES Y EFECTOS VISUALES) ---
 # ==============================================================================
-# NOTA: Las llaves dobles {{ }} son necesarias en f-strings para evitar errores de sintaxis
 st.markdown(f"""
 <style>
     /* IMPORTAR FUENTE FUTURISTA */
@@ -554,7 +552,6 @@ def open_inventory_modal():
     """, unsafe_allow_html=True)
     
     st.write("") 
-    # **CORRECCIÓN:** Usar la función de estado para navegar
     if st.button("🚀 IR AL DEMO: DASHBOARD GERENCIAL", key="btn_go_inv"):
         set_page_and_rerun("pages/1_Inventario_Nexus.py")
 
@@ -589,7 +586,6 @@ def open_logistics_modal():
     """, unsafe_allow_html=True)
     
     st.write("")
-    # **CORRECCIÓN:** Usar la función de estado para navegar
     if st.button("🚀 IR AL DEMO: CENTRO LOGÍSTICO", key="btn_go_log"):
         set_page_and_rerun("pages/2_Operaciones_Logistica.py")
 
@@ -624,7 +620,6 @@ def open_reception_modal():
     """, unsafe_allow_html=True)
     
     st.write("")
-    # **CORRECCIÓN:** Usar la función de estado para navegar
     if st.button("🚀 IR AL DEMO: RECEPCIÓN XML", key="btn_go_xml"):
         set_page_and_rerun("pages/3_Recepcion_Inteligente.py")
 
@@ -632,13 +627,13 @@ def open_reception_modal():
 # --- 5. ESTRUCTURA PRINCIPAL (LAYOUT 3D) ---
 # ==============================================================================
 
-# >>> HERO SECTION ANIMADA (CON EL HTML 3D SOLICITADO)
+# >>> HERO SECTION ANIMADA (CON EL HTML 3D SOLICITADO Y CORREGIDO)
 st.markdown("""
 <div class="hero-container animate-enter">
     <div class="company-tag">Arquitectura de Datos Empresarial & IA</div>
     
     <div style="transform-style: preserve-3d;">
-        <h1 class="main-title-3d">
+        <h1 class="main-title-3d" style="display: inline-block;">
             GM-<span class="highlight-text-3d">DATOVATE</span>
         </h1>
     </div>
