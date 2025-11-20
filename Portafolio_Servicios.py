@@ -27,16 +27,16 @@ def get_img_as_base64(file_path):
         pass
     return None
 
-# Carga de imagen de perfil
+# Carga de imagen de perfil (Asegúrate que la ruta sea correcta)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 img_path = os.path.join(current_dir, "assets", "foto_diego.png")
 img_base64 = get_img_as_base64(img_path)
 
-# Fallback: Si no encuentra la foto local, usa un icono genérico o URL
+# Fallback: Si no encuentra la foto local, usa un icono genérico
 foto_diego_src = f"data:image/png;base64,{img_base64}" if img_base64 else "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 
 # ==============================================================================
-# --- 3. CSS PREMIUM Y ESTILOS ---
+# --- 3. CSS PREMIUM (ESTILOS) ---
 # ==============================================================================
 st.markdown(f"""
 <style>
@@ -245,100 +245,124 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# --- 4. LÓGICA DE MODALES Y NAVEGACIÓN (REFACTORIZADO) ---
+# --- 4. DEFINICIÓN DE MODALES (CORREGIDO EL PROBLEMA DE TEXTO) ---
 # ==============================================================================
-
-def create_modal_content(icon, title, body, items, quote):
-    """Genera el HTML para el contenido del modal."""
-    items_html = ""
-    for bold_text, desc in items:
-        items_html += f"""
-        <div class="modal-item">
-            <span class="modal-bullet">➤</span>
-            <div><span class="modal-highlight">{bold_text}:</span> {desc}</div>
-        </div>
-        """
-    
-    return f"""
-    <div class="custom-modal-box">
-        <div class="modal-header-icon">{icon}</div>
-        <h2 class="modal-title">{title}</h2>
-        <div class="modal-body-text">{body}</div>
-        <div class="modal-list-container">
-            {items_html}
-        </div>
-        <div class="modal-quote">"{quote}"</div>
-    </div>
-    """
+# NOTA IMPORTANTE: El código HTML dentro de st.markdown está pegado a la izquierda
+# sin indentación para evitar que Streamlit lo lea como código de programación.
 
 @st.dialog("📊 INVENTARIOS & ESTRATEGIA")
 def open_inventory_modal():
-    html_content = create_modal_content(
-        icon="🧠",
-        title="Del Caos Reactivo a la Precisión Predictiva",
-        body="La gestión tradicional basada en 'intuición' cuesta millones. Este módulo es un cerebro financiero que protege su capital.",
-        items=[
-            ("Análisis de Capital (IA)", "Detecta excedentes atrapados y quiebres de stock."),
-            ("Predicción de Demanda", "Algoritmos que anticipan qué venderá mañana."),
-            ("Visión Gerencial 360°", "KPIs en tiempo real de la salud financiera.")
-        ],
-        quote="El resultado: Menos stock obsoleto, más liquidez."
-    )
-    st.markdown(html_content, unsafe_allow_html=True)
+    st.markdown("""
+<div class="custom-modal-box">
+<div class="modal-header-icon">🧠</div>
+<h2 class="modal-title">Del Caos Reactivo a la Precisión Predictiva</h2>
+<div class="modal-body-text">
+La gestión tradicional basada en "intuición" está costando millones. 
+Este módulo no es solo un registro; es un <b>cerebro financiero</b> que protege su capital.
+</div>
+<div class="modal-list-container">
+<div class="modal-item">
+<span class="modal-bullet">➤</span>
+<div><span class="modal-highlight">Análisis de Capital (IA):</span> Detecta dónde está atrapado el dinero (excedentes) y dónde pierde ventas (quiebres).</div>
+</div>
+<div class="modal-item">
+<span class="modal-bullet">➤</span>
+<div><span class="modal-highlight">Predicción de Demanda:</span> Algoritmos que anticipan qué venderá mañana, optimizando el flujo de caja hoy.</div>
+</div>
+<div class="modal-item">
+<span class="modal-bullet">➤</span>
+<div><span class="modal-highlight">Visión Gerencial 360°:</span> KPIs en tiempo real sobre la salud financiera de su stock.</div>
+</div>
+</div>
+<div class="modal-quote">
+"El resultado: Menos stock obsoleto, más liquidez."
+</div>
+</div>
+""", unsafe_allow_html=True)
     
-    st.write("")
-    if st.button("🚀 IR AL DEMO: DASHBOARD GERENCIAL", key="btn_inv"):
+    st.write("") 
+    if st.button("🚀 IR AL DEMO: DASHBOARD GERENCIAL", key="btn_go_inv"):
         try:
             st.switch_page("pages/1_Inventario_Nexus.py")
-        except Exception as e:
-            st.error(f"Error de ruta: {e}. Verifique que la carpeta 'pages' exista.")
+        except:
+            st.error("Ruta no encontrada: asegúrese de tener la carpeta 'pages'")
 
 @st.dialog("🚚 LOGÍSTICA & ABASTECIMIENTO")
 def open_logistics_modal():
-    html_content = create_modal_content(
-        icon="⚡",
-        title="Sistema Nervioso de la Cadena de Suministro",
-        body="Motor operativo que asegura el producto correcto en el lugar correcto al menor costo.",
-        items=[
-            ("Compras Inteligentes", "Órdenes automáticas basadas en consumo real."),
-            ("Balanceo de Red", "Sugiere traslados automáticos entre sedes."),
-            ("Torre de Control", "Visibilidad total de pedidos en curso.")
-        ],
-        quote="El resultado: Compras precisas y agilidad operativa."
-    )
-    st.markdown(html_content, unsafe_allow_html=True)
-
+    st.markdown("""
+<div class="custom-modal-box">
+<div class="modal-header-icon">⚡</div>
+<h2 class="modal-title">Sistema Nervioso de la Cadena de Suministro</h2>
+<div class="modal-body-text">
+Convertimos las necesidades en acciones. Este es el motor operativo que asegura 
+que el producto correcto esté en el lugar correcto, al menor costo posible.
+</div>
+<div class="modal-list-container">
+<div class="modal-item">
+<span class="modal-bullet">➤</span>
+<div><span class="modal-highlight">Compras Inteligentes:</span> Generación automática de órdenes basadas en consumo real y Lead Time.</div>
+</div>
+<div class="modal-item">
+<span class="modal-bullet">➤</span>
+<div><span class="modal-highlight">Balanceo de Red:</span> Detecta excesos en la Sede A y faltantes en la Sede B, sugiriendo traslados automáticos.</div>
+</div>
+<div class="modal-item">
+<span class="modal-bullet">➤</span>
+<div><span class="modal-highlight">Torre de Control:</span> Visibilidad total del estado de pedidos y movimientos en curso.</div>
+</div>
+</div>
+<div class="modal-quote">
+"El resultado: Compras precisas y agilidad operativa."
+</div>
+</div>
+""", unsafe_allow_html=True)
+    
     st.write("")
-    if st.button("🚀 IR AL DEMO: CENTRO LOGÍSTICO", key="btn_log"):
+    if st.button("🚀 IR AL DEMO: CENTRO LOGÍSTICO", key="btn_go_log"):
         try:
             st.switch_page("pages/2_Operaciones_Logistica.py")
-        except Exception as e:
-            st.error(f"Error de ruta: {e}")
+        except:
+            st.error("Ruta no encontrada")
 
 @st.dialog("📥 RECEPCIÓN INTELIGENTE (XML)")
 def open_reception_modal():
-    html_content = create_modal_content(
-        icon="🛡️",
-        title="Blindaje Total de Entrada de Mercancía",
-        body="Elimina la digitación manual usando la Factura Electrónica (XML DIAN) como única verdad.",
-        items=[
-            ("Homologación Automática", "Cruce instantáneo de referencias proveedor vs interno."),
-            ("Conciliación Ciega", "Compara conteo físico vs XML digital."),
-            ("Integridad de Datos", "Garantiza que paga lo que realmente entró.")
-        ],
-        quote="El resultado: Cero errores humanos, control fiscal total."
-    )
-    st.markdown(html_content, unsafe_allow_html=True)
-
+    st.markdown("""
+<div class="custom-modal-box">
+<div class="modal-header-icon">🛡️</div>
+<h2 class="modal-title">Blindaje Total de Entrada de Mercancía</h2>
+<div class="modal-body-text">
+El 80% de los errores de inventario nacen en la recepción. Este módulo elimina la digitación manual 
+usando la Factura Electrónica (XML DIAN) como única fuente de verdad.
+</div>
+<div class="modal-list-container">
+<div class="modal-item">
+<span class="modal-bullet">➤</span>
+<div><span class="modal-highlight">Homologación Automática:</span> Cruce instantáneo de referencias del proveedor vs. catálogo interno.</div>
+</div>
+<div class="modal-item">
+<span class="modal-bullet">➤</span>
+<div><span class="modal-highlight">Conciliación Ciega:</span> Compara el conteo físico real contra el XML digital, alertando faltantes al instante.</div>
+</div>
+<div class="modal-item">
+<span class="modal-bullet">➤</span>
+<div><span class="modal-highlight">Integridad de Datos:</span> Garantiza que lo que paga es exactamente lo que entró a bodega.</div>
+</div>
+</div>
+<div class="modal-quote">
+"El resultado: Cero errores humanos, control fiscal total."
+</div>
+</div>
+""", unsafe_allow_html=True)
+    
     st.write("")
-    if st.button("🚀 IR AL DEMO: RECEPCIÓN XML", key="btn_xml"):
+    if st.button("🚀 IR AL DEMO: RECEPCIÓN XML", key="btn_go_xml"):
         try:
             st.switch_page("pages/3_Recepcion_Inteligente.py")
-        except Exception as e:
-            st.error(f"Error de ruta: {e}")
+        except:
+            st.error("Ruta no encontrada")
 
 # ==============================================================================
-# --- 5. UI PRINCIPAL ---
+# --- 5. ESTRUCTURA PRINCIPAL ---
 # ==============================================================================
 
 # >>> HERO SECTION
@@ -355,7 +379,7 @@ st.markdown("""
 
 # >>> GRID DE MÓDULOS
 st.write("")
-st.markdown("<h3 style='text-align: center; margin-bottom: 40px; font-size: 1.8rem;'>🚀 Ecosistema NEXUS: Explore el Valor de Negocio</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; margin-bottom: 50px; font-size: 2rem;'>🚀 Ecosistema NEXUS: Explore el Valor de Negocio</h3>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3, gap="medium")
 
@@ -405,7 +429,7 @@ with col3:
 st.write("")
 st.write("")
 
-c_spacer_l, c_profile, c_spacer_r = st.columns([1, 8, 1])
+c_spacer_l, c_profile, c_spacer_r = st.columns([1, 6, 1])
 
 with c_profile:
     st.markdown(f"""
@@ -413,15 +437,15 @@ with c_profile:
         <img src="{foto_diego_src}" class="profile-img" alt="Diego Mauricio García">
         <div style="flex: 1;">
             <h4 style="color: #06B6D4; margin:0 0 10px 0; font-weight: 800; letter-spacing:1.5px;">ARQUITECTURA & VISIÓN</h4>
-            <h2 style="color: white; margin: 0 0 15px 0; font-size: 2.2rem;">Diego Mauricio García</h2>
-            <p style="color: #E2E8F0; font-size: 1rem; line-height: 1.6; font-style: italic; border-left: 4px solid #06B6D4; padding-left: 20px;">
+            <h2 style="color: white; margin: 0 0 20px 0; font-size: 2.5rem;">Diego Mauricio García</h2>
+            <p style="color: #E2E8F0; font-size: 1.1rem; line-height: 1.8; font-style: italic; border-left: 4px solid #06B6D4; padding-left: 20px;">
                 "En GM-Datovate no vendemos software, diseñamos el sistema nervioso de su organización. 
                 Mi obsesión es eliminar la fricción operativa mediante arquitecturas de datos que piensan, aprenden y actúan por sí mismas."
             </p>
             <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem;">CEO & Founder</span>
-                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem;">Data Architect</span>
-                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem;">Python Expert</span>
+                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">CEO & Founder</span>
+                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Data Architect</span>
+                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Python Expert</span>
             </div>
         </div>
     </div>
@@ -429,4 +453,4 @@ with c_profile:
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: #64748B; margin-bottom: 30px;'>© 2025 GM-DATOVATE. Todos los derechos reservados.</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: #64748B; margin-bottom: 40px;'>© 2025 GM-DATOVATE. Todos los derechos reservados.</div>", unsafe_allow_html=True)
