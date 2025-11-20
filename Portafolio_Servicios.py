@@ -170,7 +170,7 @@ st.markdown(f"""
     }}
 
     /* --- HERO SECTION (IMPACTANTE 3D) --- */
-    .hero-container {
+    .hero-container {{
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -180,10 +180,10 @@ st.markdown(f"""
         margin-bottom: 40px;
         position: relative;
         perspective: 1200px; /* Profundidad de escena */
-    }
+    }}
 
     /* Efecto de luz detrás del título */
-    .hero-container::before {
+    .hero-container::before {{
         content: '';
         position: absolute;
         top: 40%;
@@ -194,9 +194,9 @@ st.markdown(f"""
         background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.25) 0%, rgba(0,0,0,0) 70%);
         filter: blur(60px);
         z-index: -1;
-    }
+    }}
 
-    .company-tag {
+    .company-tag {{
         background: rgba(6, 182, 212, 0.05);
         color: #22d3ee;
         padding: 8px 24px;
@@ -209,10 +209,10 @@ st.markdown(f"""
         border: 1px solid rgba(6, 182, 212, 0.4);
         box-shadow: 0 0 25px rgba(6, 182, 212, 0.15);
         backdrop-filter: blur(5px);
-    }
+    }}
 
     /* ESTILOS NUEVOS PARA TÍTULO 3D MASIVO */
-    .main-title-3d {
+    .main-title-3d {{
         font-size: 6rem; /* Tamaño aumentado */
         font-weight: 900;
         margin: 0;
@@ -239,9 +239,9 @@ st.markdown(f"""
             
         /* Sombra 3D Profunda */
         filter: drop-shadow(0 15px 25px rgba(0,0,0,0.8));
-    }
+    }}
 
-    .highlight-text-3d {
+    .highlight-text-3d {{
         /* Gradiente Cian Eléctrico */
         background: linear-gradient(
             110deg,
@@ -257,13 +257,13 @@ st.markdown(f"""
         
         /* Resplandor específico para la parte DATOVATE */
         filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.6));
-    }
+    }}
 
-    @media (max-width: 768px) {
-        .main-title-3d { font-size: 3.5rem; animation: none; transform: none; }
-    }
+    @media (max-width: 768px) {{
+        .main-title-3d {{ font-size: 3.5rem; animation: none; transform: none; }}
+    }}
     
-    .subtitle {
+    .subtitle {{
         font-size: 1.3rem;
         color: #cbd5e1;
         max-width: 800px;
@@ -273,10 +273,10 @@ st.markdown(f"""
         text-shadow: 0 2px 10px rgba(0,0,0,0.8);
         position: relative;
         z-index: 1;
-    }
+    }}
 
     /* --- CARDS 3D (GLASSMORPHISM) --- */
-    .flow-card {
+    .flow-card {{
         background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
@@ -290,10 +290,10 @@ st.markdown(f"""
         transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         position: relative;
         overflow: hidden;
-    }
+    }}
 
     /* Brillo superior en la tarjeta */
-    .flow-card::before {
+    .flow-card::before {{
         content: '';
         position: absolute;
         top: 0;
@@ -303,49 +303,49 @@ st.markdown(f"""
         background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
         opacity: 0;
         transition: opacity 0.4s ease;
-    }
+    }}
     
-    .flow-card:hover {
+    .flow-card:hover {{
         transform: translateY(-12px) scale(1.02);
         background: rgba(30, 41, 59, 0.6);
         border-color: rgba(6, 182, 212, 0.5);
         box-shadow: 
             0 20px 40px -10px rgba(0, 0, 0, 0.5),
             0 0 20px rgba(6, 182, 212, 0.2); /* Glow effect */
-    }
+    }}
 
-    .flow-card:hover::before {
+    .flow-card:hover::before {{
         opacity: 1;
-    }
+    }}
 
-    .card-icon { 
+    .card-icon {{ 
         font-size: 3.5rem; 
         margin-bottom: 20px; 
         filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
         transition: transform 0.3s ease;
-    }
+    }}
 
-    .flow-card:hover .card-icon {
+    .flow-card:hover .card-icon {{
         transform: scale(1.1) rotate(5deg);
-    }
+    }}
 
-    .card-title { 
+    .card-title {{ 
         font-size: 1.5rem; 
         font-weight: 700; 
         color: #FFFFFF; 
         margin-bottom: 12px; 
         letter-spacing: -0.5px;
-    }
+    }}
     
-    .card-desc { 
+    .card-desc {{ 
         font-size: 0.95rem; 
         color: #94a3b8; 
         margin-bottom: 25px; 
         line-height: 1.6; 
-    }
+    }}
 
     /* --- PERFIL (RESPONSIVE + 3D) --- */
-    .profile-box {
+    .profile-box {{
         background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.8));
         padding: 40px;
         border-radius: 30px;
@@ -357,10 +357,10 @@ st.markdown(f"""
         flex-direction: row;
         position: relative;
         overflow: hidden;
-    }
+    }}
 
     /* Decoración de fondo en perfil */
-    .profile-box::after {
+    .profile-box::after {{
         content: '';
         position: absolute;
         right: -50px;
@@ -370,9 +370,9 @@ st.markdown(f"""
         background: radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%);
         border-radius: 50%;
         pointer-events: none;
-    }
+    }}
     
-    .profile-img {
+    .profile-img {{
         width: 160px;
         height: 160px;
         border-radius: 50%;
@@ -381,14 +381,14 @@ st.markdown(f"""
         margin-right: 40px;
         flex-shrink: 0;
         animation: pulse-glow 3s infinite; /* Animación de pulso */
-    }
+    }}
 
-    .profile-content {
+    .profile-content {{
         flex: 1;
         z-index: 1;
-    }
+    }}
 
-    .profile-quote {
+    .profile-quote {{
         color: #e2e8f0; 
         font-size: 1.1rem; 
         line-height: 1.8; 
@@ -400,16 +400,16 @@ st.markdown(f"""
         padding-top: 10px;
         padding-bottom: 10px;
         border-radius: 0 10px 10px 0;
-    }
+    }}
 
-    .profile-tags {
+    .profile-tags {{
         margin-top: 25px; 
         display: flex; 
         gap: 12px; 
         flex-wrap: wrap;
-    }
+    }}
     
-    .tag-pill {
+    .tag-pill {{
         background: rgba(15, 23, 42, 0.6);
         border: 1px solid rgba(6, 182, 212, 0.5);
         color: #22d3ee;
@@ -419,41 +419,41 @@ st.markdown(f"""
         font-weight: 600;
         letter-spacing: 1px;
         transition: all 0.3s ease;
-    }
+    }}
     
-    .tag-pill:hover {
+    .tag-pill:hover {{
         background: rgba(6, 182, 212, 0.2);
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(6, 182, 212, 0.2);
-    }
+    }}
 
     /* --- MEDIA QUERY MÓVIL --- */
-    @media only screen and (max-width: 768px) {
-        .profile-box {
+    @media only screen and (max-width: 768px) {{
+        .profile-box {{
             flex-direction: column;
             text-align: center;
             padding: 30px 20px;
-        }
-        .profile-img {
+        }}
+        .profile-img {{
             margin-right: 0;
             margin-bottom: 25px;
             width: 140px;
             height: 140px;
-        }
-        .profile-quote {
+        }}
+        .profile-quote {{
             border-left: none;
             border-top: 3px solid #06B6D4;
             padding-left: 0;
             padding-top: 20px;
             background: linear-gradient(180deg, rgba(6,182,212,0.05) 0%, transparent 100%);
-        }
-        .profile-tags {
+        }}
+        .profile-tags {{
             justify-content: center;
-        }
-    }
+        }}
+    }}
 
     /* --- BOTONES (NEÓN) --- */
-    div.stButton > button {
+    div.stButton > button {{
         width: 100%;
         background: transparent;
         color: #22d3ee;
@@ -467,9 +467,9 @@ st.markdown(f"""
         position: relative;
         overflow: hidden;
         z-index: 1;
-    }
+    }}
     
-    div.stButton > button::before {
+    div.stButton > button::before {{
         content: "";
         position: absolute;
         top: 0;
@@ -479,24 +479,24 @@ st.markdown(f"""
         background: linear-gradient(90deg, #06B6D4, #3b82f6);
         z-index: -1;
         transition: width 0.3s ease;
-    }
+    }}
 
-    div.stButton > button:hover {
+    div.stButton > button:hover {{
         color: white;
         border-color: transparent;
         transform: translateY(-3px);
         box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.6);
-    }
+    }}
 
-    div.stButton > button:hover::before {
+    div.stButton > button:hover::before {{
         width: 100%;
-    }
+    }}
     
     /* Eliminar padding extra superior de Streamlit */
-    .block-container {
+    .block-container {{
         padding-top: 2rem;
         padding-bottom: 5rem;
-    }
+    }}
 
 </style>
 """, unsafe_allow_html=True)
