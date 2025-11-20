@@ -38,6 +38,7 @@ foto_diego_src = f"data:image/png;base64,{img_base64}" if img_base64 else "https
 # ==============================================================================
 # --- 3. CSS ULTRA-PREMIUM (3D, ANIMACIONES Y EFECTOS VISUALES) ---
 # ==============================================================================
+# NOTA: Las llaves dobles {{ }} son necesarias en f-strings para evitar errores de sintaxis
 st.markdown(f"""
 <style>
     /* IMPORTAR FUENTE FUTURISTA */
@@ -611,7 +612,7 @@ def open_reception_modal():
 # --- 5. ESTRUCTURA PRINCIPAL (LAYOUT 3D) ---
 # ==============================================================================
 
-# >>> HERO SECTION ANIMADA (ACTUALIZADA CON TITULO GIGANTE 3D)
+# >>> HERO SECTION ANIMADA (CON EL HTML 3D SOLICITADO)
 st.markdown("""
 <div class="hero-container animate-enter">
     <div class="company-tag">Arquitectura de Datos Empresarial & IA</div>
