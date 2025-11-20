@@ -36,7 +36,7 @@ img_base64 = get_img_as_base64(img_path)
 foto_diego_src = f"data:image/png;base64,{img_base64}" if img_base64 else "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 
 # ==============================================================================
-# --- 3. CSS PREMIUM (ESTILOS) ---
+# --- 3. CSS PREMIUM (ESTILOS + RESPONSIVIDAD) ---
 # ==============================================================================
 st.markdown(f"""
 <style>
@@ -161,6 +161,13 @@ st.markdown(f"""
         -webkit-text-fill-color: transparent;
     }}
 
+    /* Ajuste tamaño título en móvil */
+    @media (max-width: 768px) {{
+        .main-title {{
+            font-size: 2.5rem;
+        }}
+    }}
+
     .highlight-text {{
         background: linear-gradient(90deg, #3b82f6, #06B6D4);
         -webkit-background-clip: text;
@@ -201,7 +208,7 @@ st.markdown(f"""
     .card-title {{ font-size: 1.4rem; font-weight: 700; color: #FFFFFF; margin-bottom: 10px; }}
     .card-desc {{ font-size: 0.95rem; color: #cbd5e1; margin-bottom: 20px; line-height: 1.5; }}
 
-    /* PERFIL */
+    /* --- PERFIL (RESPONSIVE FIX) --- */
     .profile-box {{
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         padding: 40px;
@@ -209,8 +216,9 @@ st.markdown(f"""
         border: 1px solid rgba(51, 65, 85, 0.7);
         margin-top: 50px;
         display: flex;
-        align-items: center;
+        align-items: center; /* Centrado vertical en desktop */
         box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        flex-direction: row; /* Defecto Desktop: Fila */
     }}
     
     .profile-img {{
@@ -221,6 +229,55 @@ st.markdown(f"""
         border: 4px solid #06B6D4;
         margin-right: 30px;
         box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
+        flex-shrink: 0; /* Evita que la imagen se aplaste */
+    }}
+
+    .profile-content {{
+        flex: 1;
+    }}
+
+    .profile-quote {{
+        color: #E2E8F0; 
+        font-size: 1.1rem; 
+        line-height: 1.8; 
+        font-style: italic; 
+        border-left: 4px solid #06B6D4; 
+        padding-left: 20px;
+    }}
+
+    .profile-tags {{
+        margin-top: 20px; 
+        display: flex; 
+        gap: 10px; 
+        flex-wrap: wrap;
+    }}
+
+    /* --- MEDIA QUERY PARA MÓVILES (Aquí está la magia) --- */
+    @media only screen and (max-width: 768px) {{
+        .profile-box {{
+            flex-direction: column; /* Cambia a columna vertical */
+            text-align: center;     /* Centra todo el texto */
+            padding: 30px 20px;
+        }}
+
+        .profile-img {{
+            margin-right: 0;        /* Quita margen derecho */
+            margin-bottom: 20px;    /* Añade espacio abajo */
+            width: 130px;           /* Un poco más pequeña */
+            height: 130px;
+        }}
+
+        .profile-quote {{
+            border-left: none;      /* Quita la barra lateral */
+            border-top: 3px solid #06B6D4; /* Pone barra arriba */
+            padding-left: 0;
+            padding-top: 15px;
+            font-size: 1rem;
+        }}
+
+        .profile-tags {{
+            justify-content: center; /* Centra las etiquetas */
+        }}
     }}
 
     /* BOTONES */
@@ -245,7 +302,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# --- 4. DEFINICIÓN DE MODALES (RUTAS CORREGIDAS) ---
+# --- 4. DEFINICIÓN DE MODALES ---
 # ==============================================================================
 
 @st.dialog("📊 INVENTARIOS & ESTRATEGIA")
@@ -280,7 +337,6 @@ def open_inventory_modal():
     
     st.write("") 
     if st.button("🚀 IR AL DEMO: DASHBOARD GERENCIAL", key="btn_go_inv"):
-        # Ruta exacta al archivo en la carpeta pages
         st.switch_page("pages/1_Inventario_Nexus.py")
 
 @st.dialog("🚚 LOGÍSTICA & ABASTECIMIENTO")
@@ -315,7 +371,6 @@ def open_logistics_modal():
     
     st.write("")
     if st.button("🚀 IR AL DEMO: CENTRO LOGÍSTICO", key="btn_go_log"):
-        # Ruta exacta al archivo en la carpeta pages
         st.switch_page("pages/2_Operaciones_Logistica.py")
 
 @st.dialog("📥 RECEPCIÓN INTELIGENTE (XML)")
@@ -350,7 +405,6 @@ def open_reception_modal():
     
     st.write("")
     if st.button("🚀 IR AL DEMO: RECEPCIÓN XML", key="btn_go_xml"):
-        # Ruta exacta al archivo en la carpeta pages
         st.switch_page("pages/3_Recepcion_Inteligente.py")
 
 # ==============================================================================
@@ -382,7 +436,7 @@ with col1:
         <div>
             <div class="card-icon">📊</div>
             <div class="card-title">1. Control & Estrategia</div>
-            <p class="card-desc">El cerebro financiero. Análisis predictivo de capital, detección de riesgos y optimización con IA.</p>
+            <div class="card-desc">El cerebro financiero. Análisis predictivo de capital, detección de riesgos y optimización con IA.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -396,7 +450,7 @@ with col2:
         <div>
             <div class="card-icon">🚚</div>
             <div class="card-title">2. Logística Inteligente</div>
-            <p class="card-desc">El brazo ejecutor. Automatización de compras y rebalanceo autónomo de stock entre bodegas.</p>
+            <div class="card-desc">El brazo ejecutor. Automatización de compras y rebalanceo autónomo de stock entre bodegas.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -410,31 +464,32 @@ with col3:
         <div>
             <div class="card-icon">📥</div>
             <div class="card-title">3. Recepción Blindada</div>
-            <p class="card-desc">La puerta de entrada. Procesamiento automático de XML (DIAN) y conciliación fiscal vs física.</p>
+            <div class="card-desc">La puerta de entrada. Procesamiento automático de XML (DIAN) y conciliación fiscal vs física.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     if st.button("Explorar Módulo ➝", key="b3"):
         open_reception_modal()
 
-# >>> PERFIL LÍDER
+# >>> PERFIL LÍDER (CORREGIDO PARA MÓVIL)
 st.write("")
 st.write("")
 
 c_spacer_l, c_profile, c_spacer_r = st.columns([1, 6, 1])
 
 with c_profile:
+    # Nota: He reestructurado el HTML para usar las clases CSS nuevas que manejan la responsividad
     st.markdown(f"""
     <div class="profile-box">
         <img src="{foto_diego_src}" class="profile-img" alt="Diego Mauricio García">
-        <div style="flex: 1;">
+        <div class="profile-content">
             <h4 style="color: #06B6D4; margin:0 0 10px 0; font-weight: 800; letter-spacing:1.5px;">ARQUITECTURA & VISIÓN</h4>
             <h2 style="color: white; margin: 0 0 20px 0; font-size: 2.5rem;">Diego Mauricio García</h2>
-            <p style="color: #E2E8F0; font-size: 1.1rem; line-height: 1.8; font-style: italic; border-left: 4px solid #06B6D4; padding-left: 20px;">
+            <p class="profile-quote">
                 "En GM-Datovate no vendemos software, diseñamos el sistema nervioso de su organización. 
                 Mi obsesión es eliminar la fricción operativa mediante arquitecturas de datos que piensan, aprenden y actúan por sí mismas."
             </p>
-            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <div class="profile-tags">
                 <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">CEO & Founder</span>
                 <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Data Architect</span>
                 <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Python Expert</span>
