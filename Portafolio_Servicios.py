@@ -23,43 +23,106 @@ def get_img_as_base64(file_path):
         pass
     return None
 
-# Carga de imagen de perfil
+# Carga de imagen de perfil (Asegúrate de tener la carpeta assets y la foto)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 img_path = os.path.join(current_dir, "assets", "foto_diego.png")
 img_base64 = get_img_as_base64(img_path)
 # Fallback si no encuentra la imagen local
 foto_diego_src = f"data:image/png;base64,{img_base64}" if img_base64 else "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 
-# --- 3. CSS PREMIUM (MEJORADO PARA CONTRASTE) ---
+# --- 3. CSS PREMIUM (CORREGIDO Y MEJORADO) ---
 st.markdown(f"""
 <style>
     /* IMPORTAR FUENTE MODERNA */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
 
-    html, body, [class*="css"] {{
-        font-family: 'Inter', sans-serif;
-        background-color: #0E1117; /* Fondo Oscuro Profundo */
-        color: #F0F2F6; /* Texto mucho más claro para contraste */
+    /* FONDO GENERAL DE LA APP */
+    .stApp {{
+        background-color: #0E1117;
+        color: #FFFFFF;
+    }}
+    
+    /* --- ESTILOS PARA EL MODAL (ARREGLO VISUAL) --- */
+    /* Esto fuerza un contenedor oscuro dentro del modal para garantizar contraste */
+    .modal-container {{
+        background: linear-gradient(145deg, #111827, #1f2937);
+        border-radius: 15px;
+        padding: 25px;
+        border: 1px solid #374151;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    }}
+    
+    .modal-header-icon {{
+        font-size: 3.5rem;
+        text-align: center;
+        display: block;
+        margin-bottom: 15px;
+        text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
     }}
 
-    /* --- HERO SECTION (ENCABEZADO) --- */
+    .modal-title {{
+        color: #FFFFFF !important;
+        font-family: 'Inter', sans-serif;
+        font-weight: 800;
+        font-size: 1.8rem;
+        text-align: center;
+        margin-bottom: 20px;
+        background: -webkit-linear-gradient(0deg, #38bdf8, #818cf8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }}
+
+    .modal-body-text {{
+        color: #E5E7EB !important; /* Gris muy claro casi blanco */
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        text-align: justify;
+    }}
+
+    .modal-list {{
+        list-style: none;
+        padding: 0;
+    }}
+
+    .modal-list li {{
+        color: #D1D5DB; /* Gris claro */
+        font-size: 1rem;
+        margin-bottom: 12px;
+        padding-left: 25px;
+        position: relative;
+    }}
+
+    .modal-list li::before {{
+        content: '➤';
+        color: #06B6D4; /* Cian neón */
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-size: 0.9rem;
+    }}
+    
+    .modal-highlight {{
+        color: #38BDF8; /* Azul cielo */
+        font-weight: bold;
+    }}
+
+    /* --- HERO SECTION --- */
     .hero-container {{
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: 80px 20px 50px 20px;
-        background: radial-gradient(circle at center, #1a202c 0%, #0E1117 80%);
-        border-radius: 0 0 50px 50px;
-        margin-bottom: 60px;
+        padding: 60px 20px 40px 20px;
+        background: radial-gradient(circle at center, #1a202c 0%, #0E1117 70%);
         border-bottom: 1px solid #2d3748;
-        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        margin-bottom: 50px;
     }}
 
     .company-tag {{
         background-color: rgba(6, 182, 212, 0.15);
-        color: #22d3ee; /* Cian más brillante */
+        color: #22d3ee;
         padding: 6px 18px;
         border-radius: 20px;
         font-size: 0.9rem;
@@ -76,81 +139,60 @@ st.markdown(f"""
         font-weight: 900;
         margin: 0;
         line-height: 1.1;
-        /* Degradado más brillante para el título */
         background: linear-gradient(90deg, #FFFFFF 20%, #cbd5e1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 30px rgba(255,255,255,0.1);
     }}
 
     .highlight-text {{
-        /* Degradado azul eléctrico más intenso */
         background: linear-gradient(90deg, #3b82f6, #06B6D4);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }}
-
+    
     .subtitle {{
         font-size: 1.35rem;
-        color: #E2E8F0; /* Gris muy claro */
+        color: #E2E8F0;
         max-width: 800px;
         margin-top: 25px;
         line-height: 1.7;
         font-weight: 400;
     }}
 
-    /* --- CARDS DE FLUJO (VIDRIO / NEON) --- */
+    /* --- CARDS PRINCIPALES --- */
     .flow-card {{
-        background: rgba(30, 41, 59, 0.75); /* Un poco más opaco para legibilidad */
+        background: rgba(30, 41, 59, 0.75);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         padding: 35px;
         border-radius: 24px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efecto rebote sutil */
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }}
-
     .flow-card:hover {{
         transform: translateY(-12px) scale(1.02);
         background: rgba(30, 41, 59, 1);
         border-color: #3b82f6;
         box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.5);
     }}
-
-    .card-icon {{ font-size: 3.5rem; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }}
+    .card-icon {{ font-size: 3.5rem; margin-bottom: 20px; }}
     .card-title {{ font-size: 1.6rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px; }}
-    /* Descripción de la tarjeta mucho más clara */
-    .card-desc {{ font-size: 1rem; color: #E2E8F0; margin-bottom: 25px; line-height: 1.6; }}
+    .card-desc {{ font-size: 1rem; color: #cbd5e1; margin-bottom: 25px; line-height: 1.6; }}
 
-    /* --- PERFIL DE LIDERAZGO --- */
+    /* --- PERFIL LÍDER --- */
     .profile-box {{
-        display: flex;
-        align-items: center;
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         padding: 45px;
         border-radius: 30px;
         border: 1px solid rgba(51, 65, 85, 0.7);
-        margin-top: 80px;
-        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.4);
-        position: relative;
-        overflow: hidden;
+        margin-top: 60px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }}
-    
-    /* Efecto de luz sutil en el perfil */
-    .profile-box::before {{
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
-        pointer-events: none;
-    }}
-    
     .profile-img {{
         width: 160px;
         height: 160px;
@@ -158,212 +200,204 @@ st.markdown(f"""
         object-fit: cover;
         border: 4px solid #06B6D4;
         margin-right: 35px;
-        box-shadow: 0 0 25px rgba(6, 182, 212, 0.5);
-        z-index: 1;
+        box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
     }}
 
-    /* --- BOTONES PERSONALIZADOS --- */
+    /* --- BOTONES --- */
     div.stButton > button {{
         width: 100%;
-        /* Degradado más vibrante */
         background: linear-gradient(90deg, #2563EB 0%, #06B6D4 100%);
         color: white;
         border: none;
         padding: 14px 20px;
         font-weight: 700;
-        letter-spacing: 0.5px;
         border-radius: 10px;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
     }}
     div.stButton > button:hover {{
-        transform: translateY(-3px);
-        box-shadow: 0 12px 20px -5px rgba(37, 99, 235, 0.6);
-        background: linear-gradient(90deg, #1D4ED8 0%, #0891b2 100%);
-    }}
-    
-    /* Estilo para el texto dentro de los modales (st.dialog) */
-    .modal-highlight {{
-        color: #06B6D4;
-        font-weight: bold;
-    }}
-    .modal-text {{
-        font-size: 1.1rem;
-        line-height: 1.7;
-        color: #E2E8F0;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
     }}
 
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# --- 4. DEFINICIÓN DE MODALES DE VALOR (BI & IA PITCH) ---
+# --- 4. DEFINICIÓN DE MODALES (CONTRASTE CORREGIDO Y DISEÑO IMPACTANTE) ---
 # ==============================================================================
+# Nota: Usamos HTML puro dentro del modal para garantizar que el fondo sea oscuro
+# y el texto claro, independientemente del tema de Streamlit.
 
-@st.dialog("📊 Inteligencia de Inventarios y Capital")
+@st.dialog("📊 INVENTARIOS & ESTRATEGIA")
 def open_inventory_modal():
     st.markdown("""
-    <div style='text-align: center; margin-bottom: 20px;'>
-        <span style='font-size: 4rem;'>🧠</span>
-    </div>
-    <h3 style='text-align: center; color: #FFFFFF;'>Del Caos Reactivo a la Precisión Predictiva</h3>
-    <div class="modal-text">
-        <p>La gestión tradicional de inventarios basada en "intuición" o Excel estático está costando millones en capital inmovilizado y ventas perdidas.
-        Este módulo no es solo un registro; es un <b>cerebro analítico</b>.</p>
-        <ul>
-            <li><b>Análisis de Capital con IA:</b> Detecta automáticamente dónde está atrapado su dinero (excedentes) y dónde está perdiendo oportunidades (quiebres), sugiriendo acciones de liquidación o compra.</li>
-            <li><b>Predicción de Demanda:</b> Algoritmos que analizan patrones históricos para anticipar necesidades futuras, optimizando el flujo de caja.</li>
-            <li><b>Visión Gerencial 360°:</b> KPIs en tiempo real sobre la salud financiera de su stock.</li>
+    <div class="modal-container">
+        <div class="modal-header-icon">🧠</div>
+        <h2 class="modal-title">Del Caos Reactivo a la Precisión Predictiva</h2>
+        
+        <div class="modal-body-text">
+            La gestión tradicional basada en "intuición" está costando millones. 
+            Este módulo no es solo un registro; es un <b>cerebro financiero</b> que protege su capital.
+        </div>
+
+        <ul class="modal-list">
+            <li><span class="modal-highlight">Análisis de Capital (IA):</span> Detecta dónde está atrapado el dinero (excedentes) y dónde pierde ventas (quiebres).</li>
+            <li><span class="modal-highlight">Predicción de Demanda:</span> Algoritmos que anticipan qué venderá mañana, optimizando el flujo de caja hoy.</li>
+            <li><span class="modal-highlight">Visión Gerencial 360°:</span> KPIs en tiempo real sobre la salud financiera de su stock.</li>
         </ul>
-        <p><b>El Resultado:</b> Menos inventario obsoleto, mayor disponibilidad de productos clave y liberación significativa de capital de trabajo.</p>
+        
+        <div style="text-align: center; margin-top: 20px; color: #94a3b8; font-style: italic;">
+            "El resultado: Menos stock obsoleto, más liquidez."
+        </div>
     </div>
-    <hr style="border-color: rgba(255,255,255,0.1);">
+    <br>
     """, unsafe_allow_html=True)
     
-    # Botón de acción final dentro del modal
-    if st.button("🚀 Ver Demo: Dashboard Gerencial", key="modal_btn_inv"):
+    if st.button("🚀 IR AL DEMO: DASHBOARD GERENCIAL", key="btn_go_inv"):
         st.switch_page("pages/1_Inventario_Nexus.py")
 
-
-@st.dialog("🚚 Logística Autónoma y Abastecimiento")
+@st.dialog("🚚 LOGÍSTICA & ABASTECIMIENTO")
 def open_logistics_modal():
     st.markdown("""
-    <div style='text-align: center; margin-bottom: 20px;'>
-        <span style='font-size: 4rem;'>⚡</span>
-    </div>
-    <h3 style='text-align: center; color: #FFFFFF;'>El Sistema Nervioso de su Cadena de Suministro</h3>
-    <div class="modal-text">
-        <p>Convertimos las necesidades detectadas por el módulo de inventario en acciones logísticas inmediatas. 
-        Este es el motor operativo que asegura que el producto correcto esté en el lugar correcto.</p>
-        <ul>
-            <li><b>Compras Inteligentes:</b> Generación automática de órdenes de compra sugeridas basadas en la demanda real y tiempos de entrega del proveedor, eliminando el "yo creo que necesitamos X".</li>
-            <li><b>Balanceo de Red (Traslados):</b> El sistema identifica que una sucursal tiene exceso mientras otra tiene escasez, sugiriendo traslados internos antes de comprar nuevo stock.</li>
-            <li><b>Torre de Control:</b> Visibilidad centralizada del estado de todas las órdenes y movimientos en curso.</li>
+    <div class="modal-container">
+        <div class="modal-header-icon">⚡</div>
+        <h2 class="modal-title">El Sistema Nervioso de su Cadena de Suministro</h2>
+        
+        <div class="modal-body-text">
+            Convertimos las necesidades en acciones. Este es el motor operativo que asegura 
+            que el producto correcto esté en el lugar correcto, al menor costo posible.
+        </div>
+
+        <ul class="modal-list">
+            <li><span class="modal-highlight">Compras Inteligentes:</span> Generación automática de órdenes basadas en consumo real y Lead Time del proveedor.</li>
+            <li><span class="modal-highlight">Balanceo de Red:</span> El sistema detecta excesos en la Sede A y faltantes en la Sede B, sugiriendo traslados automáticos.</li>
+            <li><span class="modal-highlight">Torre de Control:</span> Visibilidad total del estado de pedidos y movimientos en curso.</li>
         </ul>
-        <p><b>El Valor:</b> Reducción de costos de compra, optimización de la red de distribución y agilidad operativa sin precedentes.</p>
+        
+        <div style="text-align: center; margin-top: 20px; color: #94a3b8; font-style: italic;">
+            "El resultado: Compras precisas y agilidad operativa."
+        </div>
     </div>
-    <hr style="border-color: rgba(255,255,255,0.1);">
+    <br>
     """, unsafe_allow_html=True)
     
-    if st.button("🚀 Ver Demo: Centro de Operaciones", key="modal_btn_log"):
+    if st.button("🚀 IR AL DEMO: CENTRO LOGÍSTICO", key="btn_go_log"):
         st.switch_page("pages/2_Operaciones_Logistica.py")
 
-
-@st.dialog("📥 Recepción Digital Sin Fricción (XML)")
+@st.dialog("📥 RECEPCIÓN INTELIGENTE (XML)")
 def open_reception_modal():
     st.markdown("""
-    <div style='text-align: center; margin-bottom: 20px;'>
-        <span style='font-size: 4rem;'>🛡️</span>
-    </div>
-    <h3 style='text-align: center; color: #FFFFFF;'>Blindaje de la Entrada de Mercancía</h3>
-    <div class="modal-text">
-        <p>El 80% de los errores de inventario nacen en una mala recepción. Este módulo elimina la entrada manual de datos y utiliza la factura electrónica (XML DIAN) como única fuente de verdad.</p>
-        <ul>
-            <li><b>Homologación Automática:</b> El sistema lee el XML del proveedor y cruza automáticamente sus referencias con su catálogo interno, detectando productos nuevos o cambios de precio al instante.</li>
-            <li><b>Conciliación Ciega Digital:</b> El equipo de bodega realiza el conteo físico en el sistema, y este lo compara automáticamente contra lo facturado en el XML, resaltando discrepancias (sobrantes/faltantes) en segundos.</li>
-            <li><b>Integridad de Datos:</b> Garantiza que lo que se paga es exactamente lo que entró físicamente al almacén.</li>
+    <div class="modal-container">
+        <div class="modal-header-icon">🛡️</div>
+        <h2 class="modal-title">Blindaje Total de Entrada de Mercancía</h2>
+        
+        <div class="modal-body-text">
+            El 80% de los errores de inventario nacen en la recepción. Este módulo elimina la digitación manual 
+            usando la Factura Electrónica (XML DIAN) como única fuente de verdad.
+        </div>
+
+        <ul class="modal-list">
+            <li><span class="modal-highlight">Homologación Automática:</span> Cruce instantáneo de referencias del proveedor vs. catálogo interno.</li>
+            <li><span class="modal-highlight">Conciliación Ciega:</span> Compara el conteo físico real contra el XML digital, alertando faltantes al instante.</li>
+            <li><span class="modal-highlight">Integridad de Datos:</span> Garantiza que lo que paga es exactamente lo que entró a bodega.</li>
         </ul>
-        <p><b>El Impacto:</b> Eliminación de errores humanos de digitación, detección inmediata de fraudes o errores de proveedores y actualización del inventario en tiempo récord.</p>
+        
+        <div style="text-align: center; margin-top: 20px; color: #94a3b8; font-style: italic;">
+            "El resultado: Cero errores humanos, control fiscal total."
+        </div>
     </div>
-    <hr style="border-color: rgba(255,255,255,0.1);">
+    <br>
     """, unsafe_allow_html=True)
     
-    if st.button("🚀 Ver Demo: Recepción Inteligente", key="modal_btn_xml"):
+    if st.button("🚀 IR AL DEMO: RECEPCIÓN XML", key="btn_go_xml"):
         st.switch_page("pages/3_Recepcion_Inteligente.py")
 
-
 # ==============================================================================
-# --- 5. ESTRUCTURA VISUAL PRINCIPAL ---
+# --- 5. ESTRUCTURA PRINCIPAL ---
 # ==============================================================================
 
-# >>> HERO SECTION (Centralizada y Brillante)
+# >>> HERO SECTION
 st.markdown("""
 <div class="hero-container">
     <div class="company-tag">Arquitectura de Datos Empresarial & IA</div>
     <h1 class="main-title">GM-<span class="highlight-text">DATOVATE</span></h1>
     <p class="subtitle">
         Transformamos el caos operativo en <b>Ventaja Competitiva</b>.
-        <br>Una suite integrada que utiliza Inteligencia Artificial para sincronizar Inventarios, Logística y Finanzas en tiempo real. El futuro no se reporta, se construye.
+        <br>Una suite integrada que utiliza Inteligencia Artificial para sincronizar Inventarios, Logística y Finanzas en tiempo real.
     </p>
 </div>
 """, unsafe_allow_html=True)
 
-# >>> FLUJO DE TRABAJO (GRID)
+# >>> GRID DE MÓDULOS
 st.write("")
 st.markdown("<h3 style='text-align: center; margin-bottom: 50px; font-size: 2rem;'>🚀 Ecosistema NEXUS: Explore el Valor de Negocio</h3>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3, gap="medium")
 
-# --- CARD 1: INVENTARIOS ---
+# --- CARD 1 ---
 with col1:
     st.markdown("""
     <div class="flow-card">
         <div>
             <div class="card-icon">📊</div>
             <div class="card-title">1. Control & Estrategia</div>
-            <p class="card-desc">
-                El cerebro financiero de la operación. Análisis predictivo de capital de trabajo, detección de riesgos de quiebre y optimización de inventario con IA.
-            </p>
+            <p class="card-desc">El cerebro financiero. Análisis predictivo de capital, detección de riesgos y optimización con IA.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
-    # El botón ahora abre el MODAL, no cambia de página directamente
-    if st.button("Explorar Valor e Inteligencia ➝", key="btn_open_inv"):
+    if st.button("Explorar Módulo ➝", key="b1"):
         open_inventory_modal()
 
-# --- CARD 2: LOGÍSTICA ---
+# --- CARD 2 ---
 with col2:
     st.markdown("""
     <div class="flow-card">
         <div>
             <div class="card-icon">🚚</div>
-            <div class="card-title">2. Abastecimiento Inteligente</div>
-            <p class="card-desc">
-                El brazo ejecutor táctico. Automatización de compras basada en demanda real y rebalanceo autónomo de stock entre bodegas.
-            </p>
+            <div class="card-title">2. Logística Inteligente</div>
+            <p class="card-desc">El brazo ejecutor. Automatización de compras y rebalanceo autónomo de stock entre bodegas.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Explorar Valor Logístico ➝", key="btn_open_log"):
+    if st.button("Explorar Módulo ➝", key="b2"):
         open_logistics_modal()
 
-# --- CARD 3: RECEPCIÓN XML ---
+# --- CARD 3 ---
 with col3:
     st.markdown("""
     <div class="flow-card">
         <div>
             <div class="card-icon">📥</div>
-            <div class="card-title">3. Recepción Blindada (XML)</div>
-            <p class="card-desc">
-                La puerta de entrada digital. Procesamiento automático de facturas electrónicas (DIAN) y conciliación fiscal vs. física sin intervención manual.
-            </p>
+            <div class="card-title">3. Recepción Blindada</div>
+            <p class="card-desc">La puerta de entrada. Procesamiento automático de XML (DIAN) y conciliación fiscal vs física.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Explorar Valor de Automatización ➝", key="btn_open_xml"):
+    if st.button("Explorar Módulo ➝", key="b3"):
         open_reception_modal()
 
-# >>> PERFIL DEL LÍDER (REDITADO PARA MAXIMO IMPACTO)
-st.write("")
+# >>> PERFIL LÍDER
 st.write("")
 st.write("")
 
-col_spacer_l, col_profile_main, col_spacer_r = st.columns([1, 6, 1])
+c_spacer_l, c_profile, c_spacer_r = st.columns([1, 6, 1])
 
-with col_profile_main:
+with c_profile:
     st.markdown(f"""
-    <div class="profile-box" style="z-index: 2;">
+    <div class="profile-box">
         <img src="{foto_diego_src}" class="profile-img" alt="Diego Mauricio García">
-        <div>
-            <h4 style="color: #06B6D4; margin:0 0 10px 0; font-weight: 800; letter-spacing:1.5px; text-transform: uppercase;">Visión & Arquitectura Tecnológica</h4>
-            <h2 style="color: white; margin: 0 0 20px 0; font-size: 2.5rem; text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);">Diego Mauricio García</h2>
-            <p style="color: #E2E8F0; font-size: 1.15rem; line-height: 1.8; font-style: italic; border-left: 4px solid #06B6D4; padding-left: 20px; margin-bottom: 25px;">
-                "En GM-Datovate no vendemos software, diseñamos el sistema nervioso central de su organización. Mi obsesión es eliminar la fricción operativa inútil mediante arquitecturas de datos que piensan, aprenden y actúan por sí mismas, liberando el potencial humano para la estrategia."
+        <div style="flex: 1;">
+            <h4 style="color: #06B6D4; margin:0 0 10px 0; font-weight: 800; letter-spacing:1.5px;">ARQUITECTURA & VISIÓN</h4>
+            <h2 style="color: white; margin: 0 0 20px 0; font-size: 2.5rem;">Diego Mauricio García</h2>
+            <p style="color: #E2E8F0; font-size: 1.1rem; line-height: 1.8; font-style: italic; border-left: 4px solid #06B6D4; padding-left: 20px;">
+                "En GM-Datovate no vendemos software, diseñamos el sistema nervioso de su organización. 
+                Mi obsesión es eliminar la fricción operativa mediante arquitecturas de datos que piensan, aprenden y actúan por sí mismas."
             </p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <span style="background: rgba(15, 23, 42, 0.8); border: 1px solid #06B6D4; color: #06B6D4; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">CEO & Founder</span>
-                <span style="background: rgba(15, 23, 42, 0.8); border: 1px solid #06B6D4; color: #06B6D4; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">Lead Data Architect</span>
-                <span style="background: rgba(15, 23, 42, 0.8); border: 1px solid #06B6D4; color: #06B6D4; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">AI & Python Expert</span>
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">CEO & Founder</span>
+                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Data Architect</span>
+                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Python Expert</span>
             </div>
         </div>
     </div>
@@ -371,4 +405,4 @@ with col_profile_main:
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: #94A3B8; margin-top: 20px; margin-bottom: 40px;'>© 2025 GM-DATOVATE. Arquitectura de Sistemas Operativos Inteligentes.</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: #64748B; margin-bottom: 40px;'>© 2025 GM-DATOVATE. Todos los derechos reservados.</div>", unsafe_allow_html=True)
