@@ -27,7 +27,7 @@ def get_img_as_base64(file_path):
         pass
     return None
 
-# Carga de imagen de perfil (Asegúrate que la ruta sea correcta)
+# Carga de imagen de perfil
 current_dir = os.path.dirname(os.path.abspath(__file__))
 img_path = os.path.join(current_dir, "assets", "foto_diego.png")
 img_base64 = get_img_as_base64(img_path)
@@ -245,121 +245,113 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# --- 4. DEFINICIÓN DE MODALES (CORREGIDO EL PROBLEMA DE TEXTO) ---
+# --- 4. DEFINICIÓN DE MODALES (RUTAS CORREGIDAS) ---
 # ==============================================================================
-# NOTA IMPORTANTE: El código HTML dentro de st.markdown está pegado a la izquierda
-# sin indentación para evitar que Streamlit lo lea como código de programación.
 
 @st.dialog("📊 INVENTARIOS & ESTRATEGIA")
 def open_inventory_modal():
     st.markdown("""
-<div class="custom-modal-box">
-<div class="modal-header-icon">🧠</div>
-<h2 class="modal-title">Del Caos Reactivo a la Precisión Predictiva</h2>
-<div class="modal-body-text">
-La gestión tradicional basada en "intuición" está costando millones. 
-Este módulo no es solo un registro; es un <b>cerebro financiero</b> que protege su capital.
-</div>
-<div class="modal-list-container">
-<div class="modal-item">
-<span class="modal-bullet">➤</span>
-<div><span class="modal-highlight">Análisis de Capital (IA):</span> Detecta dónde está atrapado el dinero (excedentes) y dónde pierde ventas (quiebres).</div>
-</div>
-<div class="modal-item">
-<span class="modal-bullet">➤</span>
-<div><span class="modal-highlight">Predicción de Demanda:</span> Algoritmos que anticipan qué venderá mañana, optimizando el flujo de caja hoy.</div>
-</div>
-<div class="modal-item">
-<span class="modal-bullet">➤</span>
-<div><span class="modal-highlight">Visión Gerencial 360°:</span> KPIs en tiempo real sobre la salud financiera de su stock.</div>
-</div>
-</div>
-<div class="modal-quote">
-"El resultado: Menos stock obsoleto, más liquidez."
-</div>
-</div>
-""", unsafe_allow_html=True)
+    <div class="custom-modal-box">
+    <div class="modal-header-icon">🧠</div>
+    <h2 class="modal-title">Del Caos Reactivo a la Precisión Predictiva</h2>
+    <div class="modal-body-text">
+    La gestión tradicional basada en "intuición" está costando millones. 
+    Este módulo no es solo un registro; es un <b>cerebro financiero</b> que protege su capital.
+    </div>
+    <div class="modal-list-container">
+    <div class="modal-item">
+    <span class="modal-bullet">➤</span>
+    <div><span class="modal-highlight">Análisis de Capital (IA):</span> Detecta dónde está atrapado el dinero (excedentes) y dónde pierde ventas (quiebres).</div>
+    </div>
+    <div class="modal-item">
+    <span class="modal-bullet">➤</span>
+    <div><span class="modal-highlight">Predicción de Demanda:</span> Algoritmos que anticipan qué venderá mañana, optimizando el flujo de caja hoy.</div>
+    </div>
+    <div class="modal-item">
+    <span class="modal-bullet">➤</span>
+    <div><span class="modal-highlight">Visión Gerencial 360°:</span> KPIs en tiempo real sobre la salud financiera de su stock.</div>
+    </div>
+    </div>
+    <div class="modal-quote">
+    "El resultado: Menos stock obsoleto, más liquidez."
+    </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.write("") 
     if st.button("🚀 IR AL DEMO: DASHBOARD GERENCIAL", key="btn_go_inv"):
-        try:
-            st.switch_page("pages/1_Inventario_Nexus.py")
-        except:
-            st.error("Ruta no encontrada: asegúrese de tener la carpeta 'pages'")
+        # Ruta exacta al archivo en la carpeta pages
+        st.switch_page("pages/1_Inventario_Nexus.py")
 
 @st.dialog("🚚 LOGÍSTICA & ABASTECIMIENTO")
 def open_logistics_modal():
     st.markdown("""
-<div class="custom-modal-box">
-<div class="modal-header-icon">⚡</div>
-<h2 class="modal-title">Sistema Nervioso de la Cadena de Suministro</h2>
-<div class="modal-body-text">
-Convertimos las necesidades en acciones. Este es el motor operativo que asegura 
-que el producto correcto esté en el lugar correcto, al menor costo posible.
-</div>
-<div class="modal-list-container">
-<div class="modal-item">
-<span class="modal-bullet">➤</span>
-<div><span class="modal-highlight">Compras Inteligentes:</span> Generación automática de órdenes basadas en consumo real y Lead Time.</div>
-</div>
-<div class="modal-item">
-<span class="modal-bullet">➤</span>
-<div><span class="modal-highlight">Balanceo de Red:</span> Detecta excesos en la Sede A y faltantes en la Sede B, sugiriendo traslados automáticos.</div>
-</div>
-<div class="modal-item">
-<span class="modal-bullet">➤</span>
-<div><span class="modal-highlight">Torre de Control:</span> Visibilidad total del estado de pedidos y movimientos en curso.</div>
-</div>
-</div>
-<div class="modal-quote">
-"El resultado: Compras precisas y agilidad operativa."
-</div>
-</div>
-""", unsafe_allow_html=True)
+    <div class="custom-modal-box">
+    <div class="modal-header-icon">⚡</div>
+    <h2 class="modal-title">Sistema Nervioso de la Cadena de Suministro</h2>
+    <div class="modal-body-text">
+    Convertimos las necesidades en acciones. Este es el motor operativo que asegura 
+    que el producto correcto esté en el lugar correcto, al menor costo posible.
+    </div>
+    <div class="modal-list-container">
+    <div class="modal-item">
+    <span class="modal-bullet">➤</span>
+    <div><span class="modal-highlight">Compras Inteligentes:</span> Generación automática de órdenes basadas en consumo real y Lead Time.</div>
+    </div>
+    <div class="modal-item">
+    <span class="modal-bullet">➤</span>
+    <div><span class="modal-highlight">Balanceo de Red:</span> Detecta excesos en la Sede A y faltantes en la Sede B, sugiriendo traslados automáticos.</div>
+    </div>
+    <div class="modal-item">
+    <span class="modal-bullet">➤</span>
+    <div><span class="modal-highlight">Torre de Control:</span> Visibilidad total del estado de pedidos y movimientos en curso.</div>
+    </div>
+    </div>
+    <div class="modal-quote">
+    "El resultado: Compras precisas y agilidad operativa."
+    </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.write("")
     if st.button("🚀 IR AL DEMO: CENTRO LOGÍSTICO", key="btn_go_log"):
-        try:
-            st.switch_page("pages/2_Operaciones_Logistica.py")
-        except:
-            st.error("Ruta no encontrada")
+        # Ruta exacta al archivo en la carpeta pages
+        st.switch_page("pages/2_Operaciones_Logistica.py")
 
 @st.dialog("📥 RECEPCIÓN INTELIGENTE (XML)")
 def open_reception_modal():
     st.markdown("""
-<div class="custom-modal-box">
-<div class="modal-header-icon">🛡️</div>
-<h2 class="modal-title">Blindaje Total de Entrada de Mercancía</h2>
-<div class="modal-body-text">
-El 80% de los errores de inventario nacen en la recepción. Este módulo elimina la digitación manual 
-usando la Factura Electrónica (XML DIAN) como única fuente de verdad.
-</div>
-<div class="modal-list-container">
-<div class="modal-item">
-<span class="modal-bullet">➤</span>
-<div><span class="modal-highlight">Homologación Automática:</span> Cruce instantáneo de referencias del proveedor vs. catálogo interno.</div>
-</div>
-<div class="modal-item">
-<span class="modal-bullet">➤</span>
-<div><span class="modal-highlight">Conciliación Ciega:</span> Compara el conteo físico real contra el XML digital, alertando faltantes al instante.</div>
-</div>
-<div class="modal-item">
-<span class="modal-bullet">➤</span>
-<div><span class="modal-highlight">Integridad de Datos:</span> Garantiza que lo que paga es exactamente lo que entró a bodega.</div>
-</div>
-</div>
-<div class="modal-quote">
-"El resultado: Cero errores humanos, control fiscal total."
-</div>
-</div>
-""", unsafe_allow_html=True)
+    <div class="custom-modal-box">
+    <div class="modal-header-icon">🛡️</div>
+    <h2 class="modal-title">Blindaje Total de Entrada de Mercancía</h2>
+    <div class="modal-body-text">
+    El 80% de los errores de inventario nacen en la recepción. Este módulo elimina la digitación manual 
+    usando la Factura Electrónica (XML DIAN) como única fuente de verdad.
+    </div>
+    <div class="modal-list-container">
+    <div class="modal-item">
+    <span class="modal-bullet">➤</span>
+    <div><span class="modal-highlight">Homologación Automática:</span> Cruce instantáneo de referencias del proveedor vs. catálogo interno.</div>
+    </div>
+    <div class="modal-item">
+    <span class="modal-bullet">➤</span>
+    <div><span class="modal-highlight">Conciliación Ciega:</span> Compara el conteo físico real contra el XML digital, alertando faltantes al instante.</div>
+    </div>
+    <div class="modal-item">
+    <span class="modal-bullet">➤</span>
+    <div><span class="modal-highlight">Integridad de Datos:</span> Garantiza que lo que paga es exactamente lo que entró a bodega.</div>
+    </div>
+    </div>
+    <div class="modal-quote">
+    "El resultado: Cero errores humanos, control fiscal total."
+    </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.write("")
     if st.button("🚀 IR AL DEMO: RECEPCIÓN XML", key="btn_go_xml"):
-        try:
-            st.switch_page("pages/3_Recepcion_Inteligente.py")
-        except:
-            st.error("Ruta no encontrada")
+        # Ruta exacta al archivo en la carpeta pages
+        st.switch_page("pages/3_Recepcion_Inteligente.py")
 
 # ==============================================================================
 # --- 5. ESTRUCTURA PRINCIPAL ---
