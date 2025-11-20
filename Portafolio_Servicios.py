@@ -66,6 +66,19 @@ st.markdown(f"""
         from {{ opacity: 0; transform: translateY(30px); }}
         to {{ opacity: 1; transform: translateY(0); }}
     }}
+    
+    /* NUEVA ANIMACIÓN PARA EL TÍTULO 3D (SHIMMER) */
+    @keyframes text-shimmer {{
+        0% {{ background-position: -200% center; }}
+        100% {{ background-position: 200% center; }}
+    }}
+
+    /* NUEVA ANIMACIÓN DE FLOTACIÓN 3D PARA EL TÍTULO */
+    @keyframes title-float-3d {{
+        0% {{ transform: perspective(1000px) rotateX(10deg) translateY(0); }}
+        50% {{ transform: perspective(1000px) rotateX(10deg) translateY(-15px); }}
+        100% {{ transform: perspective(1000px) rotateX(10deg) translateY(0); }}
+    }}
 
     /* --- FONDO GENERAL (Living Dark Matter) --- */
     .stApp {{
@@ -156,83 +169,114 @@ st.markdown(f"""
         padding-top: 15px;
     }}
 
-    /* --- HERO SECTION (IMPACTANTE) --- */
-    .hero-container {{
+    /* --- HERO SECTION (IMPACTANTE 3D) --- */
+    .hero-container {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: 60px 20px 40px 20px;
+        padding: 80px 20px 60px 20px;
         margin-bottom: 40px;
         position: relative;
-    }}
+        perspective: 1200px; /* Profundidad de escena */
+    }
 
     /* Efecto de luz detrás del título */
-    .hero-container::before {{
+    .hero-container::before {
         content: '';
         position: absolute;
-        top: 50%;
+        top: 40%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 60%;
-        height: 100px;
-        background: rgba(6, 182, 212, 0.15);
-        filter: blur(80px);
+        width: 80%;
+        height: 150px;
+        background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.25) 0%, rgba(0,0,0,0) 70%);
+        filter: blur(60px);
         z-index: -1;
-        border-radius: 50%;
-    }}
+    }
 
-    .company-tag {{
-        background: rgba(6, 182, 212, 0.1);
+    .company-tag {
+        background: rgba(6, 182, 212, 0.05);
         color: #22d3ee;
-        padding: 6px 18px;
+        padding: 8px 24px;
         border-radius: 30px;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 3px;
-        margin-bottom: 20px;
-        border: 1px solid rgba(6, 182, 212, 0.3);
-        box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+        letter-spacing: 4px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(6, 182, 212, 0.4);
+        box-shadow: 0 0 25px rgba(6, 182, 212, 0.15);
         backdrop-filter: blur(5px);
-    }}
+    }
 
-    .main-title {{
-        font-size: 4.5rem;
+    /* ESTILOS NUEVOS PARA TÍTULO 3D MASIVO */
+    .main-title-3d {
+        font-size: 6rem; /* Tamaño aumentado */
         font-weight: 900;
         margin: 0;
-        line-height: 1.1;
-        background: linear-gradient(to bottom right, #FFFFFF 30%, #94a3b8 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
-    }}
-
-    @media (max-width: 768px) {{
-        .main-title {{ font-size: 2.8rem; }}
-    }}
-
-    .highlight-text {{
-        background: linear-gradient(90deg, #3b82f6, #06B6D4, #2dd4bf);
+        line-height: 1;
+        text-transform: uppercase;
+        letter-spacing: -2px;
+        
+        /* Efecto de Material Metálico/Luz */
+        background: linear-gradient(
+            110deg,
+            #94a3b8 15%,
+            #ffffff 25%,
+            #94a3b8 35%,
+            #64748b 45%
+        );
         background-size: 200% auto;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        animation: gradient-bg 3s linear infinite;
-    }}
+        
+        /* Animaciones compuestas */
+        animation: 
+            title-float-3d 6s ease-in-out infinite,
+            text-shimmer 5s linear infinite;
+            
+        /* Sombra 3D Profunda */
+        filter: drop-shadow(0 15px 25px rgba(0,0,0,0.8));
+    }
+
+    .highlight-text-3d {
+        /* Gradiente Cian Eléctrico */
+        background: linear-gradient(
+            110deg,
+            #06B6D4 20%,
+            #67e8f9 30%,
+            #22d3ee 45%,
+            #06B6D4 60%
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: text-shimmer 3s linear infinite;
+        
+        /* Resplandor específico para la parte DATOVATE */
+        filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.6));
+    }
+
+    @media (max-width: 768px) {
+        .main-title-3d { font-size: 3.5rem; animation: none; transform: none; }
+    }
     
-    .subtitle {{
-        font-size: 1.25rem;
+    .subtitle {
+        font-size: 1.3rem;
         color: #cbd5e1;
-        max-width: 750px;
-        margin-top: 25px;
-        line-height: 1.6;
+        max-width: 800px;
+        margin-top: 40px;
+        line-height: 1.7;
         font-weight: 300;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }}
+        text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        position: relative;
+        z-index: 1;
+    }
 
     /* --- CARDS 3D (GLASSMORPHISM) --- */
-    .flow-card {{
+    .flow-card {
         background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
@@ -246,10 +290,10 @@ st.markdown(f"""
         transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         position: relative;
         overflow: hidden;
-    }}
+    }
 
     /* Brillo superior en la tarjeta */
-    .flow-card::before {{
+    .flow-card::before {
         content: '';
         position: absolute;
         top: 0;
@@ -259,49 +303,49 @@ st.markdown(f"""
         background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
         opacity: 0;
         transition: opacity 0.4s ease;
-    }}
+    }
     
-    .flow-card:hover {{
+    .flow-card:hover {
         transform: translateY(-12px) scale(1.02);
         background: rgba(30, 41, 59, 0.6);
         border-color: rgba(6, 182, 212, 0.5);
         box-shadow: 
             0 20px 40px -10px rgba(0, 0, 0, 0.5),
             0 0 20px rgba(6, 182, 212, 0.2); /* Glow effect */
-    }}
+    }
 
-    .flow-card:hover::before {{
+    .flow-card:hover::before {
         opacity: 1;
-    }}
+    }
 
-    .card-icon {{ 
+    .card-icon { 
         font-size: 3.5rem; 
         margin-bottom: 20px; 
         filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
         transition: transform 0.3s ease;
-    }}
+    }
 
-    .flow-card:hover .card-icon {{
+    .flow-card:hover .card-icon {
         transform: scale(1.1) rotate(5deg);
-    }}
+    }
 
-    .card-title {{ 
+    .card-title { 
         font-size: 1.5rem; 
         font-weight: 700; 
         color: #FFFFFF; 
         margin-bottom: 12px; 
         letter-spacing: -0.5px;
-    }}
+    }
     
-    .card-desc {{ 
+    .card-desc { 
         font-size: 0.95rem; 
         color: #94a3b8; 
         margin-bottom: 25px; 
         line-height: 1.6; 
-    }}
+    }
 
     /* --- PERFIL (RESPONSIVE + 3D) --- */
-    .profile-box {{
+    .profile-box {
         background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.8));
         padding: 40px;
         border-radius: 30px;
@@ -313,10 +357,10 @@ st.markdown(f"""
         flex-direction: row;
         position: relative;
         overflow: hidden;
-    }}
+    }
 
     /* Decoración de fondo en perfil */
-    .profile-box::after {{
+    .profile-box::after {
         content: '';
         position: absolute;
         right: -50px;
@@ -326,9 +370,9 @@ st.markdown(f"""
         background: radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%);
         border-radius: 50%;
         pointer-events: none;
-    }}
+    }
     
-    .profile-img {{
+    .profile-img {
         width: 160px;
         height: 160px;
         border-radius: 50%;
@@ -337,14 +381,14 @@ st.markdown(f"""
         margin-right: 40px;
         flex-shrink: 0;
         animation: pulse-glow 3s infinite; /* Animación de pulso */
-    }}
+    }
 
-    .profile-content {{
+    .profile-content {
         flex: 1;
         z-index: 1;
-    }}
+    }
 
-    .profile-quote {{
+    .profile-quote {
         color: #e2e8f0; 
         font-size: 1.1rem; 
         line-height: 1.8; 
@@ -356,16 +400,16 @@ st.markdown(f"""
         padding-top: 10px;
         padding-bottom: 10px;
         border-radius: 0 10px 10px 0;
-    }}
+    }
 
-    .profile-tags {{
+    .profile-tags {
         margin-top: 25px; 
         display: flex; 
         gap: 12px; 
         flex-wrap: wrap;
-    }}
+    }
     
-    .tag-pill {{
+    .tag-pill {
         background: rgba(15, 23, 42, 0.6);
         border: 1px solid rgba(6, 182, 212, 0.5);
         color: #22d3ee;
@@ -375,41 +419,41 @@ st.markdown(f"""
         font-weight: 600;
         letter-spacing: 1px;
         transition: all 0.3s ease;
-    }}
+    }
     
-    .tag-pill:hover {{
+    .tag-pill:hover {
         background: rgba(6, 182, 212, 0.2);
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(6, 182, 212, 0.2);
-    }}
+    }
 
     /* --- MEDIA QUERY MÓVIL --- */
-    @media only screen and (max-width: 768px) {{
-        .profile-box {{
+    @media only screen and (max-width: 768px) {
+        .profile-box {
             flex-direction: column;
             text-align: center;
             padding: 30px 20px;
-        }}
-        .profile-img {{
+        }
+        .profile-img {
             margin-right: 0;
             margin-bottom: 25px;
             width: 140px;
             height: 140px;
-        }}
-        .profile-quote {{
+        }
+        .profile-quote {
             border-left: none;
             border-top: 3px solid #06B6D4;
             padding-left: 0;
             padding-top: 20px;
             background: linear-gradient(180deg, rgba(6,182,212,0.05) 0%, transparent 100%);
-        }}
-        .profile-tags {{
+        }
+        .profile-tags {
             justify-content: center;
-        }}
-    }}
+        }
+    }
 
     /* --- BOTONES (NEÓN) --- */
-    div.stButton > button {{
+    div.stButton > button {
         width: 100%;
         background: transparent;
         color: #22d3ee;
@@ -423,9 +467,9 @@ st.markdown(f"""
         position: relative;
         overflow: hidden;
         z-index: 1;
-    }}
+    }
     
-    div.stButton > button::before {{
+    div.stButton > button::before {
         content: "";
         position: absolute;
         top: 0;
@@ -435,24 +479,24 @@ st.markdown(f"""
         background: linear-gradient(90deg, #06B6D4, #3b82f6);
         z-index: -1;
         transition: width 0.3s ease;
-    }}
+    }
 
-    div.stButton > button:hover {{
+    div.stButton > button:hover {
         color: white;
         border-color: transparent;
         transform: translateY(-3px);
         box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.6);
-    }}
+    }
 
-    div.stButton > button:hover::before {{
+    div.stButton > button:hover::before {
         width: 100%;
-    }}
+    }
     
     /* Eliminar padding extra superior de Streamlit */
-    .block-container {{
+    .block-container {
         padding-top: 2rem;
         padding-bottom: 5rem;
-    }}
+    }
 
 </style>
 """, unsafe_allow_html=True)
@@ -567,11 +611,17 @@ def open_reception_modal():
 # --- 5. ESTRUCTURA PRINCIPAL (LAYOUT 3D) ---
 # ==============================================================================
 
-# >>> HERO SECTION ANIMADA
+# >>> HERO SECTION ANIMADA (ACTUALIZADA CON TITULO GIGANTE 3D)
 st.markdown("""
 <div class="hero-container animate-enter">
     <div class="company-tag">Arquitectura de Datos Empresarial & IA</div>
-    <h1 class="main-title">GM-<span class="highlight-text">DATOVATE</span></h1>
+    
+    <div style="transform-style: preserve-3d;">
+        <h1 class="main-title-3d">
+            GM-<span class="highlight-text-3d">DATOVATE</span>
+        </h1>
+    </div>
+
     <p class="subtitle">
         Transformamos el caos operativo en <b>Ventaja Competitiva</b>.
         <br>Una suite integrada que utiliza Inteligencia Artificial para sincronizar Inventarios, Logística y Finanzas en tiempo real.
