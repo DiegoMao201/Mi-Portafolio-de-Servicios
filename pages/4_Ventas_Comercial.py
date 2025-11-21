@@ -5,8 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import time
-import random
-import io
+import io # Necesario para generar el Excel en memoria
 
 # ==============================================================================
 # --- 1. CONFIGURACIÓN DE PÁGINA ---
@@ -23,7 +22,6 @@ st.set_page_config(
 # ==============================================================================
 st.markdown("""
 <style>
-    /* Importar fuente (opcional si ya está cargada en main) */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
 
     .stApp {
@@ -37,7 +35,7 @@ st.markdown("""
         background: linear-gradient(145deg, #1e232a, #161b22);
         border-radius: 15px;
         padding: 20px;
-        border-left: 5px solid #00CC96; /* Verde Éxito por defecto */
+        border-left: 5px solid #00CC96;
         box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         margin-bottom: 15px;
         transition: all 0.3s ease;
@@ -52,7 +50,7 @@ st.markdown("""
 
     /* AI INSIGHT BOX */
     .ai-insight-box {
-        background: rgba(99, 110, 250, 0.1); /* Azul Plotly */
+        background: rgba(99, 110, 250, 0.1);
         border: 1px solid #636EFA;
         border-radius: 12px;
         padding: 20px;
@@ -84,376 +82,415 @@ st.markdown("""
         border: none;
         font-weight: bold;
         border-radius: 8px;
-        padding: 0.5rem 1rem;
+        padding: 0.6rem 1.2rem;
+        width: 100%;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# --- 3. MOTOR DE DATOS (SIMULACIÓN BASADA EN TU ESTRUCTURA REAL) ---
+# --- 3. MOTOR DE DATOS (SIMULACIÓN MEJORADA CON RENTABILIDAD) ---
 # ==============================================================================
 @st.cache_data
 def generar_datos_comerciales():
     """
-    Genera un DataFrame que imita la estructura de tu archivo real 'ventas_detalle.csv'.
-    Incluye lógica de Marcas, Vendedores (Mostradores) y Documentos (Facturas/Albaranes).
+    Genera datos simulados incluyendo Costos para análisis de Margen.
     """
     np.random.seed(42)
     
-    # Configuración basada en tu código
     vendedores_mostrador = ["MOSTRADOR PEREIRA", "MOSTRADOR ARMENIA", "MOSTRADOR MANIZALES", "MOSTRADOR LAURELES"]
     vendedores_calle = ["JUAN PEREZ", "MARIA RODRIGUEZ", "CARLOS GOMEZ", "ANALISTA COMERCIAL"]
     todos_vendedores = vendedores_mostrador + vendedores_calle
     
     productos_cl4 = ['ESTUCOMAS', 'PINTULUX', 'KORAZA', 'VINILTEX', 'VINILICO']
-    otras_marcas = ['ABRACOL', 'YALE', 'SAINT GOBAIN', 'GOYA', 'ALLEGION']
-    
+    otras_marcas = ['ABRACOL', 'YALE', 'SAINT GOBAIN', 'GOYA', 'ALLEGION', 'SEGUREX', '3M']
+    categorias_base = ["PINTURAS", "CERRAJERIA", "HERRAMIENTAS", "ABRASIVOS", "SEGURIDAD"]
+
     data = []
     fecha_inicio = datetime(2024, 1, 1)
     
-    # Generar 2000 transacciones simuladas
-    for i in range(2000):
+    # Simulamos "Personalidad" de vendedores (Algunos venden más volumen, otros más margen)
+    perfiles_vendedores = {}
+    for v in todos_vendedores:
+        perfiles_vendedores[v] = {
+            'factor_desc': np.random.uniform(0.05, 0.25), # Descuento promedio que dan
+            'cat_fuerte': np.random.choice(categorias_base) # Categoría donde son fuertes
+        }
+
+    for i in range(2500):
         fecha = fecha_inicio + timedelta(days=np.random.randint(0, 365))
         vendedor = np.random.choice(todos_vendedores)
+        perfil = perfiles_vendedores[vendedor]
         
-        # Lógica de Documento: 85% Facturas, 10% Albaranes (Pendientes), 5% Notas Crédito
+        # Tipo Documento
         tipo_rand = np.random.random()
-        if tipo_rand < 0.85:
-            tipo_doc = "FACTURA ELECTRONICA"
-            factor = 1
-        elif tipo_rand < 0.95:
-            tipo_doc = "ALBARAN DE VENTA" # Dinero pendiente
-            factor = 1
-        else:
-            tipo_doc = "NOTA CREDITO"
-            factor = -1
+        if tipo_rand < 0.88: tipo_doc, factor = "FACTURA ELECTRONICA", 1
+        elif tipo_rand < 0.96: tipo_doc, factor = "ALBARAN DE VENTA", 1
+        else: tipo_doc, factor = "NOTA CREDITO", -1
             
-        # Producto
-        es_cl4 = np.random.random() < 0.4 # 40% son productos clave CL4
-        if es_cl4:
-            prod_nombre = np.random.choice(productos_cl4)
-            categoria = "PINTURAS"
+        # Producto y Categoría
+        if np.random.random() < 0.6: # 60% probabilidad de vender su categoría fuerte
+            categoria = perfil['cat_fuerte']
+            prod_nombre = f"{categoria} PREMIUM {np.random.randint(100,999)}"
+        else:
+            categoria = np.random.choice([c for c in categorias_base if c != perfil['cat_fuerte']])
+            prod_nombre = f"ARTICULO {categoria} {np.random.randint(100,999)}"
+
+        # CL4 Logica
+        if categoria == "PINTURAS":
             marca = "PINTUCO"
+            if np.random.random() < 0.5: prod_nombre = np.random.choice(productos_cl4)
         else:
-            prod_nombre = f"ARTICULO {np.random.choice(otras_marcas)} {np.random.randint(100,999)}"
-            categoria = "FERRETERIA"
             marca = np.random.choice(otras_marcas)
-            
-        cliente_id = f"C-{np.random.randint(1000, 1200)}" # 200 clientes únicos
-        cliente_nombre = f"FERRETERIA {cliente_id} SAS"
+
+        # Valores Financieros
+        costo_base = np.random.randint(10000, 500000)
+        margen_teorico = 0.35 # 35% margen base
+        precio_lista = costo_base / (1 - margen_teorico)
         
-        valor_base = np.random.exponential(500000) # Ventas variadas
+        # Aplicar descuento según vendedor
+        descuento_real = np.random.normal(perfil['factor_desc'], 0.02)
+        precio_venta = precio_lista * (1 - descuento_real)
+        
+        valor_venta_total = precio_venta * factor
+        costo_total = costo_base * factor
+        utilidad = valor_venta_total - costo_total
+        
+        cliente_id = f"C-{np.random.randint(1000, 1150)}"
         
         data.append({
             'fecha_venta': fecha,
-            'anio': fecha.year,
             'mes': fecha.month,
             'Serie': f"F{fecha.strftime('%m%d')}-{i}",
             'TipoDocumento': tipo_doc,
             'nomvendedor': vendedor,
             'cliente_id': cliente_id,
-            'nombre_cliente': cliente_nombre,
+            'nombre_cliente': f"CLIENTE {cliente_id}",
             'nombre_articulo': prod_nombre,
             'categoria_producto': categoria,
             'nombre_marca': marca,
-            'valor_venta': valor_base * factor,
-            'unidades': np.random.randint(1, 50)
+            'valor_venta': valor_venta_total,
+            'costo_venta': costo_total,
+            'utilidad': utilidad,
+            'unidades': np.random.randint(1, 20)
         })
         
     df = pd.DataFrame(data)
+    # Calcular margen %
+    df['margen_pct'] = (df['utilidad'] / df['valor_venta']).fillna(0) * 100
     
-    # Generar Presupuestos (Metas)
-    df_presupuesto = pd.DataFrame({
+    # Generar Metas
+    df_metas = pd.DataFrame({
         'nomvendedor': todos_vendedores,
-        'presupuesto_mensual': [np.random.randint(80, 150)*1000000 for _ in todos_vendedores]
+        'presupuesto_mensual': [np.random.randint(90, 180)*1000000 for _ in todos_vendedores]
     })
     
-    return df, df_presupuesto
+    return df, df_metas
 
-# Cargar datos en sesión
+# --- CARGA DE DATOS ---
 if 'df_ventas' not in st.session_state:
     st.session_state.df_ventas, st.session_state.df_metas = generar_datos_comerciales()
 
 df = st.session_state.df_ventas
 df_metas = st.session_state.df_metas
 
-# --- BARRA LATERAL DE FILTROS (Estilo Gerencial) ---
+# ==============================================================================
+# --- 4. FUNCIÓN GENERADORA DE EXCEL PROFESIONAL (CORRECCIÓN DEL ERROR) ---
+# ==============================================================================
+def generar_excel_gerencial(df_periodo, df_kpi_vendedores, df_oportunidades, mes_nombre):
+    """
+    Crea un archivo Excel Binario real (bytes) con múltiples hojas y formato.
+    """
+    output = io.BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    workbook = writer.book
+    
+    # Estilos
+    fmt_header = workbook.add_format({'bold': True, 'bg_color': '#1F4E78', 'font_color': 'white', 'border': 1, 'align': 'center'})
+    fmt_currency = workbook.add_format({'num_format': '$ #,##0', 'border': 1})
+    fmt_pct = workbook.add_format({'num_format': '0.0%', 'border': 1})
+    fmt_text = workbook.add_format({'border': 1})
+    
+    # --- HOJA 1: RESUMEN EJECUTIVO ---
+    df_kpi_vendedores.to_excel(writer, sheet_name='Desempeño Vendedores', startrow=1, index=False)
+    ws1 = writer.sheets['Desempeño Vendedores']
+    
+    # Encabezados Hoja 1
+    for col_num, value in enumerate(df_kpi_vendedores.columns.values):
+        ws1.write(0, col_num, value, fmt_header)
+    ws1.set_column('A:A', 25) # Vendedor
+    ws1.set_column('B:C', 18, fmt_currency) # Ventas
+    ws1.set_column('D:E', 12, fmt_pct) # Cumplimiento/Margen
+    ws1.set_column('F:F', 15, fmt_currency) # Ticket
+    ws1.set_column('G:G', 40) # Recomendación
+    
+    # --- HOJA 2: OPORTUNIDADES CL4 ---
+    if not df_oportunidades.empty:
+        df_oportunidades.to_excel(writer, sheet_name='Oportunidades Cross-Sell', startrow=1, index=False)
+        ws2 = writer.sheets['Oportunidades Cross-Sell']
+        for col_num, value in enumerate(df_oportunidades.columns.values):
+            ws2.write(0, col_num, value, fmt_header)
+        ws2.set_column('A:B', 20)
+        ws2.set_column('C:C', 12) # Potencial
+        ws2.set_column('D:D', 35) # Faltantes
+        ws2.set_column('E:E', 18, fmt_currency)
+
+    # --- HOJA 3: DATA CRUDA (VENTAS) ---
+    # Exportamos una muestra o todo el mes
+    df_export = df_periodo[['fecha_venta', 'Serie', 'nombre_cliente', 'nomvendedor', 'nombre_articulo', 'categoria_producto', 'valor_venta', 'utilidad']].copy()
+    df_export.to_excel(writer, sheet_name='Detalle Transacciones', startrow=1, index=False)
+    ws3 = writer.sheets['Detalle Transacciones']
+    for col_num, value in enumerate(df_export.columns.values):
+        ws3.write(0, col_num, value, fmt_header)
+    ws3.set_column('A:A', 15)
+    ws3.set_column('B:F', 20)
+    ws3.set_column('G:H', 15, fmt_currency)
+
+    writer.close()
+    return output.getvalue()
+
+# ==============================================================================
+# --- 5. LÓGICA DEL DASHBOARD ---
+# ==============================================================================
+
+# Sidebar
 with st.sidebar:
     st.page_link("Portafolio_Servicios.py", label="Volver al Inicio", icon="🏠")
     st.divider()
-    
-    st.header("🎛️ Filtros de Análisis")
-    
-    # Filtro Mes (Asumimos año actual simulado)
+    st.header("🎛️ Filtros de Mando")
     meses_disponibles = sorted(df['mes'].unique())
-    mes_sel = st.selectbox("Seleccionar Mes", meses_disponibles, index=len(meses_disponibles)-1, format_func=lambda x: datetime(2024, x, 1).strftime('%B'))
+    mes_sel = st.selectbox("Periodo Contable", meses_disponibles, index=len(meses_disponibles)-1, format_func=lambda x: datetime(2024, x, 1).strftime('%B %Y').upper())
     
-    # Filtro Vendedor
-    lista_vendedores = ["TODOS"] + sorted(df['nomvendedor'].unique().tolist())
-    vendedor_sel = st.selectbox("Fuerza de Ventas", lista_vendedores)
-    
-    st.divider()
-    st.info("🧠 **Neural Sync:**\nLas ventas registradas aquí actualizan automáticamente los puntos de reorden en el Módulo de Inventarios.")
+    st.info("💡 **Tip Gerencial:**\nUtiliza la pestaña 'Análisis de Equipo' para ver la matriz de rentabilidad vs volumen.")
 
-# --- FILTRADO DE DATOS ---
+# Filtrar Data Global
 df_periodo = df[df['mes'] == mes_sel].copy()
+df_periodo_facturado = df_periodo[df_periodo['TipoDocumento'].isin(['FACTURA ELECTRONICA', 'NOTA CREDITO'])]
 
-if vendedor_sel != "TODOS":
-    df_periodo = df_periodo[df_periodo['nomvendedor'] == vendedor_sel]
-    # Ajustar meta para mostrar solo la del vendedor
-    meta_actual = df_metas[df_metas['nomvendedor'] == vendedor_sel]['presupuesto_mensual'].sum()
-else:
-    meta_actual = df_metas['presupuesto_mensual'].sum()
+# Cálculos Globales
+venta_total = df_periodo_facturado['valor_venta'].sum()
+utilidad_total = df_periodo_facturado['utilidad'].sum()
+margen_global_pct = (utilidad_total / venta_total * 100) if venta_total > 0 else 0
+meta_mes = df_metas['presupuesto_mensual'].sum()
+cumplimiento_global = (venta_total / meta_mes * 100) if meta_mes > 0 else 0
 
-# ==============================================================================
-# --- 4. CÁLCULOS DE NEGOCIO (LÓGICA DE TU CÓDIGO ORIGINAL ADAPTADA) ---
-# ==============================================================================
+# --- HEADER ---
+st.title("NEXUS COMMERCIAL | Centro de Comando")
+st.markdown(f"**Periodo:** {datetime(2024, mes_sel, 1).strftime('%B %Y')} | **Estado:** 🟢 Datos Auditados")
 
-# 1. Venta Neta (Facturas - Notas Crédito) vs Albaranes (Pendiente)
-venta_neta = df_periodo[df_periodo['TipoDocumento'].isin(['FACTURA ELECTRONICA', 'NOTA CREDITO'])]['valor_venta'].sum()
-albaranes_pendientes = df_periodo[df_periodo['TipoDocumento'] == 'ALBARAN DE VENTA']['valor_venta'].sum()
+# --- KPIS SUPERIORES ---
+k1, k2, k3, k4 = st.columns(4)
+k1.markdown(f"""<div class="kpi-card"><div class="kpi-title">Venta Neta</div><div class="kpi-value">${venta_total/1e6:,.1f} M</div><div class="kpi-sub">Meta: ${meta_mes/1e6:,.1f} M ({cumplimiento_global:.1f}%)</div></div>""", unsafe_allow_html=True)
+k2.markdown(f"""<div class="kpi-card"><div class="kpi-title">Utilidad Bruta</div><div class="kpi-value">${utilidad_total/1e6:,.1f} M</div><div class="kpi-sub">Margen Global: {margen_global_pct:.1f}%</div></div>""", unsafe_allow_html=True)
+k3.markdown(f"""<div class="kpi-card" style="border-left-color:#636EFA"><div class="kpi-title">Transacciones</div><div class="kpi-value">{df_periodo_facturado['Serie'].nunique()}</div><div class="kpi-sub">Ticket Promedio: ${venta_total/df_periodo_facturado['Serie'].nunique():,.0f}</div></div>""", unsafe_allow_html=True)
+k4.markdown(f"""<div class="kpi-card" style="border-left-color:#AB63FA"><div class="kpi-title">Cartera Vencida (Sim)</div><div class="kpi-value">4.2%</div><div class="kpi-sub">Sana (< 5%)</div></div>""", unsafe_allow_html=True)
 
-# 2. Lógica CL4 (Oportunidades de Venta Cruzada)
-# Identificar clientes que compraron ALGO en el mes, pero NO compraron productos clave
-productos_clave = ['ESTUCOMAS', 'PINTULUX', 'KORAZA', 'VINILTEX', 'VINILICO']
-clientes_activos = df_periodo['cliente_id'].unique()
-
-oportunidades = []
-for cliente in clientes_activos:
-    compras_cliente = df_periodo[df_periodo['cliente_id'] == cliente]
-    productos_comprados = compras_cliente['nombre_articulo'].unique()
-    
-    # Lógica simple de tu script: verificar qué falta del mix ideal
-    faltantes = [p for p in productos_clave if not any(p in prod for prod in productos_comprados)]
-    
-    if len(faltantes) > 0 and len(faltantes) < len(productos_clave): # Si compró al menos uno, pero faltan otros
-        nombre_cliente = compras_cliente['nombre_cliente'].iloc[0]
-        vendedor_asig = compras_cliente['nomvendedor'].iloc[0]
-        total_compra = compras_cliente['valor_venta'].sum()
-        oportunidades.append({
-            'Cliente': nombre_cliente,
-            'Vendedor': vendedor_asig,
-            'Potencial': len(faltantes),
-            'Faltantes': ", ".join(faltantes[:3]), # Mostrar primeros 3
-            'Valor Compra Actual': total_compra
-        })
-
-df_oportunidades = pd.DataFrame(oportunidades)
-
-# ==============================================================================
-# --- 5. INTERFAZ DE USUARIO (DASHBOARD) ---
-# ==============================================================================
-
-# Encabezado
-st.title("NEXUS COMMERCIAL | Neural Sales Engine")
-st.markdown(f"**Periodo Analizado:** {datetime(2024, mes_sel, 1).strftime('%B %Y')} | **Estado:** 🟢 Sincronizado con ERP")
-
-# --- SECCIÓN 1: KPIS GERENCIALES ---
-col1, col2, col3, col4 = st.columns(4)
-
-cumplimiento = (venta_neta / meta_actual * 100) if meta_actual > 0 else 0
-delta_color = "kpi-alert" if cumplimiento < 80 else ""
-
-with col1:
-    st.markdown(f"""
-    <div class="kpi-card {delta_color}">
-        <div class="kpi-title">Venta Neta Facturada</div>
-        <div class="kpi-value">${venta_neta/1e6:,.1f} M</div>
-        <div class="kpi-sub">Meta: ${meta_actual/1e6:,.1f} M ({cumplimiento:.1f}%)</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown(f"""
-    <div class="kpi-card" style="border-left-color: #636EFA;">
-        <div class="kpi-title">Dinero Pendiente (Albaranes)</div>
-        <div class="kpi-value">${albaranes_pendientes/1e6:,.1f} M</div>
-        <div class="kpi-sub">⚠️ Mercancía entregada sin facturar</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col3:
-    tickets = df_periodo['Serie'].nunique()
-    ticket_promedio = venta_neta / tickets if tickets > 0 else 0
-    st.markdown(f"""
-    <div class="kpi-card" style="border-left-color: #FFA15A;">
-        <div class="kpi-title">Ticket Promedio</div>
-        <div class="kpi-value">${ticket_promedio/1e3:,.0f} K</div>
-        <div class="kpi-sub">📊 {tickets} Transacciones</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col4:
-    n_oportunidades = len(df_oportunidades)
-    st.markdown(f"""
-    <div class="kpi-card" style="border-left-color: #AB63FA;">
-        <div class="kpi-title">Oportunidades (Algoritmo CL4)</div>
-        <div class="kpi-value">{n_oportunidades}</div>
-        <div class="kpi-sub">🚀 Clientes con potencial de Cross-Selling</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# --- SECCIÓN 2: PESTAÑAS DE ANÁLISIS PROFUNDO ---
-st.markdown("### 📡 Centro de Análisis Estratégico")
-tab_dash, tab_opps, tab_team, tab_docs = st.tabs([
-    "📊 Radar Comercial", 
-    "🧬 Matriz de Oportunidades (CL4)", 
-    "👥 Fuerza de Ventas",
-    "📄 Auditoría de Documentos"
+# --- PESTAÑAS PRINCIPALES ---
+tab_analisis, tab_equipo, tab_cl4, tab_export = st.tabs([
+    "📊 Análisis 360°", 
+    "🧠 Inteligencia de Equipo", 
+    "🧬 Oportunidades (CL4)",
+    "📥 Exportación Gerencial"
 ])
 
-# === TAB 1: RADAR COMERCIAL (VISUALIZACIONES) ===
-with tab_dash:
-    c_chart1, c_chart2 = st.columns([2, 1])
-    
-    with c_chart1:
-        st.subheader("Tendencia de Ventas vs Presupuesto")
-        # Crear datos simulados diarios para el gráfico
-        dias_mes = df_periodo.groupby('fecha_venta')['valor_venta'].sum().reset_index()
-        dias_mes['Acumulado'] = dias_mes['valor_venta'].cumsum()
-        meta_lineal = [meta_actual * (i/len(dias_mes)) for i in range(1, len(dias_mes)+1)]
+# === TAB 1: ANÁLISIS 360 ===
+with tab_analisis:
+    c1, c2 = st.columns([2, 1])
+    with c1:
+        st.subheader("Tendencia Diaria vs Meta")
+        diario = df_periodo_facturado.groupby('fecha_venta')['valor_venta'].sum().reset_index()
+        diario['acum'] = diario['valor_venta'].cumsum()
+        # Linea de meta lineal
+        meta_lineal = [meta_mes * (i/30) for i in range(1, len(diario)+1)] # Aprox
         
-        fig_trend = go.Figure()
-        fig_trend.add_trace(go.Scatter(x=dias_mes['fecha_venta'], y=dias_mes['Acumulado'], fill='tozeroy', name='Venta Real', line=dict(color='#00CC96')))
-        fig_trend.add_trace(go.Scatter(x=dias_mes['fecha_venta'], y=meta_lineal, name='Proyección Meta', line=dict(color='#EF553B', dash='dot')))
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=diario['fecha_venta'], y=diario['acum'], fill='tozeroy', name='Real', line=dict(color='#00CC96')))
+        fig.add_trace(go.Scatter(x=diario['fecha_venta'], y=meta_lineal, name='Proyección Ideal', line=dict(color='white', dash='dot')))
+        fig.update_layout(height=350, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='white'))
+        st.plotly_chart(fig, use_container_width=True)
         
-        fig_trend.update_layout(
-            height=350, 
-            paper_bgcolor='rgba(0,0,0,0)', 
-            plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='white'),
-            margin=dict(l=0, r=0, t=20, b=20)
-        )
-        st.plotly_chart(fig_trend, use_container_width=True)
+    with c2:
+        st.subheader("Rentabilidad por Categoría")
+        cat_rent = df_periodo_facturado.groupby('categoria_producto')[['valor_venta', 'utilidad']].sum().reset_index()
+        cat_rent['margen'] = (cat_rent['utilidad'] / cat_rent['valor_venta'] * 100)
         
-    with c_chart2:
-        st.subheader("Mix de Categorías")
-        fig_pie = px.sunburst(
-            df_periodo[df_periodo['valor_venta']>0], 
-            path=['categoria_producto', 'nombre_marca'], 
-            values='valor_venta',
-            color='valor_venta',
-            color_continuous_scale='Tealgrn'
-        )
-        fig_pie.update_layout(height=350, margin=dict(l=0, r=0, t=20, b=20))
-        st.plotly_chart(fig_pie, use_container_width=True)
+        fig_bar = px.bar(cat_rent, x='margen', y='categoria_producto', orientation='h', color='margen', title="Margen %", color_continuous_scale='RdYlGn')
+        fig_bar.update_layout(height=350, font=dict(color='white'))
+        st.plotly_chart(fig_bar, use_container_width=True)
 
-# === TAB 2: OPORTUNIDADES (La lógica CL4 de tu script) ===
-with tab_opps:
+# === TAB 2: INTELIGENCIA DE EQUIPO (SUPER ANÁLISIS) ===
+with tab_equipo:
+    st.markdown("### 🕵️ Evaluación de Desempeño de Vendedores")
+    
+    # Preparar Datos Agrupados
+    df_vendedores = df_periodo_facturado.groupby('nomvendedor').agg(
+        Ventas_Totales=('valor_venta', 'sum'),
+        Utilidad_Total=('utilidad', 'sum'),
+        Transacciones=('Serie', 'nunique'),
+        Ticket_Prom=('valor_venta', 'mean')
+    ).reset_index()
+    
+    df_vendedores['Margen_Pct'] = (df_vendedores['Utilidad_Total'] / df_vendedores['Ventas_Totales'] * 100)
+    df_vendedores = df_vendedores.merge(df_metas, on='nomvendedor', how='left')
+    df_vendedores['Cumplimiento'] = (df_vendedores['Ventas_Totales'] / df_vendedores['presupuesto_mensual'] * 100)
+    
+    # GENERADOR DE RECOMENDACIONES IA
+    def generar_insight(row):
+        if row['Cumplimiento'] > 100 and row['Margen_Pct'] > 30:
+            return "🌟 ESTRELLA: Mantener incentivos. Potenciar como mentor."
+        elif row['Cumplimiento'] > 100 and row['Margen_Pct'] < 25:
+            return "⚠️ VOLUMEN RIESGOSO: Vende mucho pero con mucho descuento. Revisar política de precios."
+        elif row['Cumplimiento'] < 80 and row['Margen_Pct'] > 35:
+            return "💎 NICHO: Excelente margen, pero bajo volumen. Asignar clientes más grandes."
+        else:
+            return "🚨 ALERTA: Bajo rendimiento integral. Requiere plan de choque o capacitación."
+
+    df_vendedores['Recomendacion_IA'] = df_vendedores.apply(generar_insight, axis=1)
+
+    # 1. MATRIZ DE RENDIMIENTO (SCATTER PLOT)
+    col_matrix, col_heatmap = st.columns([3, 2])
+    
+    with col_matrix:
+        st.subheader("Matriz de Posicionamiento: Volumen vs Rentabilidad")
+        fig_matrix = px.scatter(
+            df_vendedores, 
+            x='Cumplimiento', 
+            y='Margen_Pct', 
+            size='Ventas_Totales', 
+            color='Recomendacion_IA',
+            hover_name='nomvendedor',
+            text='nomvendedor',
+            color_discrete_map={
+                "🌟 ESTRELLA: Mantener incentivos. Potenciar como mentor.": "#00CC96",
+                "⚠️ VOLUMEN RIESGOSO: Vende mucho pero con mucho descuento. Revisar política de precios.": "#FFA15A",
+                "💎 NICHO: Excelente margen, pero bajo volumen. Asignar clientes más grandes.": "#636EFA",
+                "🚨 ALERTA: Bajo rendimiento integral. Requiere plan de choque o capacitación.": "#EF553B"
+            }
+        )
+        # Líneas promedio
+        avg_cump = df_vendedores['Cumplimiento'].mean()
+        avg_marg = df_vendedores['Margen_Pct'].mean()
+        
+        fig_matrix.add_hline(y=avg_marg, line_dash="dot", annotation_text="Margen Promedio", annotation_position="bottom right")
+        fig_matrix.add_vline(x=avg_cump, line_dash="dot", annotation_text="Cumplimiento Promedio", annotation_position="top right")
+        
+        fig_matrix.update_traces(textposition='top center')
+        fig_matrix.update_layout(height=500, plot_bgcolor='rgba(255,255,255,0.05)', xaxis_title="Cumplimiento de Meta (%)", yaxis_title="Margen de Rentabilidad (%)")
+        st.plotly_chart(fig_matrix, use_container_width=True)
+        
+    with col_heatmap:
+        st.subheader("ADN del Vendedor (Heatmap)")
+        st.info("Intensidad de ventas por Categoría")
+        
+        # Pivot para Heatmap
+        heatmap_data = df_periodo_facturado.groupby(['nomvendedor', 'categoria_producto'])['valor_venta'].sum().reset_index()
+        fig_heat = px.density_heatmap(
+            heatmap_data, 
+            x='categoria_producto', 
+            y='nomvendedor', 
+            z='valor_venta', 
+            color_continuous_scale='Viridis'
+        )
+        fig_heat.update_layout(height=500)
+        st.plotly_chart(fig_heat, use_container_width=True)
+
+    st.markdown("---")
+    st.subheader("📋 Detalle Táctico de Vendedores")
+    # Tabla Estilizada
+    st.dataframe(
+        df_vendedores[['nomvendedor', 'Ventas_Totales', 'Cumplimiento', 'Margen_Pct', 'Ticket_Prom', 'Recomendacion_IA']],
+        column_config={
+            "nomvendedor": "Vendedor",
+            "Ventas_Totales": st.column_config.NumberColumn("Venta Total", format="$%d"),
+            "Cumplimiento": st.column_config.ProgressColumn("Meta %", format="%.1f%%", min_value=0, max_value=120),
+            "Margen_Pct": st.column_config.NumberColumn("Margen %", format="%.1f%%"),
+            "Ticket_Prom": st.column_config.NumberColumn("Ticket Promedio", format="$%d"),
+            "Recomendacion_IA": "Diagnóstico Algorítmico"
+        },
+        use_container_width=True,
+        hide_index=True
+    )
+
+# === TAB 3: OPORTUNIDADES CL4 ===
+with tab_cl4:
     st.markdown("""
     <div class="ai-insight-box">
-        <div class="ai-icon">🧠</div>
+        <div class="ai-icon">🧬</div>
         <div>
-            <h4 style="margin:0; color:#636EFA">Algoritmo de Detección de Patrones (CL4)</h4>
-            <p style="margin:5px 0 0 0; font-size:0.9rem;">
-                El sistema ha analizado el comportamiento de compra de <b>{len(clientes_activos)} clientes</b>.
-                Se han detectado <b>{n_oportunidades} clientes</b> que compraron productos base (ej. Koraza) pero olvidaron complementarios (ej. Estucomas/Viniltex).
-                <br>👉 <i>Acción sugerida: Exportar lista y enviar a fuerza de ventas para gestión telefónica inmediata.</i>
-            </p>
+            <h4>Algoritmo CL4: Detección de Venta Cruzada</h4>
+            <p>Analiza patrones de compra incompletos. Ejemplo: Cliente compra Pintura pero no compra Estuco ni Brochas.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    if not df_oportunidades.empty:
-        # Ordenar por potencial de venta (Valor de compra actual indica tamaño de cliente)
-        df_show_opps = df_oportunidades.sort_values('Valor Compra Actual', ascending=False).head(15)
+    # Logica CL4 (Recalculada para asegurar datos)
+    productos_clave = ['ESTUCOMAS', 'PINTULUX', 'KORAZA', 'VINILTEX', 'VINILICO']
+    clientes_activos = df_periodo['cliente_id'].unique()
+    oportunidades = []
+    
+    for cliente in clientes_activos:
+        compras = df_periodo[df_periodo['cliente_id'] == cliente]
+        prods = compras['nombre_articulo'].unique()
+        faltantes = [p for p in productos_clave if not any(p in x for x in prods)]
         
+        # Si compró productos de pintura (PINTUCO) pero le faltan claves
+        if any("PINTUCO" in x for x in compras['nombre_marca'].unique()) and len(faltantes) > 0:
+            oportunidades.append({
+                'Cliente': compras['nombre_cliente'].iloc[0],
+                'Vendedor': compras['nomvendedor'].iloc[0],
+                'Potencial': len(faltantes),
+                'Faltantes': ", ".join(faltantes[:3]),
+                'Valor Compra Actual': compras['valor_venta'].sum()
+            })
+            
+    df_opps = pd.DataFrame(oportunidades)
+    
+    if not df_opps.empty:
+        df_opps = df_opps.sort_values('Valor Compra Actual', ascending=False)
         st.dataframe(
-            df_show_opps,
+            df_opps.head(20),
             column_config={
-                "Valor Compra Actual": st.column_config.ProgressColumn("Tamaño Cliente", format="$%d", min_value=0, max_value=int(df_show_opps['Valor Compra Actual'].max())),
-                "Faltantes": st.column_config.TextColumn("Productos a Ofrecer (Cross-Sell)"),
-                "Potencial": st.column_config.NumberColumn("Gap Score")
+                "Valor Compra Actual": st.column_config.NumberColumn("Valor Cliente", format="$%d"),
+                "Potencial": st.column_config.NumberColumn("Score Oportunidad", help="Más alto = Más productos faltan")
             },
-            use_container_width=True,
-            hide_index=True
+            use_container_width=True, hide_index=True
+        )
+    else:
+        st.success("No se detectaron brechas de portafolio críticas en este periodo.")
+
+# === TAB 4: EXPORTACIÓN (LA SOLUCIÓN AL PROBLEMA) ===
+with tab_export:
+    st.markdown("### 📥 Centro de Descargas Gerenciales")
+    st.info("Genera un archivo Excel consolidado con todas las métricas, análisis de IA y detalles operativos para la junta directiva.")
+    
+    c_down1, c_down2 = st.columns([2, 1])
+    
+    with c_down1:
+        # PREPARACIÓN DEL ARCHIVO
+        fecha_reporte = datetime(2024, mes_sel, 1).strftime('%Y_%m')
+        nombre_archivo = f"Reporte_Gerencial_NEXUS_{fecha_reporte}.xlsx"
+        
+        # Usamos la función corregida
+        excel_data = generar_excel_gerencial(df_periodo, df_vendedores, df_opps, datetime(2024, mes_sel, 1).strftime('%B'))
+        
+        st.download_button(
+            label=f"📊 DESCARGAR REPORTE EJECUTIVO ({datetime(2024, mes_sel, 1).strftime('%B')})",
+            data=excel_data,
+            file_name=nombre_archivo,
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            help="Click para descargar el análisis completo en formato .xlsx compatible con Excel 2013+"
         )
         
-        col_dl_1, col_dl_2 = st.columns([1, 4])
-        with col_dl_1:
-            # Simulación de exportación
-            st.download_button(
-                label="📥 Descargar Reporte CL4 (Excel)",
-                data="Simulacion Excel",
-                file_name="Oportunidades_CL4.xlsx",
-                mime="text/csv"
-            )
-    else:
-        st.success("¡Increíble! Todos los clientes activos tienen el mix de productos completo.")
-
-# === TAB 3: RANKING VENDEDORES ===
-with tab_team:
-    st.subheader("🏆 Rendimiento Fuerza de Ventas")
-    
-    # Agrupar por vendedor
-    ranking = df_periodo.groupby('nomvendedor').agg(
-        Venta=('valor_venta', 'sum'),
-        Transacciones=('Serie', 'nunique')
-    ).reset_index()
-    
-    # Unir con metas
-    ranking = ranking.merge(df_metas, on='nomvendedor', how='left')
-    ranking['Cumplimiento'] = (ranking['Venta'] / ranking['presupuesto_mensual']) * 100
-    ranking = ranking.sort_values('Cumplimiento', ascending=False)
-    
-    # Gráfico de Barras
-    fig_bar = px.bar(
-        ranking, 
-        x='Cumplimiento', 
-        y='nomvendedor', 
-        orientation='h',
-        text_auto='.1f',
-        color='Cumplimiento',
-        color_continuous_scale=['#EF553B', '#FFA15A', '#00CC96'],
-        title="Ranking de Cumplimiento (%)"
-    )
-    fig_bar.update_layout(yaxis={'categoryorder':'total ascending'}, font=dict(color='white'), plot_bgcolor='rgba(0,0,0,0)')
-    st.plotly_chart(fig_bar, use_container_width=True)
-
-# === TAB 4: AUDITORÍA ALBARANES (Tu código de control) ===
-with tab_docs:
-    st.subheader("📄 Auditoría de Ingresos Pendientes (Albaranes)")
-    st.warning("Estas transacciones han movido inventario pero NO han generado factura electrónica (Cartera). Requieren atención inmediata.")
-    
-    df_albaranes = df_periodo[df_periodo['TipoDocumento'] == 'ALBARAN DE VENTA'][['fecha_venta', 'Serie', 'nombre_cliente', 'nomvendedor', 'valor_venta']].copy()
-    
-    if not df_albaranes.empty:
-        st.dataframe(
-            df_albaranes,
-            column_config={
-                "fecha_venta": st.column_config.DateColumn("Fecha"),
-                "valor_venta": st.column_config.NumberColumn("Valor Pendiente", format="$%d")
-            },
-            use_container_width=True
-        )
-        
-        if st.button("⚡ Convertir Albaranes a Facturas (Simulación ERP)"):
-            with st.spinner("Conectando con DIAN y ERP... Generando Facturas Electrónicas..."):
-                time.sleep(2)
-            st.balloons()
-            st.success(f"Se han procesado {len(df_albaranes)} documentos correctamente. El inventario y cartera están sincronizados.")
-    else:
-        st.success("✅ No hay albaranes pendientes. Todo está facturado.")
+    with c_down2:
+        st.markdown("**Contenido del Reporte:**")
+        st.markdown("""
+        * ✅ **Sheet 1:** KPIs y Matriz de Vendedores
+        * ✅ **Sheet 2:** Oportunidades CL4 (Leads)
+        * ✅ **Sheet 3:** Data Transaccional (Auditoría)
+        """)
 
 # ==============================================================================
-# --- 6. CIERRE Y CONEXIÓN CON EL ECOSISTEMA ---
+# --- 6. FOOTER ---
 # ==============================================================================
 st.divider()
-col_footer_l, col_footer_r = st.columns([3, 1])
-
-with col_footer_l:
-    st.markdown("""
-    #### 🔗 Integración de Ecosistema
-    Este módulo comercial no trabaja aislado. 
-    * Las ventas aquí registradas se descuentan en tiempo real del **Módulo de Inventarios**.
-    * El algoritmo CL4 alimenta las sugerencias de compra en el **Módulo Logístico**.
-    """)
-
-with col_footer_r:
-    if st.button("📡 Sincronizar Todo"):
-        st.toast("Sincronizando Ventas...", icon="💰")
-        time.sleep(1)
-        st.toast("Actualizando Stocks...", icon="📦")
-        time.sleep(1)
-        st.toast("Recalculando KPIs...", icon="📊")
-        st.success("Ecosistema NEXUS actualizado.")
+st.markdown(f"<div style='text-align:center; color:#666;'>NEXUS OS v2.5 | Generado: {datetime.now().strftime('%Y-%m-%d %H:%M')}</div>", unsafe_allow_html=True)
