@@ -12,7 +12,7 @@ import xlsxwriter
 
 # --- 1. CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
-    page_title="NEXUS OPS | Abastecimiento Estratégico",
+    page_title="NEXUS PRO | Abastecimiento Estratégico",
     page_icon="🏭",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -275,7 +275,7 @@ class PDFReport(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 15)
         self.set_text_color(46, 134, 193) # Azul corporativo
-        self.cell(0, 10, 'NEXUS OPS - Reporte Operativo', 0, 1, 'C')
+        self.cell(0, 10, 'NEXUS PRO - Reporte Operativo', 0, 1, 'C')
         self.ln(5)
     def footer(self):
         self.set_y(-15)
@@ -333,7 +333,7 @@ with st.sidebar:
     st.divider()
     
     # Simulación de logo
-    st.markdown("<h2 style='text-align: center; color: #2E86C1;'>NEXUS OPS</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #2E86C1;'>NEXUS PRO</h2>", unsafe_allow_html=True)
     
     st.subheader("Filtros Globales")
     
@@ -739,7 +739,7 @@ with tab4:
         st.caption("Indica la eficiencia en la redistribución interna.")
 
     st.markdown("#### Tablero de Aprendizaje")
-    st.warning("🤖 En una implementación completa, esta sección mostraría un ranking de proveedores basado en **Lead Time**, **Faltantes** (inventario) y **Costo** (OC), permitiendo a NEXUS OPS optimizar continuamente las decisiones de compra.")
+    st.warning("🤖 En una implementación completa, esta sección mostraría un ranking de proveedores basado en **Lead Time**, **Faltantes** (inventario) y **Costo** (OC), permitiendo a NEXUS PRO optimizar continuamente las decisiones de compra.")
     
     if st.button("Simular Actualización de Estados de Órdenes", use_container_width=True):
         st.toast("Simulando una actualización de estado en las órdenes...", icon="📡")
