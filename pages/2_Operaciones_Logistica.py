@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import random
 import io
@@ -155,26 +155,118 @@ def calcular_abastecimiento(df):
 
 df_work = calcular_abastecimiento(st.session_state.df_maestro.copy())
 
+# --- MOCK DE DATOS PARA LA TORRE DE CONTROL (ACTUALIZADO) ---
+@st.cache_data
+def get_tracking_data(df_maestro):
+    """Genera datos simulados y persistentes de órdenes de compra y traslado."""
+    
+    proveedores = df_maestro['Proveedor'].unique()
+    almacenes = df_maestro['Almacen_Nombre'].unique()
+    
+    data_list = []
+    
+    # Simulación de Órdenes de Compra (OC)
+    for i in range(101, 111):
+        date_created = datetime.now() - timedelta(days=random.randint(1, 45))
+        supplier = random.choice(proveedores)
+        
+        # Simulación de estados con probabilidad
+        rand_val = random.random()
+        if rand_val < 0.2:
+            status = "🟢 Recibido (100%)"
+            date_status = date_created + timedelta(days=random.randint(20, 30))
+        elif rand_val < 0.4:
+            status = "🟡 En Tránsito (Llega Hoy)"
+            date_status = date_created + timedelta(days=random.randint(15, 19))
+        elif rand_val < 0.6:
+            status = "🔵 Despachado (En Ruta)"
+            date_status = date_created + timedelta(days=random.randint(5, 14))
+        elif rand_val < 0.8:
+            status = "⚪ Pendiente Aprobación"
+            date_status = date_created
+        else:
+            status = "🔴 Cancelada/Rechazada"
+            date_status = date_created + timedelta(days=random.randint(1, 5))
+            
+        data_list.append({
+            "ID_Orden": f"OC-{date_created.year}-1{i}",
+            "Fecha_Creacion": date_created.strftime('%Y-%m-%d'),
+            "Tipo": "Compra",
+            "Portafolio": random.choice(df_maestro['Categoria'].unique()),
+            "Tercero": supplier,
+            "Almacen_Destino": random.choice(almacenes),
+            "Estado": status,
+            "Fecha_Estimada_Llegada": (date_status + timedelta(days=random.randint(1, 5))).strftime('%Y-%m-%d') if 'En Tránsito' in status else '',
+            "Valor_Total": random.randint(3000000, 25000000),
+            "Comentario": f"OC para {supplier}. Gestión de stock bajo."
+        })
+
+    # Simulación de Órdenes de Traslado (TR)
+    for i in range(80, 85):
+        date_created = datetime.now() - timedelta(days=random.randint(1, 15))
+        store_origin = random.choice(almacenes)
+        store_dest = random.choice([a for a in almacenes if a != store_origin])
+        
+        rand_val = random.random()
+        if rand_val < 0.3:
+            status = "🟢 Recibido (100%)"
+            date_status = date_created + timedelta(days=random.randint(3, 7))
+        elif rand_val < 0.7:
+            status = "🔵 Despachado (En Ruta)"
+            date_status = date_created + timedelta(days=random.randint(1, 3))
+        else:
+            status = "⚪ Pendiente Picking"
+            date_status = date_created
+            
+        data_list.append({
+            "ID_Orden": f"TR-{date_created.year}-0{i}",
+            "Fecha_Creacion": date_created.strftime('%Y-%m-%d'),
+            "Tipo": "Traslado",
+            "Portafolio": random.choice(df_maestro['Categoria'].unique()),
+            "Tercero": f"{store_origin} -> {store_dest}",
+            "Almacen_Destino": store_dest,
+            "Estado": status,
+            "Fecha_Estimada_Llegada": (date_status + timedelta(days=random.randint(1, 2))).strftime('%Y-%m-%d') if 'Despachado' in status else '',
+            "Valor_Total": 0,
+            "Comentario": f"Traslado de excedente de {store_origin}."
+        })
+        
+    df = pd.DataFrame(data_list)
+    df['Fecha_Creacion'] = pd.to_datetime(df['Fecha_Creacion'])
+    return df
+
+# Inicializar datos de tracking
+if 'df_tracking' not in st.session_state:
+    st.session_state.df_tracking = get_tracking_data(st.session_state.df_maestro)
+
+
 # --- 4. FUNCIONES GENERADORAS DE ARCHIVOS (EXCEL Y PDF) ---
 
 def generar_excel(df, hoja="Reporte"):
     """Genera un archivo Excel en memoria bytes."""
     output = io.BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df.to_excel(writer, index=False, sheet_name=hoja)
+    
+    # Pre-procesamiento: Quitar 'Seleccionar' y formatear
+    df_temp = df.drop(columns=['Seleccionar'], errors='ignore')
+    if 'Costo Unit.' in df_temp.columns:
+        df_temp['Costo Unit.'] = df_temp['Costo Unit.'].apply(lambda x: f"${x:,.0f}")
+    if 'Total Estimado' in df_temp.columns:
+        df_temp['Total Estimado'] = df_temp['Total Estimado'].apply(lambda x: f"${x:,.0f}")
+        
+    df_temp.to_excel(writer, index=False, sheet_name=hoja)
     
     workbook = writer.book
     worksheet = writer.sheets[hoja]
     
     # Formatos profesionales
     header_fmt = workbook.add_format({'bold': True, 'fg_color': '#2E86C1', 'font_color': 'white', 'border': 1})
-    money_fmt = workbook.add_format({'num_format': '$#,##0'})
     
-    for col_num, value in enumerate(df.columns.values):
+    for col_num, value in enumerate(df_temp.columns.values):
         worksheet.write(0, col_num, value, header_fmt)
         # Ajustar ancho
         worksheet.set_column(col_num, col_num, 20)
-        
+    
     writer.close()
     return output.getvalue()
 
@@ -204,32 +296,35 @@ def generar_pdf(df, titulo):
     pdf.cell(0, 10, f"Fecha Generación: {datetime.now().strftime('%Y-%m-%d %H:%M')}", 0, 1, 'L')
     pdf.ln(5)
     
+    # Pre-procesamiento: Quitar 'Seleccionar' y formatear para PDF
+    df_temp = df.drop(columns=['Seleccionar'], errors='ignore').copy()
+    if 'Costo Unit.' in df_temp.columns:
+        df_temp['Costo Unit.'] = df_temp['Costo Unit.'].apply(lambda x: f"${x:,.0f}")
+    if 'Total Estimado' in df_temp.columns:
+        df_temp['Total Estimado'] = df_temp['Total Estimado'].apply(lambda x: f"${x:,.0f}")
+
     # Tabla simple
-    # Calculamos ancho dinámico
-    num_cols = len(df.columns)
+    num_cols = len(df_temp.columns)
     col_width = 190 / num_cols if num_cols > 0 else 10
     row_height = 7
     
     # Encabezados
     pdf.set_font("Arial", 'B', 8)
     pdf.set_fill_color(232, 244, 253) # Azul muy claro
-    for col in df.columns:
-        # Truncar nombre de columna si es muy largo
+    for col in df_temp.columns:
         clean_col = str(col)[:15]
         pdf.cell(col_width, row_height, clean_col, 1, 0, 'C', True)
     pdf.ln()
     
     # Filas
     pdf.set_font("Arial", '', 8)
-    for i, row in df.iterrows():
-        for col in df.columns:
+    for i, row in df_temp.iterrows():
+        for col in df_temp.columns:
             txt = str(row[col])
             # Truncar texto de celda si es muy largo
             pdf.cell(col_width, row_height, txt[:18], 1, 0, 'C')
         pdf.ln()
     
-    # --- CORRECCIÓN DEL ERROR ---
-    # Devolvemos los bytes directamente.
     return bytes(pdf.output())
 
 # --- 5. UI: BARRA LATERAL DE NAVEGACIÓN ---
@@ -269,6 +364,9 @@ with col_h2:
     if st.button("🔄 Actualizar Análisis"):
         st.toast("Recalculando algoritmos de abastecimiento...", icon="🤖")
         time.sleep(1)
+        # Forzamos un recálculo simple para simular frescura de datos
+        st.session_state.df_maestro = init_mock_data()
+        st.session_state.df_tracking = get_tracking_data(st.session_state.df_maestro)
         st.rerun()
 
 # --- 7. PESTAÑAS DE CONTENIDO ---
@@ -323,7 +421,7 @@ with tab1:
     with col_chart2:
         st.subheader("Salud del Inventario")
         # Gauge Chart (Velocímetro)
-        eficiencia = 100 - (skus_quiebre / len(df_vista) * 100)
+        eficiencia = 100 - (skus_quiebre / len(df_vista) * 100) if len(df_vista) > 0 else 100
         fig_gauge = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = eficiencia,
@@ -404,7 +502,6 @@ with tab2:
                 )
                 
                 # Generar PDF
-                # Aseguramos que el nombre no sea muy largo
                 pdf_data = generar_pdf(seleccionados_tras, "ORDEN DE TRASLADO INTERNO")
                 st.download_button(
                     label="📄 Descargar PDF (Legal)",
@@ -485,7 +582,7 @@ with tab3:
         
         with c_buy1:
             total_oc = (seleccionados_compra['Cant. Sugerida'] * seleccionados_compra['Costo Unit.']).sum()
-            st.subheader(f"Total Orden: ${total_oc:,.0f}")
+            st.subheader(f"Total Orden: **${total_oc:,.0f}**")
             st.markdown(f"Items Seleccionados: **{len(seleccionados_compra)}**")
             
             if st.button("📧 Enviar Orden al Proveedor", type="primary", use_container_width=True):
@@ -506,34 +603,154 @@ with tab3:
     else:
         st.warning("Seleccione al menos un producto para generar la orden.")
 
-# === TAB 4: TRACKING ===
+# === TAB 4: TRACKING (TORRE DE CONTROL ACTUALIZADA) ===
 with tab4:
-    st.subheader("📡 Torre de Control: Seguimiento en Vivo")
-    st.markdown("Monitoreo en tiempo real del estado de todas las órdenes generadas (Simulación).")
+    st.header("📡 Torre de Control: Orquestación Total de la Cadena")
     
-    # Datos Mock de Tracking mejorados
-    tracking_data = [
-        {"ID": "OC-2024-101", "Fecha": "2024-05-20", "Tipo": "Compra", "Destino/Origen": "DISTRIBUIDORA GLOBAL", "Estado": "🟢 Recibido (100%)", "Total": "$15,400,000"},
-        {"ID": "OC-2024-102", "Fecha": "2024-05-21", "Tipo": "Compra", "Destino/Origen": "IMPORTADOS S.A.", "Estado": "🟡 En Tránsito (Llega Hoy)", "Total": "$8,200,000"},
-        {"ID": "TR-2024-088", "Fecha": "2024-05-22", "Tipo": "Traslado", "Destino/Origen": "Tienda Norte -> Sur", "Estado": "🔵 Despachado", "Total": "$0"},
-        {"ID": "OC-2024-103", "Fecha": "2024-05-22", "Tipo": "Compra", "Destino/Origen": "HERRAMIENTAS PRO", "Estado": "⚪ Pendiente Aprobación", "Total": "$4,500,000"},
-        {"ID": "TR-2024-089", "Fecha": "2024-05-23", "Tipo": "Traslado", "Destino/Origen": "Sede Ppal -> Occidente", "Estado": "⚪ Pendiente Picking", "Total": "$0"},
+    st.markdown("""
+    <div class="guide-box">
+        <div class="guide-title">🚀 Valor Estratégico: Control y Aprendizaje</div>
+        Esta Torre de Control le ofrece visibilidad total sobre **cada movimiento** (compra y traslado). 
+        <br>Al centralizar esta información, la aplicación futura podrá:
+        <ul>
+            <li>**Evaluar Proveedores** en tiempo de entrega y faltantes.</li>
+            <li>**Optimizar Rutas** de traslado.</li>
+            <li>**Recomendar mejores proveedores** basándose en el historial de eficiencia.</li>
+        </ul>
+        **Todo el flujo operativo está bajo control.**
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 1. FILTROS DE LA TORRE DE CONTROL
+    st.subheader("Filtros de Órdenes")
+    col_f1, col_f2, col_f3, col_f4 = st.columns(4)
+    
+    df_track_work = st.session_state.df_tracking.copy()
+
+    with col_f1:
+        tipo_orden = st.multiselect("Tipo de Orden:", ["Compra", "Traslado"], default=["Compra", "Traslado"])
+        df_track_work = df_track_work[df_track_work['Tipo'].isin(tipo_orden)]
+
+    with col_f2:
+        estados = sorted(df_track_work['Estado'].unique())
+        estado_sel = st.multiselect("Filtrar por Estado:", estados, default=[e for e in estados if 'Pendiente' in e or 'Tránsito' in e or 'Despachado' in e])
+        df_track_work = df_track_work[df_track_work['Estado'].isin(estado_sel)]
+        
+    with col_f3:
+        proveedores_list = sorted(df_track_work[df_track_work['Tipo'] == 'Compra']['Tercero'].unique())
+        tercero_sel = st.multiselect("Proveedor / Ruta:", proveedores_list, default=proveedores_list)
+        # Aseguramos incluir las rutas de traslado si se seleccionó ese tipo
+        tercero_sel.extend(df_track_work[df_track_work['Tipo'] == 'Traslado']['Tercero'].unique())
+        df_track_work = df_track_work[df_track_work['Tercero'].isin(tercero_sel)]
+
+    with col_f4:
+        # Filtro de fecha de creación (rango)
+        min_date = df_track_work['Fecha_Creacion'].min().date() if not df_track_work.empty else datetime.now().date() - timedelta(days=30)
+        max_date = df_track_work['Fecha_Creacion'].max().date() if not df_track_work.empty else datetime.now().date()
+        date_range = st.date_input("Rango de Creación:", [min_date, max_date], max_value=datetime.now().date())
+        
+        if len(date_range) == 2:
+            start_date = pd.to_datetime(date_range[0])
+            end_date = pd.to_datetime(date_range[1]) + timedelta(days=1) # Incluir el final del día
+            df_track_work = df_track_work[
+                (df_track_work['Fecha_Creacion'] >= start_date) & 
+                (df_track_work['Fecha_Creacion'] < end_date)
+            ]
+
+    st.markdown("---")
+    
+    # 2. TABLA DE GESTIÓN INTERACTIVA
+    st.subheader("Gestión de Órdenes Pendientes y en Curso")
+    
+    # Preparamos la tabla para el Data Editor
+    df_display_track = df_track_work.copy()
+    
+    # Formateo de columnas
+    df_display_track['Valor_Total_Fmt'] = df_display_track.apply(lambda x: f"${x['Valor_Total']:,.0f}" if x['Tipo'] == 'Compra' else 'N/A', axis=1)
+    df_display_track = df_display_track.sort_values(by='Fecha_Creacion', ascending=False)
+    
+    # Seleccionamos y renombramos columnas para la vista
+    df_display_track = df_display_track[[
+        'ID_Orden', 'Tipo', 'Fecha_Creacion', 'Tercero', 'Portafolio', 
+        'Estado', 'Fecha_Estimada_Llegada', 'Valor_Total_Fmt', 'Comentario'
+    ]]
+    df_display_track.columns = [
+        'ID', 'Tipo', 'Creada', 'Tercero/Ruta', 'Portafolio', 
+        'Estado Actual', 'Llegada Est.', 'Valor (Compra)', 'Notas'
     ]
-    df_track = pd.DataFrame(tracking_data)
+
     
-    st.dataframe(
-        df_track,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Estado": st.column_config.Column(width="medium"),
-            "Total": st.column_config.TextColumn(width="small"),
-            "Tipo": st.column_config.Column(width="small")
-        }
-    )
+    if df_display_track.empty:
+        st.warning("No hay órdenes que coincidan con los filtros seleccionados.")
+    else:
+        # Lógica de colores para los estados
+        def get_color_style(estado):
+            if 'Recibido' in estado: return 'background-color: #E8F8F5; color: #008000; font-weight: bold;' # Verde claro
+            if 'Tránsito' in estado: return 'background-color: #FFF9E8; color: #FFA500; font-weight: bold;' # Amarillo claro
+            if 'Despachado' in estado: return 'background-color: #E8F4FD; color: #2E86C1; font-weight: bold;' # Azul claro
+            if 'Pendiente' in estado: return 'background-color: #F8F8F8; color: #555555;' # Gris claro
+            if 'Cancelada' in estado or 'Rechazada' in estado: return 'background-color: #F9EBEA; color: #FF0000; font-weight: bold;' # Rojo claro
+            return ''
+
+        # Aplicamos el estilo de color (requiere una función de formato CSS en el dataframe)
+        st.dataframe(
+            df_display_track.style.applymap(get_color_style, subset=['Estado Actual']),
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                'ID': st.column_config.TextColumn("ID", width="small"),
+                'Tipo': st.column_config.TextColumn("Tipo", width="small"),
+                'Estado Actual': st.column_config.TextColumn("Estado Actual", width="medium"),
+                'Llegada Est.': st.column_config.DateColumn("Llegada Est.", format="YYYY-MM-DD", width="small"),
+                'Valor (Compra)': st.column_config.TextColumn("Valor (Compra)", width="small"),
+                'Notas': st.column_config.TextColumn("Notas", width="medium")
+            }
+        )
+
+    st.markdown("---")
     
-    c_refresh, c_void = st.columns([1, 4])
-    if c_refresh.button("🔄 Actualizar Estados (API Transportadora)"):
-        with st.spinner("Consultando GPS de transportadoras..."):
-            time.sleep(1.5)
-            st.success("Estados actualizados correctamente.")
+    # 3. ACCIONES Y MÉTRICAS DE APRENDIZAJE
+    st.subheader("Métricas Operativas Clave")
+    
+    # Simulación de KPIs de la Torre de Control
+    df_compra = st.session_state.df_tracking[st.session_state.df_tracking['Tipo'] == 'Compra']
+    oc_recibidas = len(df_compra[df_compra['Estado'].str.contains('Recibido')])
+    oc_totales = len(df_compra)
+    ot_recibidas = len(st.session_state.df_tracking[st.session_state.df_tracking['Tipo'] == 'Traslado']['Estado'].str.contains('Recibido'))
+    ot_totales = len(st.session_state.df_tracking[st.session_state.df_tracking['Tipo'] == 'Traslado'])
+    
+    col_kpi_t1, col_kpi_t2, col_kpi_t3 = st.columns(3)
+    
+    with col_kpi_t1:
+        tasa_cumplimiento = (oc_recibidas / oc_totales) * 100 if oc_totales > 0 else 0
+        st.metric(label="Cumplimiento OC (Recibidas/Total)", value=f"{tasa_cumplimiento:,.1f}%", delta_color="normal", delta=f"{oc_recibidas}/{oc_totales}")
+        st.caption("Mide la efectividad del proceso de compra.")
+
+    with col_kpi_t2:
+        # Tiempo promedio de entrega (Simulación)
+        tiempo_promedio = random.randint(18, 25) # Días
+        st.metric(label="Lead Time Prom. Proveedores", value=f"{tiempo_promedio} días", delta_color="inverse", delta=f"-2 días (vs mes ant.)")
+        st.caption("Métrica crítica para el reabastecimiento.")
+
+    with col_kpi_t3:
+        # Traslados completados
+        tasa_traslado = (ot_recibidas / ot_totales) * 100 if ot_totales > 0 else 0
+        st.metric(label="Efectividad de Traslados", value=f"{tasa_traslado:,.1f}%", delta_color="normal", delta=f"{ot_recibidas}/{ot_totales}")
+        st.caption("Indica la eficiencia en la redistribución interna.")
+
+    st.markdown("#### Tablero de Aprendizaje")
+    st.warning("🤖 En una implementación completa, esta sección mostraría un ranking de proveedores basado en **Lead Time**, **Faltantes** (inventario) y **Costo** (OC), permitiendo a NEXUS OPS optimizar continuamente las decisiones de compra.")
+    
+    if st.button("Simular Actualización de Estados de Órdenes", use_container_width=True):
+        st.toast("Simulando una actualización de estado en las órdenes...", icon="📡")
+        
+        # Lógica de gestión simulada: mover 1 orden pendiente a 'Despachado'
+        df_pending = st.session_state.df_tracking[st.session_state.df_tracking['Estado'].str.contains('Pendiente Aprobación')]
+        if not df_pending.empty:
+            idx = df_pending.index[0]
+            st.session_state.df_tracking.loc[idx, 'Estado'] = "🔵 Despachado (En Ruta)"
+            st.session_state.df_tracking.loc[idx, 'Fecha_Estimada_Llegada'] = (datetime.now() + timedelta(days=random.randint(5, 15))).strftime('%Y-%m-%d')
+            st.success(f"La orden **{st.session_state.df_tracking.loc[idx, 'ID_Orden']}** ha pasado a **Despachado**.")
+            st.rerun()
+        else:
+            st.info("No hay órdenes pendientes para simular el avance de estado.")
