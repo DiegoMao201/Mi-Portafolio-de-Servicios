@@ -362,12 +362,13 @@ with tab_trends:
         # GRÁFICO DE LINEAS (VENTAS DIARIAS)
         df_daily = df_mes.groupby('fecha').agg({'venta': 'sum'}).reset_index()
         fig_line = px.line(df_daily, x='fecha', y='venta', title="Evolución Diaria de Ventas", markers=True)
+        # --- CORRECCIÓN DEL ERROR ---
+        # Se eliminó el parámetro 'line_dict' que causaba el ValueError
         fig_line.update_layout(
             plot_bgcolor='rgba(0,0,0,0)',
             xaxis_title=None,
             yaxis_title="Venta ($)",
             height=350,
-            line_dict=dict(color='#3B82F6'),
             font=dict(family="Inter, sans-serif", color="#334155")
         )
         fig_line.update_traces(line_color='#2563EB', line_width=3)
