@@ -300,7 +300,7 @@ df_mes = df[df['mes_nombre'] == mes_sel].copy()
 st.markdown("""
 <div class="nexus-hero">
     <div>
-        <span class="nexus-badge">NEXUS COMMERCIAL v3.0</span>
+        <span class="nexus-badge">NEXUS PRO COMMERCIAL </span>
         <h1 style="margin: 10px 0 5px 0; font-size: 2rem; font-weight: 900; color: #0F172A;">Centro de Inteligencia Comercial</h1>
         <p style="color: #64748B; margin: 0; max-width: 700px; font-size: 1rem;">
             Tablero unificado que cruza <strong>transacciones en tiempo real</strong> con rentabilidad real.
