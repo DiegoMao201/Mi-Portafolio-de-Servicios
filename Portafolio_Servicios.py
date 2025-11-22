@@ -32,31 +32,33 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 img_path = os.path.join(current_dir, "assets", "foto_diego.png")
 img_base64 = get_img_as_base64(img_path)
 
-# Fallback: Si no encuentra la foto local, usa un icono genérico
+# Fallback: Si no encuentra la foto local, usa un icono genérico profesional
 foto_diego_src = f"data:image/png;base64,{img_base64}" if img_base64 else "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 
 # ==============================================================================
-# --- 3. CSS PREMIUM (ESTILOS + RESPONSIVIDAD) ---
+# --- 3. CSS PREMIUM (ESTILO CLARO / LIGHT THEME) ---
 # ==============================================================================
 st.markdown(f"""
 <style>
     /* IMPORTAR FUENTE */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
 
-    /* FONDO GENERAL */
+    /* --- FONDO GENERAL (LIGHT THEME) --- */
     .stApp {{
-        background-color: #0E1117;
-        color: #FFFFFF;
+        background-color: #FFFFFF; /* Fondo Blanco Puro */
+        background-image: radial-gradient(#F1F5F9 1px, transparent 1px); /* Puntos sutiles */
+        background-size: 20px 20px;
+        color: #1E293B; /* Texto Gris Oscuro (Slate 800) */
         font-family: 'Inter', sans-serif;
     }}
     
-    /* MODALES */
+    /* MODALES (Ventanas emergentes) */
     .custom-modal-box {{
-        background: linear-gradient(145deg, #111827, #1f2937);
-        padding: 20px;
+        background: #FFFFFF;
+        padding: 30px;
         border-radius: 15px;
-        border: 1px solid #374151;
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Sombra suave */
     }}
     
     .modal-header-icon {{
@@ -64,91 +66,87 @@ st.markdown(f"""
         text-align: center;
         display: block;
         margin-bottom: 10px;
-        text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
     }}
 
     .modal-title {{
-        color: #FFFFFF !important;
+        color: #0F172A !important; /* Texto casi negro */
         font-family: 'Inter', sans-serif;
         font-weight: 800;
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         text-align: center;
         margin-bottom: 15px;
-        background: -webkit-linear-gradient(0deg, #38bdf8, #818cf8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
     }}
 
     .modal-body-text {{
-        color: #E5E7EB !important;
-        font-size: 0.95rem;
-        line-height: 1.5;
-        margin-bottom: 20px;
+        color: #475569 !important; /* Gris medio para lectura */
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 25px;
         text-align: justify;
     }}
 
     .modal-list-container {{
-        background-color: rgba(255, 255, 255, 0.03);
+        background-color: #F8FAFC; /* Gris muy claro */
         border-radius: 10px;
-        padding: 15px;
-        border: 1px solid rgba(255,255,255,0.05);
+        padding: 20px;
+        border: 1px solid #E2E8F0;
     }}
 
     .modal-item {{
         display: flex;
         align-items: flex-start;
-        margin-bottom: 8px;
-        color: #D1D5DB;
-        font-size: 0.9rem;
+        margin-bottom: 12px;
+        color: #334155;
+        font-size: 0.95rem;
     }}
 
     .modal-bullet {{
-        color: #06B6D4;
+        color: #2563EB; /* Azul Royal */
         font-size: 1.1rem;
-        margin-right: 8px;
+        margin-right: 10px;
         line-height: 1.2;
     }}
     
     .modal-highlight {{
-        color: #38BDF8;
+        color: #0369A1; /* Azul oscuro fuerte */
         font-weight: 700;
     }}
 
     .modal-quote {{
         text-align: center; 
-        margin-top: 20px; 
-        color: #94a3b8; 
+        margin-top: 25px; 
+        color: #64748B; 
         font-style: italic; 
-        font-size: 0.85rem;
-        border-top: 1px solid rgba(255,255,255,0.1);
-        padding-top: 10px;
+        font-size: 0.9rem;
+        border-top: 1px solid #E2E8F0;
+        padding-top: 15px;
     }}
 
-    /* HERO SECTION */
+    /* HERO SECTION (Encabezado) */
     .hero-container {{
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: 50px 20px 30px 20px;
-        background: radial-gradient(circle at center, #1a202c 0%, #0E1117 70%);
-        border-bottom: 1px solid #2d3748;
-        margin-bottom: 40px;
+        padding: 60px 20px 40px 20px;
+        background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+        border-bottom: 1px solid #E2E8F0;
+        margin-bottom: 50px;
     }}
 
     .company-tag {{
-        background-color: rgba(6, 182, 212, 0.15);
-        color: #22d3ee;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-size: 0.8rem;
+        background-color: #E0F2FE; /* Azul muy pálido */
+        color: #0284C7; /* Azul corporativo */
+        padding: 6px 18px;
+        border-radius: 30px;
+        font-size: 0.85rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 2px;
-        margin-bottom: 15px;
-        border: 1px solid rgba(6, 182, 212, 0.4);
-        box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+        margin-bottom: 20px;
+        border: 1px solid #BAE6FD;
     }}
 
     .main-title {{
@@ -156,9 +154,8 @@ st.markdown(f"""
         font-weight: 900;
         margin: 0;
         line-height: 1.1;
-        background: linear-gradient(90deg, #FFFFFF 20%, #cbd5e1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #0F172A; /* Slate 900 */
+        letter-spacing: -2px;
     }}
 
     /* Ajuste tamaño título en móvil */
@@ -169,56 +166,67 @@ st.markdown(f"""
     }}
 
     .highlight-text {{
-        background: linear-gradient(90deg, #3b82f6, #06B6D4);
+        background: linear-gradient(90deg, #2563EB, #0891B2);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }}
     
     .subtitle {{
-        font-size: 1.2rem;
-        color: #E2E8F0;
-        max-width: 700px;
-        margin-top: 20px;
+        font-size: 1.25rem;
+        color: #64748B; /* Gris elegante */
+        max-width: 750px;
+        margin-top: 25px;
         line-height: 1.6;
         font-weight: 400;
     }}
 
-    /* CARDS */
+    /* CARDS (Tarjetas de Módulos) */
     .flow-card {{
-        background: rgba(30, 41, 59, 0.75);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 30px;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        padding: 35px;
         border-radius: 20px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: all 0.3s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }}
     
     .flow-card:hover {{
-        transform: translateY(-10px) scale(1.02);
-        background: rgba(30, 41, 59, 1);
-        border-color: #3b82f6;
-        box-shadow: 0 20px 40px -12px rgba(37, 99, 235, 0.5);
+        transform: translateY(-8px);
+        border-color: #2563EB;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }}
 
-    .card-icon {{ font-size: 3rem; margin-bottom: 15px; }}
-    .card-title {{ font-size: 1.4rem; font-weight: 700; color: #FFFFFF; margin-bottom: 10px; }}
-    .card-desc {{ font-size: 0.95rem; color: #cbd5e1; margin-bottom: 20px; line-height: 1.5; }}
+    .card-icon {{ font-size: 3rem; margin-bottom: 20px; }}
+    
+    .card-title {{ 
+        font-size: 1.5rem; 
+        font-weight: 700; 
+        color: #1E293B; 
+        margin-bottom: 12px; 
+    }}
+    
+    .card-desc {{ 
+        font-size: 1rem; 
+        color: #64748B; 
+        margin-bottom: 25px; 
+        line-height: 1.5; 
+    }}
 
     /* --- PERFIL (RESPONSIVE FIX) --- */
     .profile-box {{
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        background: #FFFFFF;
         padding: 40px;
         border-radius: 25px;
-        border: 1px solid rgba(51, 65, 85, 0.7);
-        margin-top: 50px;
+        border: 1px solid #E2E8F0;
+        margin-top: 60px;
         display: flex;
         align-items: center; /* Centrado vertical en desktop */
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        flex-direction: row; /* Defecto Desktop: Fila */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08); /* Sombra elegante */
+        flex-direction: row; 
     }}
     
     .profile-img {{
@@ -226,10 +234,10 @@ st.markdown(f"""
         height: 150px;
         border-radius: 50%;
         object-fit: cover;
-        border: 4px solid #06B6D4;
-        margin-right: 30px;
-        box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
-        flex-shrink: 0; /* Evita que la imagen se aplaste */
+        border: 4px solid #FFFFFF;
+        margin-right: 40px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0; 
     }}
 
     .profile-content {{
@@ -237,101 +245,111 @@ st.markdown(f"""
     }}
 
     .profile-quote {{
-        color: #E2E8F0; 
-        font-size: 1.1rem; 
+        color: #475569; 
+        font-size: 1.15rem; 
         line-height: 1.8; 
         font-style: italic; 
-        border-left: 4px solid #06B6D4; 
-        padding-left: 20px;
+        border-left: 4px solid #0EA5E9; /* Borde cian/azul */
+        padding-left: 25px;
     }}
 
     .profile-tags {{
-        margin-top: 20px; 
+        margin-top: 25px; 
         display: flex; 
-        gap: 10px; 
+        gap: 12px; 
         flex-wrap: wrap;
     }}
 
-    /* --- MEDIA QUERY PARA MÓVILES (Aquí está la magia) --- */
+    .tag-pill {{
+        background-color: #F1F5F9;
+        color: #334155;
+        border: 1px solid #CBD5E1;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }}
+
+    /* --- MEDIA QUERY PARA MÓVILES --- */
     @media only screen and (max-width: 768px) {{
         .profile-box {{
-            flex-direction: column; /* Cambia a columna vertical */
-            text-align: center;     /* Centra todo el texto */
+            flex-direction: column; 
+            text-align: center;     
             padding: 30px 20px;
         }}
 
         .profile-img {{
-            margin-right: 0;        /* Quita margen derecho */
-            margin-bottom: 20px;    /* Añade espacio abajo */
-            width: 130px;           /* Un poco más pequeña */
-            height: 130px;
+            margin-right: 0;       
+            margin-bottom: 20px;    
+            width: 120px;           
+            height: 120px;
         }}
 
         .profile-quote {{
-            border-left: none;      /* Quita la barra lateral */
-            border-top: 3px solid #06B6D4; /* Pone barra arriba */
+            border-left: none;      
+            border-top: 3px solid #0EA5E9; 
             padding-left: 0;
-            padding-top: 15px;
+            padding-top: 20px;
             font-size: 1rem;
         }}
 
         .profile-tags {{
-            justify-content: center; /* Centra las etiquetas */
+            justify-content: center; 
         }}
     }}
 
     /* BOTONES */
     div.stButton > button {{
         width: 100%;
-        background: linear-gradient(90deg, #2563EB 0%, #06B6D4 100%);
+        background: linear-gradient(135deg, #2563EB 0%, #0284C7 100%);
         color: white;
         border: none;
         padding: 12px 20px;
-        font-weight: 700;
-        border-radius: 8px;
+        font-weight: 600;
+        border-radius: 10px;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
     }}
     
     div.stButton > button:hover {{
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.5);
     }}
 
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# --- 4. DEFINICIÓN DE MODALES ---
+# --- 4. DEFINICIÓN DE MODALES (CONTENIDO) ---
 # ==============================================================================
 
 @st.dialog("📊 INVENTARIOS & ESTRATEGIA")
 def open_inventory_modal():
     st.markdown("""
     <div class="custom-modal-box">
-    <div class="modal-header-icon">🧠</div>
-    <h2 class="modal-title">Del Caos Reactivo a la Precisión Predictiva</h2>
-    <div class="modal-body-text">
-    La gestión tradicional basada en "intuición" está costando millones. 
-    Este módulo no es solo un registro; es un <b>cerebro financiero</b> que protege su capital.
-    </div>
-    <div class="modal-list-container">
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Análisis de Capital (IA):</span> Detecta dónde está atrapado el dinero (excedentes) y dónde pierde ventas (quiebres).</div>
-    </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Predicción de Demanda:</span> Algoritmos que anticipan qué venderá mañana, optimizando el flujo de caja hoy.</div>
-    </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Visión Gerencial 360°:</span> KPIs en tiempo real sobre la salud financiera de su stock.</div>
-    </div>
-    </div>
-    <div class="modal-quote">
-    "El resultado: Menos stock obsoleto, más liquidez."
-    </div>
+        <div class="modal-header-icon">🧠</div>
+        <h2 class="modal-title">Del Caos Reactivo a la Precisión Predictiva</h2>
+        <div class="modal-body-text">
+            La gestión tradicional basada en "intuición" está costando millones. 
+            Este módulo no es solo un registro; es un <b>cerebro financiero</b> que protege su capital.
+        </div>
+        <div class="modal-list-container">
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Análisis de Capital (IA):</span> Detecta dónde está atrapado el dinero (excedentes) y dónde pierde ventas (quiebres).</div>
+            </div>
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Predicción de Demanda:</span> Algoritmos que anticipan qué venderá mañana, optimizando el flujo de caja hoy.</div>
+            </div>
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Visión Gerencial 360°:</span> KPIs en tiempo real sobre la salud financiera de su stock.</div>
+            </div>
+        </div>
+        <div class="modal-quote">
+            "El resultado: Menos stock obsoleto, más liquidez."
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -343,29 +361,29 @@ def open_inventory_modal():
 def open_logistics_modal():
     st.markdown("""
     <div class="custom-modal-box">
-    <div class="modal-header-icon">⚡</div>
-    <h2 class="modal-title">Sistema Nervioso de la Cadena de Suministro</h2>
-    <div class="modal-body-text">
-    Convertimos las necesidades en acciones. Este es el motor operativo que asegura 
-    que el producto correcto esté en el lugar correcto, al menor costo posible.
-    </div>
-    <div class="modal-list-container">
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Compras Inteligentes:</span> Generación automática de órdenes basadas en consumo real y Lead Time.</div>
-    </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Balanceo de Red:</span> Detecta excesos en la Sede A y faltantes en la Sede B, sugiriendo traslados automáticos.</div>
-    </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Torre de Control:</span> Visibilidad total del estado de pedidos y movimientos en curso.</div>
-    </div>
-    </div>
-    <div class="modal-quote">
-    "El resultado: Compras precisas y agilidad operativa."
-    </div>
+        <div class="modal-header-icon">⚡</div>
+        <h2 class="modal-title">Sistema Nervioso de la Cadena de Suministro</h2>
+        <div class="modal-body-text">
+            Convertimos las necesidades en acciones. Este es el motor operativo que asegura 
+            que el producto correcto esté en el lugar correcto, al menor costo posible.
+        </div>
+        <div class="modal-list-container">
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Compras Inteligentes:</span> Generación automática de órdenes basadas en consumo real y Lead Time.</div>
+            </div>
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Balanceo de Red:</span> Detecta excesos en la Sede A y faltantes en la Sede B, sugiriendo traslados automáticos.</div>
+            </div>
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Torre de Control:</span> Visibilidad total del estado de pedidos y movimientos en curso.</div>
+            </div>
+        </div>
+        <div class="modal-quote">
+            "El resultado: Compras precisas y agilidad operativa."
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -377,29 +395,29 @@ def open_logistics_modal():
 def open_reception_modal():
     st.markdown("""
     <div class="custom-modal-box">
-    <div class="modal-header-icon">🛡️</div>
-    <h2 class="modal-title">Blindaje Total de Entrada de Mercancía</h2>
-    <div class="modal-body-text">
-    El 80% de los errores de inventario nacen en la recepción. Este módulo elimina la digitación manual 
-    usando la Factura Electrónica (XML DIAN) como única fuente de verdad.
-    </div>
-    <div class="modal-list-container">
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Homologación Automática:</span> Cruce instantáneo de referencias del proveedor vs. catálogo interno.</div>
-    </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Conciliación Ciega:</span> Compara el conteo físico real contra el XML digital, alertando faltantes al instante.</div>
-    </div>
-    <div class="modal-item">
-    <span class="modal-bullet">➤</span>
-    <div><span class="modal-highlight">Integridad de Datos:</span> Garantiza que lo que paga es exactamente lo que entró a bodega.</div>
-    </div>
-    </div>
-    <div class="modal-quote">
-    "El resultado: Cero errores humanos, control fiscal total."
-    </div>
+        <div class="modal-header-icon">🛡️</div>
+        <h2 class="modal-title">Blindaje Total de Entrada de Mercancía</h2>
+        <div class="modal-body-text">
+            El 80% de los errores de inventario nacen en la recepción. Este módulo elimina la digitación manual 
+            usando la Factura Electrónica (XML DIAN) como única fuente de verdad.
+        </div>
+        <div class="modal-list-container">
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Homologación Automática:</span> Cruce instantáneo de referencias del proveedor vs. catálogo interno.</div>
+            </div>
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Conciliación Ciega:</span> Compara el conteo físico real contra el XML digital, alertando faltantes al instante.</div>
+            </div>
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Integridad de Datos:</span> Garantiza que lo que paga es exactamente lo que entró a bodega.</div>
+            </div>
+        </div>
+        <div class="modal-quote">
+            "El resultado: Cero errores humanos, control fiscal total."
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -408,7 +426,7 @@ def open_reception_modal():
         st.switch_page("pages/3_Recepcion_Inteligente.py")
 
 # ==============================================================================
-# --- 5. ESTRUCTURA PRINCIPAL ---
+# --- 5. ESTRUCTURA PRINCIPAL DEL UI ---
 # ==============================================================================
 
 # >>> HERO SECTION
@@ -425,9 +443,9 @@ st.markdown("""
 
 # >>> GRID DE MÓDULOS
 st.write("")
-st.markdown("<h3 style='text-align: center; margin-bottom: 50px; font-size: 2rem;'>🚀 Ecosistema NEXUS: Explore el Valor de Negocio</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; margin-bottom: 50px; font-size: 1.8rem; color: #334155;'>🚀 Ecosistema NEXUS: Explore el Valor de Negocio</h3>", unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3, gap="medium")
+col1, col2, col3 = st.columns(3, gap="large")
 
 # --- CARD 1 ---
 with col1:
@@ -471,28 +489,27 @@ with col3:
     if st.button("Explorar Módulo ➝", key="b3"):
         open_reception_modal()
 
-# >>> PERFIL LÍDER (CORREGIDO PARA MÓVIL)
+# >>> PERFIL LÍDER
 st.write("")
 st.write("")
 
 c_spacer_l, c_profile, c_spacer_r = st.columns([1, 6, 1])
 
 with c_profile:
-    # Nota: He reestructurado el HTML para usar las clases CSS nuevas que manejan la responsividad
     st.markdown(f"""
     <div class="profile-box">
         <img src="{foto_diego_src}" class="profile-img" alt="Diego Mauricio García">
         <div class="profile-content">
-            <h4 style="color: #06B6D4; margin:0 0 10px 0; font-weight: 800; letter-spacing:1.5px;">ARQUITECTURA & VISIÓN</h4>
-            <h2 style="color: white; margin: 0 0 20px 0; font-size: 2.5rem;">Diego Mauricio García</h2>
+            <h4 style="color: #0284C7; margin:0 0 10px 0; font-weight: 800; letter-spacing:1px; font-size: 0.9rem;">ARQUITECTURA & VISIÓN</h4>
+            <h2 style="color: #0F172A; margin: 0 0 20px 0; font-size: 2.2rem; font-weight: 900;">Diego Mauricio García</h2>
             <p class="profile-quote">
                 "En GM-Datovate no vendemos software, diseñamos el sistema nervioso de su organización. 
                 Mi obsesión es eliminar la fricción operativa mediante arquitecturas de datos que piensan, aprenden y actúan por sí mismas."
             </p>
             <div class="profile-tags">
-                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">CEO & Founder</span>
-                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Data Architect</span>
-                <span style="background: rgba(15,23,42,0.6); border: 1px solid #06B6D4; color: #06B6D4; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem;">Python Expert</span>
+                <span class="tag-pill">CEO & Founder</span>
+                <span class="tag-pill">Data Architect</span>
+                <span class="tag-pill">Python Expert</span>
             </div>
         </div>
     </div>
@@ -500,4 +517,4 @@ with c_profile:
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: #64748B; margin-bottom: 40px;'>© 2025 GM-DATOVATE. Todos los derechos reservados.</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: #94A3B8; margin-bottom: 40px; font-size: 0.85rem;'>© 2025 GM-DATOVATE. Todos los derechos reservados.</div>", unsafe_allow_html=True)
