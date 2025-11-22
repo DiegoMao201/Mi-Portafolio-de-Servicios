@@ -267,7 +267,7 @@ c_head1, c_head2 = st.columns([0.8, 8])
 with c_head1:
     st.markdown("<div style='font-size: 45px; text-align: center;'>⚡</div>", unsafe_allow_html=True)
 with c_head2:
-    st.title("NEXUS PRO | Inteligencia de Inventarios")
+    st.title("NEXUS PRO | Control & Estrategia")
     st.markdown("<span style='color: #64748B;'>Tablero de control ejecutivo para la toma de decisiones estratégicas.</span>", unsafe_allow_html=True)
 
 st.write("")
