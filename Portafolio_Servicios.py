@@ -11,7 +11,7 @@ if 'pages' not in sys.path:
     # En un entorno real, Streamlit lo maneja automáticamente.
     try:
         # Simula la navegación de archivos
-        pass 
+        pass
     except:
         pass
 
@@ -36,7 +36,7 @@ st.set_page_config(
 def get_img_as_base64(file_path):
     """Convierte imágenes locales a base64 para usar en HTML/CSS."""
     # SIMULACIÓN: Usamos un fallback genérico profesional.
-    return None 
+    return None
 
 # Carga de imagen de perfil (usará el fallback)
 img_base64 = get_img_as_base64("assets/foto_diego.png")
@@ -283,19 +283,19 @@ st.markdown(f"""
     @media only screen and (max-width: 768px) {{
         .profile-box {{
             flex-direction: column; 
-            text-align: center;    
+            text-align: center;   
             padding: 30px 20px;
         }}
 
         .profile-img {{
-            margin-right: 0;       
+            margin-right: 0;        
             margin-bottom: 20px;   
-            width: 120px;          
+            width: 120px;           
             height: 120px;
         }}
 
         .profile-quote {{
-            border-left: none;     
+            border-left: none;      
             border-top: 3px solid #0EA5E9; 
             padding-left: 0;
             padding-top: 20px;
@@ -375,33 +375,40 @@ def open_inventory_modal():
 
 @st.dialog("🚚 LOGÍSTICA & ABASTECIMIENTO")
 def open_logistics_modal():
+    # --- CONTENIDO ACTUALIZADO PARA REFLEJAR LAS 4 PESTAÑAS DEL MÓDULO 2 ---
     st.markdown("""
     <div class="custom-modal-box">
         <div class="modal-header-icon">⚡</div>
         <h2 class="modal-title">Sistema Nervioso de la Cadena de Suministro</h2>
         <div class="modal-body-text">
             Convertimos las necesidades en acciones. Este es el motor operativo que asegura 
-            que el producto correcto esté en el lugar correcto, al menor costo posible.
+            que el producto correcto esté en el lugar correcto, al menor costo posible, 
+            proporcionando control total sobre el flujo de mercancía.
         </div>
         <div class="modal-list-container">
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Compras Inteligentes:</span> Generación automática de órdenes basadas en consumo real y Lead Time.</div>
+                <div><span class="modal-highlight">Pestaña 1: Diagnóstico Estratégico.</span> Gráfico Sunburst y KPIs para identificar la salud del inventario y el capital inmovilizado.</div>
             </div>
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Balanceo de Red:</span> Detecta excesos en la Sede A y faltantes en la Sede B, sugiriendo traslados automáticos.</div>
+                <div><span class="modal-highlight">Pestaña 2: Gestión de Traslados.</span> Balanceo de red: sugiere traslados de excedentes de la Sede A para cubrir faltantes en la Sede B, generando el documento al instante.</div>
             </div>
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Torre de Control:</span> Visibilidad total del estado de pedidos y movimientos en curso.</div>
+                <div><span class="modal-highlight">Pestaña 3: Gestión de Compras.</span> Genera automáticamente Órdenes de Compra al proveedor con las cantidades sugeridas por el algoritmo (demanda, stock de seguridad).</div>
+            </div>
+            <div class="modal-item">
+                <span class="modal-bullet">➤</span>
+                <div><span class="modal-highlight">Pestaña 4: Torre de Control.</span> Visibilidad 360° en tiempo real del estado de cada pedido de compra y traslado.</div>
             </div>
         </div>
         <div class="modal-quote">
-            "El resultado: Compras precisas y agilidad operativa."
+            "El resultado: Compras precisas, agilidad operativa y menos quiebres de stock."
         </div>
     </div>
     """, unsafe_allow_html=True)
+    # --- FIN CONTENIDO ACTUALIZADO ---
     
     st.write("")
     if st.button("🚀 IR AL DEMO: CENTRO LOGÍSTICO", key="btn_go_log"):
