@@ -263,7 +263,7 @@ if filtro_marca:
 # --- 6. UI: ENCABEZADO PRINCIPAL ---
 col_h1, col_h2 = st.columns([3, 1])
 with col_h1:
-    st.title("🏭 Centro de Control Logístico")
+    st.title("🏭 Abastecimiento Inteligente")
     st.markdown("Gestión unificada de abastecimiento, inventarios y distribución.")
 with col_h2:
     if st.button("🔄 Actualizar Análisis"):
