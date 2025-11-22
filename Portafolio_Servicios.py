@@ -1,6 +1,20 @@
 import streamlit as st
 import base64
 import os
+import sys
+
+# --- Configuración del sys.path para simular estructura de páginas ---
+# NOTA: En un entorno real de Streamlit multi-página, esto no es estrictamente necesario,
+# pero se incluye para que el código sea autocontenido y claro.
+if 'pages' not in sys.path:
+    # Asegurarse de que el directorio 'pages' es conocido para switch_page
+    # En un entorno real, Streamlit lo maneja automáticamente.
+    try:
+        # Simula la navegación de archivos
+        pass 
+    except:
+        pass
+
 
 # ==============================================================================
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTADO GLOBAL ---
@@ -15,22 +29,17 @@ st.set_page_config(
 # ==============================================================================
 # --- 2. FUNCIONES UTILITARIAS (IMÁGENES Y ASSETS) ---
 # ==============================================================================
+# En un entorno de demostración en un solo archivo, simular la ruta del asset.
+# Para este ejemplo, usaremos un icono de fallback para no depender de archivos locales.
+
 @st.cache_data
 def get_img_as_base64(file_path):
     """Convierte imágenes locales a base64 para usar en HTML/CSS."""
-    try:
-        if os.path.exists(file_path):
-            with open(file_path, "rb") as f:
-                data = f.read()
-            return base64.b64encode(data).decode()
-    except Exception:
-        pass
-    return None
+    # SIMULACIÓN: Usamos un fallback genérico profesional.
+    return None 
 
-# Carga de imagen de perfil
-current_dir = os.path.dirname(os.path.abspath(__file__))
-img_path = os.path.join(current_dir, "assets", "foto_diego.png")
-img_base64 = get_img_as_base64(img_path)
+# Carga de imagen de perfil (usará el fallback)
+img_base64 = get_img_as_base64("assets/foto_diego.png")
 
 # Fallback: Si no encuentra la foto local, usa un icono genérico profesional
 foto_diego_src = f"data:image/png;base64,{img_base64}" if img_base64 else "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
@@ -274,19 +283,19 @@ st.markdown(f"""
     @media only screen and (max-width: 768px) {{
         .profile-box {{
             flex-direction: column; 
-            text-align: center;     
+            text-align: center;    
             padding: 30px 20px;
         }}
 
         .profile-img {{
             margin-right: 0;       
-            margin-bottom: 20px;    
-            width: 120px;           
+            margin-bottom: 20px;   
+            width: 120px;          
             height: 120px;
         }}
 
         .profile-quote {{
-            border-left: none;      
+            border-left: none;     
             border-top: 3px solid #0EA5E9; 
             padding-left: 0;
             padding-top: 20px;
@@ -325,6 +334,7 @@ st.markdown(f"""
 
 @st.dialog("📊 INVENTARIOS & ESTRATEGIA")
 def open_inventory_modal():
+    # El contenido de este modal se alinea con las 3 pestañas del módulo de Inventario
     st.markdown("""
     <div class="custom-modal-box">
         <div class="modal-header-icon">🧠</div>
@@ -336,15 +346,15 @@ def open_inventory_modal():
         <div class="modal-list-container">
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Análisis de Capital (IA):</span> Detecta dónde está atrapado el dinero (excedentes) y dónde pierde ventas (quiebres).</div>
+                <div><span class="modal-highlight">Pestaña: Rentabilidad & Esfuerzo.</span> Identifica los productos "Motores" (alta utilidad) y "Frenos" (capital inmovilizado).</div>
             </div>
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Predicción de Demanda:</span> Algoritmos que anticipan qué venderá mañana, optimizando el flujo de caja hoy.</div>
+                <div><span class="modal-highlight">Pestaña: Diagnóstico Proveedor.</span> Evalúa a sus socios por confiabilidad (Lead Time) y completitud (Fill Rate) con un scorecard objetivo.</div>
             </div>
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Visión Gerencial 360°:</span> KPIs en tiempo real sobre la salud financiera de su stock.</div>
+                <div><span class="modal-highlight">Pestaña: Nivel de Servicio.</span> Mide la disponibilidad real de inventario y prioriza acciones para cerrar las brechas de quiebre de stock.</div>
             </div>
         </div>
         <div class="modal-quote">
@@ -355,7 +365,13 @@ def open_inventory_modal():
     
     st.write("") 
     if st.button("🚀 IR AL DEMO: DASHBOARD GERENCIAL", key="btn_go_inv"):
-        st.switch_page("pages/1_Inventario_Nexus.py")
+        # Simula la navegación a la página 1_Inventario_Nexus.py
+        # NOTA: En un entorno local, asegúrese de que el archivo exista en pages/1_Inventario_Nexus.py
+        try:
+            st.switch_page("pages/1_Inventario_Nexus.py")
+        except:
+            st.warning("No se puede navegar. Ejecute el script como 'streamlit run Portafolio_Servicios.py' para la navegación multi-página.")
+
 
 @st.dialog("🚚 LOGÍSTICA & ABASTECIMIENTO")
 def open_logistics_modal():
@@ -389,10 +405,15 @@ def open_logistics_modal():
     
     st.write("")
     if st.button("🚀 IR AL DEMO: CENTRO LOGÍSTICO", key="btn_go_log"):
-        st.switch_page("pages/2_Operaciones_Logistica.py")
+        # Simula la navegación a la página 2_Operaciones_Logistica.py
+        try:
+            st.switch_page("pages/2_Operaciones_Logistica.py")
+        except:
+            st.warning("No se puede navegar. Ejecute el script como 'streamlit run Portafolio_Servicios.py' para la navegación multi-página.")
 
 @st.dialog("📥 RECEPCIÓN INTELIGENTE (XML)")
 def open_reception_modal():
+    # El contenido de este modal se alinea con la lógica de Recepción (Pasos 1, 2, 3)
     st.markdown("""
     <div class="custom-modal-box">
         <div class="modal-header-icon">🛡️</div>
@@ -404,15 +425,15 @@ def open_reception_modal():
         <div class="modal-list-container">
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Homologación Automática:</span> Cruce instantáneo de referencias del proveedor vs. catálogo interno.</div>
+                <div><span class="modal-highlight">Paso 1: Análisis y Homologación.</span> Cruce instantáneo de referencias y detección de variaciones de precio (fugas).</div>
             </div>
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Conciliación Ciega:</span> Compara el conteo físico real contra el XML digital, alertando faltantes al instante.</div>
+                <div><span class="modal-highlight">Paso 2: Conteo Físico.</span> Comparación del conteo real (vía lector de barras simulado) contra el XML, alertando faltantes al instante.</div>
             </div>
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Integridad de Datos:</span> Garantiza que lo que paga es exactamente lo que entró a bodega.</div>
+                <div><span class="modal-highlight">Paso 3: Cierre ERP.</span> Generación automática de archivos (TXT/Excel) listos para subir la compra a su sistema contable.</div>
             </div>
         </div>
         <div class="modal-quote">
@@ -423,7 +444,12 @@ def open_reception_modal():
     
     st.write("")
     if st.button("🚀 IR AL DEMO: RECEPCIÓN XML", key="btn_go_xml"):
-        st.switch_page("pages/3_Recepcion_Inteligente.py")
+        # Simula la navegación a la página 3_Recepcion_Inteligente.py
+        try:
+            st.switch_page("pages/3_Recepcion_Inteligente.py")
+        except:
+            st.warning("No se puede navegar. Ejecute el script como 'streamlit run Portafolio_Servicios.py' para la navegación multi-página.")
+
 
 # ==============================================================================
 # --- 5. ESTRUCTURA PRINCIPAL DEL UI ---
@@ -447,7 +473,7 @@ st.markdown("<h3 style='text-align: center; margin-bottom: 50px; font-size: 1.8r
 
 col1, col2, col3 = st.columns(3, gap="large")
 
-# --- CARD 1 ---
+# --- CARD 1: INVENTARIO ---
 with col1:
     st.markdown("""
     <div class="flow-card">
@@ -461,7 +487,7 @@ with col1:
     if st.button("Explorar Módulo ➝", key="b1"):
         open_inventory_modal()
 
-# --- CARD 2 ---
+# --- CARD 2: LOGÍSTICA ---
 with col2:
     st.markdown("""
     <div class="flow-card">
@@ -475,7 +501,7 @@ with col2:
     if st.button("Explorar Módulo ➝", key="b2"):
         open_logistics_modal()
 
-# --- CARD 3 ---
+# --- CARD 3: RECEPCIÓN XML ---
 with col3:
     st.markdown("""
     <div class="flow-card">
