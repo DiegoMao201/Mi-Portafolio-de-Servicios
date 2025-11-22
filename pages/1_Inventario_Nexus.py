@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+import time
 
 # ==============================================================================
 # --- 1. CONFIGURACIÓN DE PÁGINA ---
@@ -84,6 +85,24 @@ st.markdown("""
         border-radius: 8px;
         box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3);
     }
+    
+    /* CAJAS DE ACCIÓN */
+    .action-box-red {
+        background: #FEF2F2; 
+        padding: 20px; 
+        border-radius: 10px; 
+        border: 1px solid #FECACA;
+        border-left: 5px solid #EF4444;
+        height: 100%;
+    }
+    .action-box-blue {
+        background: #EFF6FF; 
+        padding: 20px; 
+        border-radius: 10px; 
+        border: 1px solid #BFDBFE;
+        border-left: 5px solid #3B82F6;
+        height: 100%;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -115,18 +134,22 @@ def generar_data_avanzada():
             demanda = np.random.poisson(25)
             stock = int(demanda * np.random.uniform(0, 5))
             
-            # Datos Proveedor
+            # Datos Proveedor Base
             prov = np.random.choice(proveedores_list)
-            # Simulamos cumplimiento: DistriGlobal es bueno, MegaTools es malo
+            
+            # Simulación de métricas proveedor para evaluación
             if prov == 'DistriGlobal':
                 lead_time = np.random.randint(2, 5)
                 fill_rate = np.random.uniform(0.95, 1.0)
+                post_venta = np.random.uniform(8, 10)
             elif prov == 'MegaTools':
                 lead_time = np.random.randint(10, 25)
                 fill_rate = np.random.uniform(0.70, 0.90)
+                post_venta = np.random.uniform(4, 7)
             else:
                 lead_time = np.random.randint(5, 15)
                 fill_rate = np.random.uniform(0.85, 0.98)
+                post_venta = np.random.uniform(6, 9)
 
             meses_cob = stock / demanda if demanda > 0 else 99
             
@@ -135,7 +158,6 @@ def generar_data_avanzada():
             elif meses_cob > 4: estado = "🔵 Excedente"
             else: estado = "🟢 Óptimo"
             
-            # Rentabilidad bruta mensual estimada
             utilidad_mensual = (precio - costo) * demanda
 
             data.append({
@@ -152,13 +174,72 @@ def generar_data_avanzada():
                 'Demanda_Mes': demanda,
                 'Valor_Inventario': stock * costo,
                 'Lead_Time_Real': lead_time,
-                'Fill_Rate': fill_rate, # Porcentaje de entrega completa
+                'Fill_Rate': fill_rate, 
+                'Post_Venta': post_venta,
                 'Estado': estado
             })
             
     return pd.DataFrame(data)
 
 df = generar_data_avanzada()
+
+# --- FUNCIÓN LÓGICA DE RECOMENDACIÓN DE PROVEEDOR ---
+def recomendar_mejor_proveedor(row):
+    """
+    Simula una licitación rápida entre los 4 proveedores para este producto.
+    Criterios: 80% Precio, 10% Tiempo, 5% Fill Rate, 5% Postventa.
+    Devuelve el nombre del proveedor ganador.
+    """
+    proveedores_sim = ['DistriGlobal', 'FerreAbastos', 'MegaTools', 'Importados SA']
+    scores = {}
+    
+    # Costo base del producto
+    costo_base = row['Costo']
+    
+    for p in proveedores_sim:
+        # Simulamos variaciones de oferta por proveedor
+        if p == 'DistriGlobal':
+            factor_precio = 1.05 # Más caro
+            tiempo = 3
+            fill = 0.98
+            post = 9.0
+        elif p == 'MegaTools':
+            factor_precio = 0.90 # Muy barato
+            tiempo = 20 # Lento
+            fill = 0.80
+            post = 5.0
+        elif p == 'Importados SA':
+            factor_precio = 0.95 
+            tiempo = 10 
+            fill = 0.90
+            post = 7.0
+        else: # FerreAbastos (Promedio)
+            factor_precio = 1.00
+            tiempo = 7
+            fill = 0.92
+            post = 8.0
+            
+        precio_oferta = costo_base * factor_precio
+        
+        # Normalización (Simplificada para score 0-100)
+        # Precio: Menor es mejor. Usamos inverso.
+        score_precio = (costo_base / precio_oferta) * 100 
+        # Tiempo: Menor es mejor.
+        score_tiempo = (1 / tiempo) * 1000 # Factor de escala arbitrario para normalizar
+        if score_tiempo > 100: score_tiempo = 100
+        # Fill Rate: Directo
+        score_fill = fill * 100
+        # Post Venta: Directo (es sobre 10, escalamos a 100)
+        score_post = post * 10
+        
+        # PONDERACIÓN DEL CLIENTE
+        # 80% Precio, 10% Tiempo, 5% Unidades, 5% Postventa
+        final_score = (score_precio * 0.80) + (score_tiempo * 0.10) + (score_fill * 0.05) + (score_post * 0.05)
+        scores[p] = final_score
+
+    # Retorna el proveedor con max score
+    mejor_proveedor = max(scores, key=scores.get)
+    return mejor_proveedor
 
 # ==============================================================================
 # --- 4. SIDEBAR Y FILTROS ---
@@ -195,8 +276,8 @@ st.write("")
 # --- 6. INSIGHTS & KPIs ---
 # ==============================================================================
 total_inv = df['Valor_Inventario'].sum()
-quiebres_df = df[df['Estado'] == "🔴 Quiebre"]
-excedentes_df = df[df['Estado'] == "🔵 Excedente"]
+quiebres_df = df[df['Estado'] == "🔴 Quiebre"].copy()
+excedentes_df = df[df['Estado'] == "🔵 Excedente"].copy()
 fill_rate_avg = df['Fill_Rate'].mean() * 100
 
 st.markdown(f"""
@@ -233,207 +314,131 @@ st.markdown("### 📊 Tablero de Decisiones")
 
 tab1, tab2, tab3 = st.tabs(["💰 Rentabilidad & Esfuerzo", "🚛 Diagnóstico Proveedor", "🎯 Nivel de Servicio"])
 
-# --- TAB 1: RENTABILIDAD (NUEVO ENFOQUE) ---
 with tab1:
-    st.markdown("""
-    <p class="section-desc">
-    <b>¿Dónde enfocamos esfuerzos?</b> Identifica qué categorías impulsan tu ganancia ("Motores") 
-    y cuáles consumen capital sin rotar ("Frenos"). Usa colores frescos para facilitar la lectura.
-    </p>
-    """, unsafe_allow_html=True)
-    
+    st.markdown("""<p class="section-desc"><b>¿Dónde enfocamos esfuerzos?</b> Identifica qué categorías impulsan tu ganancia ("Motores") y cuáles consumen capital sin rotar ("Frenos").</p>""", unsafe_allow_html=True)
     col_rent1, col_rent2 = st.columns(2)
-    
-    # Agrupación por categoría
-    df_cat = df.groupby('Categoria').agg({
-        'Utilidad_Mensual': 'sum',
-        'Valor_Inventario': 'sum',
-        'Margen_Pct': 'mean'
-    }).reset_index()
+    df_cat = df.groupby('Categoria').agg({'Utilidad_Mensual': 'sum', 'Valor_Inventario': 'sum', 'Margen_Pct': 'mean'}).reset_index()
     
     with col_rent1:
         st.markdown("##### 🚀 Motores de Rentabilidad (Utilidad Total)")
-        fig_bar = px.bar(
-            df_cat.sort_values('Utilidad_Mensual', ascending=True),
-            x='Utilidad_Mensual',
-            y='Categoria',
-            orientation='h',
-            text_auto='.2s',
-            color='Utilidad_Mensual',
-            color_continuous_scale=['#CCFBF1', '#2DD4BF', '#0F766E'] # Teal fresco
-        )
-        fig_bar.update_layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            xaxis_title="Utilidad Mensual ($)",
-            yaxis_title=None,
-            coloraxis_showscale=False,
-            height=350
-        )
+        fig_bar = px.bar(df_cat.sort_values('Utilidad_Mensual', ascending=True), x='Utilidad_Mensual', y='Categoria', orientation='h', text_auto='.2s', color='Utilidad_Mensual', color_continuous_scale=['#CCFBF1', '#2DD4BF', '#0F766E'])
+        fig_bar.update_layout(plot_bgcolor='rgba(0,0,0,0)', xaxis_title="Utilidad Mensual ($)", yaxis_title=None, coloraxis_showscale=False, height=350)
         st.plotly_chart(fig_bar, use_container_width=True)
-        st.caption("Estas categorías pagan las cuentas. Prioridad: **Mantener Stock**.")
 
     with col_rent2:
         st.markdown("##### ⚓ Frenos de Capital (Inventario vs Margen)")
-        # Scatter Plot: Eje X = Valor Inventario, Eje Y = Margen Promedio
-        fig_scat = px.scatter(
-            df_cat,
-            x='Valor_Inventario',
-            y='Margen_Pct',
-            size='Valor_Inventario',
-            color='Categoria',
-            text='Categoria',
-            color_discrete_sequence=px.colors.qualitative.Pastel # Colores suaves
-        )
-        fig_scat.update_layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            xaxis_title="Dinero Atrapado en Inventario ($)",
-            yaxis_title="Margen Promedio (%)",
-            height=350,
-            showlegend=False
-        )
+        fig_scat = px.scatter(df_cat, x='Valor_Inventario', y='Margen_Pct', size='Valor_Inventario', color='Categoria', text='Categoria', color_discrete_sequence=px.colors.qualitative.Pastel)
+        fig_scat.update_layout(plot_bgcolor='rgba(0,0,0,0)', xaxis_title="Dinero Atrapado ($)", yaxis_title="Margen (%)", height=350, showlegend=False)
         fig_scat.update_traces(textposition='top center')
         st.plotly_chart(fig_scat, use_container_width=True)
-        st.caption("Cuadrante inferior derecho (Mucho dinero, poco margen) requiere **Liquidación**.")
 
-# --- TAB 2: DIAGNÓSTICO PROVEEDOR (CHECKLIST) ---
 with tab2:
-    st.markdown("""
-    <p class="section-desc">
-    <b>Auditoría de Cumplimiento.</b> Evaluamos a los socios logísticos no solo por precio, sino por 
-    confiabilidad (tiempos) y completitud (Fill Rate).
-    </p>
-    """, unsafe_allow_html=True)
-    
-    # Crear Scorecard
-    prov_score = df.groupby('Proveedor').agg({
-        'Lead_Time_Real': 'mean',
-        'Fill_Rate': 'mean',
-        'Valor_Inventario': 'sum'
-    }).reset_index()
-    
-    # Lógica de Check
+    st.markdown("""<p class="section-desc"><b>Auditoría de Cumplimiento.</b> Evaluamos a los socios logísticos por confiabilidad (tiempos) y completitud (Fill Rate).</p>""", unsafe_allow_html=True)
+    prov_score = df.groupby('Proveedor').agg({'Lead_Time_Real': 'mean', 'Fill_Rate': 'mean', 'Valor_Inventario': 'sum'}).reset_index()
     prov_score['Check_Tiempo'] = prov_score['Lead_Time_Real'].apply(lambda x: "✅ Rápido" if x < 8 else ("⚠️ Lento" if x < 15 else "❌ Crítico"))
     prov_score['Check_Entregas'] = prov_score['Fill_Rate'].apply(lambda x: "✅ Completo" if x > 0.95 else ("⚠️ Parcial" if x > 0.85 else "❌ Incompleto"))
     
     col_audit1, col_audit2 = st.columns([2, 1])
-    
     with col_audit1:
         st.markdown("##### 📋 Scorecard de Cumplimiento")
+        st.dataframe(prov_score, column_config={"Proveedor": "Socio Logístico", "Lead_Time_Real": st.column_config.NumberColumn("Días Promedio", format="%.1f d"), "Fill_Rate": st.column_config.ProgressColumn("Tasa Entrega (%)", min_value=0, max_value=1, format="%.0f%%"), "Check_Tiempo": "Auditoría Tiempo", "Check_Entregas": "Auditoría Calidad", "Valor_Inventario": st.column_config.NumberColumn("Volumen Compra", format="$%d")}, hide_index=True, use_container_width=True)
+    with col_audit2:
+        st.info("💡 **Criterios de Evaluación:**")
+        st.markdown("- **✅ Rápido:** < 8 días\n- **❌ Crítico:** > 15 días\n- **✅ Completo:** > 95%\n- **❌ Incompleto:** < 85%")
+        df_stack = df.groupby(['Proveedor', 'Estado']).size().reset_index(name='Conteo')
+        fig_stack = px.bar(df_stack, x='Proveedor', y='Conteo', color='Estado', color_discrete_map={'🟢 Óptimo': '#34D399', '🔴 Quiebre': '#F87171', '🔵 Excedente': '#60A5FA', '🟠 Riesgo': '#FBBF24'})
+        fig_stack.update_layout(height=200, margin=dict(t=10, l=0, r=0, b=0), showlegend=False, plot_bgcolor='rgba(0,0,0,0)')
+        st.plotly_chart(fig_stack, use_container_width=True)
+
+with tab3:
+    st.markdown("""<p class="section-desc"><b>Termómetro de Satisfacción.</b> Probabilidad de tener el producto cuando el cliente lo pide.</p>""", unsafe_allow_html=True)
+    c_gauge, c_details = st.columns([1, 1])
+    servicio_actual = (1 - (len(quiebres_df) / len(df))) * 100
+    with c_gauge:
+        fig_gauge = go.Figure(go.Indicator(mode = "gauge+number", value = servicio_actual, number = {'suffix': "%", 'font': {'size': 50, 'color': '#0F172A'}}, domain = {'x': [0, 1], 'y': [0, 1]}, title = {'text': "Disponibilidad Total", 'font': {'size': 18, 'color': '#64748B'}}, gauge = {'axis': {'range': [None, 100], 'tickwidth': 0, 'tickcolor': "white"}, 'bar': {'color': "#10B981"}, 'bgcolor': "white", 'borderwidth': 0, 'bordercolor': "gray", 'steps': [{'range': [0, 85], 'color': "#F1F5F9"}, {'range': [0, servicio_actual], 'color': "#34D399"}], 'threshold': {'line': {'color': "#F87171", 'width': 4}, 'thickness': 0.75, 'value': 95}}))
+        fig_gauge.update_layout(height=300, margin=dict(t=50, b=10, l=30, r=30), paper_bgcolor='rgba(0,0,0,0)', font={'family': "Inter, sans-serif"})
+        st.plotly_chart(fig_gauge, use_container_width=True)
+    with c_details:
+        st.success(f"Actualmente tienes un **{servicio_actual:.1f}% de disponibilidad**.")
+        st.markdown(f"Esto significa que de cada 100 clientes que entran hoy, **{int(servicio_actual)}** encuentran lo que buscan inmediatamente.\n\n**Acciones para llegar al 95% (Meta):**\n1.  Cubrir los **{len(quiebres_df)} productos en quiebre** urgente.\n2.  Revisar a **MegaTools**.\n3.  Redistribuir excedentes.")
+
+# ==============================================================================
+# --- 8. CENTRO DE ACCIÓN (LÓGICA ACTUALIZADA) ---
+# ==============================================================================
+st.markdown("---")
+st.markdown("### ⚡ Acciones Recomendadas y Automatización")
+
+col_quiebres, col_excedentes = st.columns(2)
+
+# --- COLUMNA 1: GESTIÓN DE QUIEBRES (Con Recomendador IA) ---
+with col_quiebres:
+    st.markdown("""<div class="action-box-red"><h4 style="color: #991B1B; margin:0;">🚨 Gestión de Quiebres (Stock 0)</h4><p style="color: #7F1D1D;">Reposición inteligente basada en puntuación de proveedor.</p></div>""", unsafe_allow_html=True)
+    st.write("")
+    
+    if not quiebres_df.empty:
+        # Seleccionar top 6
+        quiebres_top = quiebres_df.head(6).copy()
+        
+        # Aplicar el motor de recomendación fila por fila
+        quiebres_top['Mejor_Opcion_IA'] = quiebres_top.apply(recomendar_mejor_proveedor, axis=1)
+        
         st.dataframe(
-            prov_score,
+            quiebres_top[['SKU', 'Producto', 'Proveedor', 'Mejor_Opcion_IA']],
             column_config={
-                "Proveedor": "Socio Logístico",
-                "Lead_Time_Real": st.column_config.NumberColumn("Días Promedio", format="%.1f d"),
-                "Fill_Rate": st.column_config.ProgressColumn("Tasa Entrega (%)", min_value=0, max_value=1, format="%.0f%%"),
-                "Check_Tiempo": "Auditoría Tiempo",
-                "Check_Entregas": "Auditoría Calidad",
-                "Valor_Inventario": st.column_config.NumberColumn("Volumen Compra", format="$%d")
+                "Proveedor": "Prov. Actual",
+                "Mejor_Opcion_IA": st.column_config.TextColumn("⭐ Sugerencia IA (80% Precio/10% Tiempo)", help="Calculado: 80% Precio, 10% Tiempo, 5% Unidades, 5% Postventa")
             },
             hide_index=True,
             use_container_width=True
         )
-    
-    with col_audit2:
-        st.info("💡 **Criterios de Evaluación:**")
-        st.markdown("""
-        - **✅ Rápido:** < 8 días
-        - **❌ Crítico:** > 15 días
-        - **✅ Completo:** > 95% de la orden
-        - **❌ Incompleto:** < 85% de la orden
-        """)
         
-        # Gráfica simple de barras apiladas de estado por proveedor
-        df_stack = df.groupby(['Proveedor', 'Estado']).size().reset_index(name='Conteo')
-        fig_stack = px.bar(df_stack, x='Proveedor', y='Conteo', color='Estado', 
-                           color_discrete_map={
-                               '🟢 Óptimo': '#34D399', 
-                               '🔴 Quiebre': '#F87171', 
-                               '🔵 Excedente': '#60A5FA', 
-                               '🟠 Riesgo': '#FBBF24'
-                           })
-        fig_stack.update_layout(height=200, margin=dict(t=10, l=0, r=0, b=0), showlegend=False, plot_bgcolor='rgba(0,0,0,0)')
-        st.plotly_chart(fig_stack, use_container_width=True)
-        st.caption("Distribución de salud de stock por proveedor.")
+        if st.button("🛒 Gestionar Compra Inteligente", type="primary"):
+            st.toast("Procesando análisis de mercado...", icon="🤖")
+            time.sleep(1.5)
+            st.success(f"¡Ordenes generadas! Se han seleccionado los proveedores sugeridos para los 6 productos. Pedido #ORD-{np.random.randint(10000,99999)} enviado al ERP.")
+            st.balloons()
+    else:
+        st.success("✅ No hay quiebres de stock críticos en este momento.")
 
-# --- TAB 3: NIVEL DE SERVICIO (GAUGE CENTRADO) ---
-with tab3:
-    st.markdown("""
-    <p class="section-desc">
-    <b>Termómetro de Satisfacción.</b> ¿Estamos listos para vender? Este indicador resume la probabilidad 
-    de tener el producto cuando el cliente lo pide.
-    </p>
-    """, unsafe_allow_html=True)
+# --- COLUMNA 2: LIBERACIÓN DE EFECTIVO (Con Campañas Dinámicas) ---
+with col_excedentes:
+    st.markdown("""<div class="action-box-blue"><h4 style="color: #1E40AF; margin:0;">💎 Liberación de Efectivo (Stock > 4m)</h4><p style="color: #1E3A8A;">Convierte inventario quieto en flujo de caja inmediato.</p></div>""", unsafe_allow_html=True)
+    st.write("")
     
-    c_gauge, c_details = st.columns([1, 1])
-    
-    servicio_actual = (1 - (len(quiebres_df) / len(df))) * 100
-    
-    with c_gauge:
-        fig_gauge = go.Figure(go.Indicator(
-            mode = "gauge+number",
-            value = servicio_actual,
-            number = {'suffix': "%", 'font': {'size': 50, 'color': '#0F172A'}}, # Número grande y centrado
-            domain = {'x': [0, 1], 'y': [0, 1]},
-            title = {'text': "Disponibilidad Total", 'font': {'size': 18, 'color': '#64748B'}},
-            gauge = {
-                'axis': {'range': [None, 100], 'tickwidth': 0, 'tickcolor': "white"},
-                'bar': {'color': "#10B981"}, # Emerald Green
-                'bgcolor': "white",
-                'borderwidth': 0,
-                'bordercolor': "gray",
-                'steps': [
-                    {'range': [0, 85], 'color': "#F1F5F9"}, # Gris fondo
-                    {'range': [0, servicio_actual], 'color': "#34D399"} # Color progreso dinámico si se quisiera complejo, aquí simple
-                ],
-                'threshold': {
-                    'line': {'color': "#F87171", 'width': 4},
-                    'thickness': 0.75,
-                    'value': 95
-                }
-            }
-        ))
-        # Ajustes para que el chart se vea limpio y centrado
-        fig_gauge.update_layout(
-            height=300, 
-            margin=dict(t=50, b=10, l=30, r=30),
-            paper_bgcolor='rgba(0,0,0,0)',
-            font={'family': "Inter, sans-serif"}
+    if not excedentes_df.empty:
+        # Seleccionar top 6 excedentes por valor de inventario
+        excedentes_top = excedentes_df.sort_values('Valor_Inventario', ascending=False).head(6).copy()
+        
+        # Selector de Estrategia
+        estrategia = st.radio(
+            "Seleccione Tipo de Campaña:",
+            ["Opción 1: Liquidación (Costo + 5%)", "Opción 2: Gran Remate (PVP - 50%)"],
+            horizontal=True
         )
-        st.plotly_chart(fig_gauge, use_container_width=True)
-    
-    with c_details:
-        st.success(f"Actualmente tienes un **{servicio_actual:.1f}% de disponibilidad**.")
-        st.markdown(f"""
-        Esto significa que de cada 100 clientes que entran hoy, **{int(servicio_actual)}** encuentran lo que buscan inmediatamente.
         
-        **Acciones para llegar al 95% (Meta):**
-        1.  Cubrir los **{len(quiebres_df)} productos en quiebre** urgente.
-        2.  Revisar a **MegaTools** (Proveedor con menor Fill Rate).
-        3.  Redistribuir los excedentes de la categoría **{excedentes_df['Categoria'].mode()[0]}**.
-        """)
-
-# ==============================================================================
-# --- 8. CENTRO DE ACCIÓN ---
-# ==============================================================================
-st.markdown("---")
-st.markdown("### ⚡ Acciones Recomendadas")
-
-ca1, ca2 = st.columns(2)
-
-with ca1:
-    st.markdown(f"""
-    <div style="background: #FEF2F2; padding: 15px; border-radius: 8px; border-left: 4px solid #F87171;">
-        <h5 style="margin:0; color: #991B1B;">⚠️ Reabastecimiento Crítico</h5>
-        <p style="font-size: 0.9rem; color: #7F1D1D;">{len(quiebres_df)} productos clave agotados. Impacto directo en ventas.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    st.button("Generar Pedidos Automáticos", use_container_width=True)
-
-with ca2:
-    st.markdown(f"""
-    <div style="background: #ECFEFF; padding: 15px; border-radius: 8px; border-left: 4px solid #0EA5E9;">
-        <h5 style="margin:0; color: #0C4A6E;">💎 Liberación de Efectivo</h5>
-        <p style="font-size: 0.9rem; color: #0e7490;">${excedentes_df['Valor_Inventario'].sum()/1e6:,.1f}M atrapados en stock lento. Sugerimos promo flash.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    st.button("Crear Campaña de Liquidación", use_container_width=True)
+        # Calcular nuevo precio según estrategia
+        if "Opción 1" in estrategia:
+            excedentes_top['Precio_Promo'] = excedentes_top['Costo'] * 1.05
+            tag_promo = "LIQUIDACIÓN"
+        else:
+            excedentes_top['Precio_Promo'] = excedentes_top['Precio'] * 0.50
+            tag_promo = "REMATE -50%"
+            
+        st.dataframe(
+            excedentes_top[['SKU', 'Producto', 'Stock', 'Precio', 'Precio_Promo']],
+            column_config={
+                "Precio": st.column_config.NumberColumn("Precio Actual", format="$%d"),
+                "Precio_Promo": st.column_config.NumberColumn(f"⚡ Precio {tag_promo}", format="$%d")
+            },
+            hide_index=True,
+            use_container_width=True
+        )
+        
+        if st.button("📢 Lanzar Campaña & Notificar", type="secondary"):
+            st.toast("Generando listados...", icon="📄")
+            time.sleep(1)
+            st.toast("Enviando WhatsApp a Gerencia Comercial...", icon="💬")
+            time.sleep(1)
+            st.success(f"¡Campaña {tag_promo} Activada! Excel enviado por correo y alerta de WhatsApp disparada.")
+    else:
+        st.success("✅ Tu inventario está saludable. No hay excedentes críticos.")
