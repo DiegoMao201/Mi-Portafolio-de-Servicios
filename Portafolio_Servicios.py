@@ -443,7 +443,7 @@ st.markdown("""
 
 # >>> GRID DE MÓDULOS
 st.write("")
-st.markdown("<h3 style='text-align: center; margin-bottom: 50px; font-size: 1.8rem; color: #334155;'>🚀 Ecosistema NEXUS: Explore el Valor de Negocio</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; margin-bottom: 50px; font-size: 1.8rem; color: #334155;'>🚀 Ecosistema NEXUS PRO: Explore el Valor de Negocio</h3>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3, gap="large")
 
