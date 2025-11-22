@@ -100,7 +100,7 @@ if 'master_db' not in st.session_state:
         'Costo_Ultima_Compra': [9200.0, 50.0, 120000.0, 130000.0]
     })
 
-# --- 4. MOTOR DE PARSING (MEJORADO PARA TOTALES) ---
+# --- 4. MOTOR DE PARSING (Mantiene el parseo robusto) ---
 def clean_tag(tag):
     """Elimina los namespaces {urn...} de los tags XML."""
     return tag.split('}', 1)[1] if '}' in tag else tag
@@ -117,9 +117,8 @@ def parse_dian_xml_engine(uploaded_file):
         # 1. Extracción de Metadatos (Proveedor)
         namespaces = {'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
                       'cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
-                      'ad': 'urn:dian:gov:co:facturaelectronica:AttachedDocument'} # Añadir namespace externo si es necesario
+                      'ad': 'urn:dian:gov:co:facturaelectronica:AttachedDocument'}
         
-        # Intentar obtener proveedor (Nombre del emisor)
         proveedor_tag = root.find('.//cac:SenderParty/cac:PartyTaxScheme/cbc:RegistrationName', namespaces)
         proveedor = proveedor_tag.text if proveedor_tag is not None else "Proveedor Desconocido"
         
@@ -142,14 +141,13 @@ def parse_dian_xml_engine(uploaded_file):
         folio = invoice_root.find('.//cbc:ID', ns_inv).text
         fecha = invoice_root.find('.//cbc:IssueDate', ns_inv).text
         
-        # Totales Generales (MEJORADO: Extracción de Subtotal, Impuesto Total y Total a Pagar)
+        # Totales Generales
         total_sin_imp_tag = invoice_root.find('.//cac:LegalMonetaryTotal/cbc:LineExtensionAmount', ns_inv)
         total_sin_imp = float(total_sin_imp_tag.text) if total_sin_imp_tag is not None else 0.0
 
         total_con_imp_tag = invoice_root.find('.//cac:LegalMonetaryTotal/cbc:PayableAmount', ns_inv)
         total_con_imp = float(total_con_imp_tag.text) if total_con_imp_tag is not None else 0.0
         
-        # Intentar calcular el IVA total directamente si no está en la línea de PayableAmount
         iva_total = 0.0
         tax_total_element = invoice_root.find('.//cac:TaxTotal/cbc:TaxAmount', ns_inv)
         if tax_total_element is not None:
@@ -157,15 +155,15 @@ def parse_dian_xml_engine(uploaded_file):
         else:
              iva_total = total_con_imp - total_sin_imp
 
-
         # 3. Extraer Líneas (Ítems)
         items = []
-        for line in invoice_root.findall('.//cac:InvoiceLine', ns_inv):
-            # Cantidad
+        for i, line in enumerate(invoice_root.findall('.//cac:InvoiceLine', ns_inv)):
+            # USAMOS UN ÍNDICE ÚNICO PARA CADA LÍNEA DE FACTURA
+            line_id = i + 1 
+            
             qty_tag = line.find('.//cbc:InvoicedQuantity', ns_inv)
             qty = float(qty_tag.text) if qty_tag is not None else 0.0
             
-            # Descripción
             desc_tag = line.find('.//cac:Item/cbc:Description', ns_inv)
             desc = desc_tag.text if desc_tag is not None else "Sin Descripción"
             
@@ -191,6 +189,7 @@ def parse_dian_xml_engine(uploaded_file):
                 line_tax_amount = float(tax_tag.text)
             
             items.append({
+                'Line_ID': line_id, # Clave de unicidad
                 'SKU_Proveedor': sku,
                 'Descripcion_Factura': desc,
                 'Cantidad_Facturada': qty,
@@ -231,8 +230,10 @@ def homologar_inventario(df_factura):
         if pd.notna(row['SKU_Interno']): 
             return row['SKU_Interno'] # Ya existe en el maestro
         # Lógica simple para SKU temporal (NUEVO-AAAA)
+        # Usamos el Line_ID para garantizar que cada línea tenga un SKU_Interno_Final único, 
+        # aunque el SKU_Proveedor se repita, evitando el merge duplicado en la conciliación.
         clean_sku = ''.join(e for e in str(row['SKU_Proveedor']) if e.isalnum())[:8]
-        return f"NUEVO-{clean_sku}"
+        return f"NUEVO-{clean_sku}-{row['Line_ID']}"
 
     df_merged['SKU_Interno_Final'] = df_merged.apply(generar_sku_final, axis=1)
     df_merged['Descripcion_Final'] = df_merged['Descripcion_Interna'].fillna(df_merged['Descripcion_Factura'])
@@ -241,7 +242,7 @@ def homologar_inventario(df_factura):
     df_merged['Diferencia_Precio_Pct'] = np.where(
         df_merged['Costo_Ultima_Compra'].notna() & (df_merged['Costo_Ultima_Compra'] > 0),
         ((df_merged['Precio_Unitario'] - df_merged['Costo_Ultima_Compra']) / df_merged['Costo_Ultima_Compra']) * 100,
-        np.nan # Usar NaN para nuevos, mejor para formato
+        np.nan 
     )
     
     return df_merged
@@ -435,12 +436,12 @@ elif st.session_state.reception_step == 1:
     error_msg = None
 
     if uploaded_file is not None:
-        header, df_items = parse_dian_xml_engine(uploaded_file) # Usamos el motor bueno
+        header, df_items = parse_dian_xml_engine(uploaded_file) 
         if df_items is None:
-            error_msg = header # El mensaje de error viene en la primera variable
+            error_msg = header 
 
     elif st.session_state.get('demo_mode'):
-        # Simulamos resultado del motor para DEMO
+        # Simulamos resultado del motor para DEMO (Asegurando Line_ID para la unicidad)
         header = {
             'Proveedor': 'FERRETERIA EJEMPLO S.A', 
             'Folio': 'PG639060', 
@@ -450,10 +451,11 @@ elif st.session_state.reception_step == 1:
             'Total_Factura': 339239.25
         }
         df_items = pd.DataFrame([
-            {'SKU_Proveedor': 'RTRXA0080106', 'Descripcion_Factura': 'MULTI-FLEX #80', 'Cantidad_Facturada': 25.0, 'Precio_Unitario': 9403.0, 'Subtotal_Linea': 235075.0, 'Impuesto_Linea': 44664.25, 'Total_Linea': 279739.25},
-            {'SKU_Proveedor': 'NUEVO-999', 'Descripcion_Factura': 'GRANALLA ACERO TEMPLADO', 'Cantidad_Facturada': 10.0, 'Precio_Unitario': 5000.0, 'Subtotal_Linea': 50000.0, 'Impuesto_Linea': 9500.0, 'Total_Linea': 59500.0}
+            {'Line_ID': 1, 'SKU_Proveedor': 'RTRXA0080106', 'Descripcion_Factura': 'MULTI-FLEX #80', 'Cantidad_Facturada': 25.0, 'Precio_Unitario': 9403.0, 'Subtotal_Linea': 235075.0, 'Impuesto_Linea': 44664.25, 'Total_Linea': 279739.25},
+            {'Line_ID': 2, 'SKU_Proveedor': 'NUEVO-999', 'Descripcion_Factura': 'GRANALLA ACERO TEMPLADO', 'Cantidad_Facturada': 10.0, 'Precio_Unitario': 5000.0, 'Subtotal_Linea': 50000.0, 'Impuesto_Linea': 9500.0, 'Total_Linea': 59500.0},
+            # Ítem duplicado en SKU_Proveedor pero distinto Line_ID para probar homologación (genera SKU_Interno_Final diferente)
+            {'Line_ID': 3, 'SKU_Proveedor': 'NUEVO-999', 'Descripcion_Factura': 'GRANALLA ACERO TEMPLADO C/IVA', 'Cantidad_Facturada': 5.0, 'Precio_Unitario': 6000.0, 'Subtotal_Linea': 30000.0, 'Impuesto_Linea': 5700.0, 'Total_Linea': 35700.0}
         ])
-
 
     # Mostrar Resultados Preliminares
     if header and df_items is not None:
@@ -497,7 +499,7 @@ elif st.session_state.reception_step == 1:
 
         nuevos = df_homologado[df_homologado['Estado_Producto'] == '🆕 NUEVO']
         if not nuevos.empty:
-            st.warning(f"⚠️ **Atención:** Se identificaron **{len(nuevos)}** productos sin referencia interna. Serán creados temporalmente.")
+            st.warning(f"⚠️ **Atención:** Se identificaron **{len(nuevos)}** productos sin referencia interna. Serán creados temporalmente con un ID único por línea para la conciliación.")
         
         st.markdown("---")
         if st.button("➡️ Confirmar Datos e Iniciar Conteo Físico", type="primary", use_container_width=True):
@@ -529,7 +531,8 @@ elif st.session_state.reception_step == 2:
     
     # Preparar DF de conteo si no existe (inicializar Cant_Recibida y Novedad)
     if 'conteo_real' not in st.session_state.current_invoice_data:
-        df_conteo_init = data[['SKU_Interno_Final', 'Descripcion_Final', 'Cantidad_Facturada']].copy()
+        # Usamos Line_ID como clave de unicidad invisible
+        df_conteo_init = data[['Line_ID', 'SKU_Interno_Final', 'Descripcion_Final', 'Cantidad_Facturada']].copy()
         df_conteo_init['Cant_Recibida'] = 0.0
         df_conteo_init['Novedad'] = ""
         st.session_state.current_invoice_data['conteo_real'] = df_conteo_init
@@ -552,12 +555,17 @@ elif st.session_state.reception_step == 2:
             match_index = df_conteo[df_conteo['SKU_Interno_Final'] == scanned_sku].index
             
             if match_index.empty:
-                 # Intentar buscar por SKU_Proveedor
-                match_index = data[data['SKU_Proveedor'] == scanned_sku].index
-                if not match_index.empty:
-                    # Si se encuentra por SKU de proveedor, usar el SKU_Interno_Final para el conteo
-                    final_sku = data.loc[match_index[0], 'SKU_Interno_Final']
+                 # Intentar buscar por SKU_Proveedor en el DF base
+                match_base = data[data['SKU_Proveedor'] == scanned_sku]
+                if not match_base.empty:
+                    # Si hay un match, tomamos el primer SKU_Interno_Final asociado
+                    final_sku = match_base.iloc[0]['SKU_Interno_Final']
                     match_index = df_conteo[df_conteo['SKU_Interno_Final'] == final_sku].index
+                    if len(match_index) > 1:
+                        st.warning(f"SKU {scanned_sku} está repetido en la factura. Asigne manualmente la cantidad en la tabla de conteo.")
+                        # Si está repetido, no podemos asignarlo automáticamente con el lector.
+                        match_index = pd.Index([])
+
             
             if not match_index.empty:
                 idx = match_index[0]
@@ -566,9 +574,9 @@ elif st.session_state.reception_step == 2:
                 st.session_state.current_invoice_data['conteo_real'] = df_conteo
                 st.toast(f"Registrado {scanned_qty} unid. de {df_conteo.loc[idx, 'Descripcion_Final']}", icon="📦")
                 time.sleep(0.1)
-                st.rerun() # Recargar para ver el cambio en el grid
+                st.rerun() 
             else:
-                st.error(f"SKU '{scanned_sku}' no encontrado en la factura. Verifique.")
+                st.error(f"SKU '{scanned_sku}' no encontrado en la factura. Verifique o ingrese manualmente la cantidad.")
                 
     # --- Herramientas y Grid del Conteo ---
     c_tools, c_grid = st.columns([1, 4])
@@ -579,13 +587,14 @@ elif st.session_state.reception_step == 2:
             df_conteo['Cant_Recibida'] = df_conteo['Cantidad_Facturada']
             st.session_state.current_invoice_data['conteo_real'] = df_conteo
             st.toast("Cantidades copiadas (Todo OK)", icon="✅")
-            st.rerun() # Recargar para reflejar el cambio en la grilla
+            st.rerun() 
             
     with c_grid:
-        # La grilla se inicializa con el DF de la sesión (o el modificado por el botón/formulario)
+        # Aquí es donde se usa Line_ID como clave oculta para garantizar que los datos vuelvan correctamente
         edited_conteo = st.data_editor(
             df_conteo,
             column_config={
+                "Line_ID": st.column_config.NumberColumn(disabled=True, width="hidden"), # Ocultar la clave
                 "SKU_Interno_Final": st.column_config.TextColumn("Ref. Interna (Conteo)", disabled=True),
                 "Descripcion_Final": st.column_config.TextColumn("Producto", disabled=True),
                 "Cantidad_Facturada": st.column_config.NumberColumn("Facturado", disabled=True, format="%.0f"),
@@ -633,14 +642,20 @@ elif st.session_state.reception_step == 3:
     df_conteo = st.session_state.current_invoice_data['conteo_real']
     header = st.session_state.current_invoice_data['header']
     
-    # Merge final (Aseguramos la integridad usando el SKU_Interno_Final)
+    # Merge final USANDO 'Line_ID' como clave para EVITAR DUPLICADOS
     df_final = pd.merge(
         df_conteo,
-        df_base[['SKU_Interno_Final', 'Precio_Unitario', 'Total_Linea', 'Estado_Producto', 'SKU_Proveedor', 'Costo_Ultima_Compra', 'Descripcion_Interna']],
-        on='SKU_Interno_Final',
+        # Seleccionamos las columnas relevantes del DF base
+        df_base[['Line_ID', 'Precio_Unitario', 'Total_Linea', 'Estado_Producto', 'SKU_Proveedor', 'Costo_Ultima_Compra', 'Descripcion_Interna']],
+        on='Line_ID', # Clave UNICA de la línea de factura
         how='left'
     )
     
+    # Eliminar la clave temporal de Line_ID si se usó para el merge
+    if 'SKU_Interno_Final' in df_final.columns and 'Line_ID' in df_final.columns:
+        # Se mantienen 'SKU_Interno_Final', 'Descripcion_Final' del df_conteo (ya que contiene los datos del editor)
+        pass
+
     # Calcular discrepancias
     df_final['Diferencia'] = df_final['Cant_Recibida'] - df_final['Cantidad_Facturada']
     df_final['Estado_Conciliacion'] = np.where(df_final['Diferencia'] == 0, '✅ OK', 
@@ -659,7 +674,7 @@ elif st.session_state.reception_step == 3:
     k4.metric("Referencias con Faltantes", len(faltantes), delta_color="inverse")
     
     st.markdown("### 📋 Resumen de la Conciliación (Factura vs. Conteo)")
-    
+        
     # Tabla Final
     def highlight_diff(row):
         # Color rojo para faltantes, verde para sobrantes
@@ -731,14 +746,12 @@ elif st.session_state.reception_step == 3:
             with st.spinner("Actualizando Maestro y Kardex..."):
                 time.sleep(2)
                 
-                # LÓGICA DE ACTUALIZACIÓN MEJORADA (Manejo de nuevos y existentes sin duplicar)
-                
-                # 1. Identificar y añadir nuevos productos
+                # 1. Identificar y añadir nuevos productos (usando el SKU_Interno_Final único)
                 nuevos_recibidos = df_final[(df_final['Estado_Producto'] == '🆕 NUEVO') & (df_final['Cant_Recibida'] > 0)]
                 if not nuevos_recibidos.empty:
+                    # Crear el DataFrame de nuevos SIN DUPLICAR (gracias al Line_ID en el SKU_Interno_Final)
                     nuevos_a_db = pd.DataFrame({
                         'SKU_Interno': nuevos_recibidos['SKU_Interno_Final'],
-                        # Asignar el SKU real del proveedor para la búsqueda futura
                         'SKU_Proveedor': nuevos_recibidos['SKU_Proveedor'], 
                         'Descripcion_Interna': nuevos_recibidos['Descripcion_Final'],
                         'Stock_Actual': nuevos_recibidos['Cant_Recibida'],
@@ -746,14 +759,15 @@ elif st.session_state.reception_step == 3:
                     })
                     st.session_state.master_db = pd.concat([st.session_state.master_db, nuevos_a_db], ignore_index=True)
                 
-                # 2. Actualizar stock y costo de existentes
+                # 2. Actualizar stock y costo de existentes (usando el SKU_Interno único)
                 existentes_actualizar = df_final[df_final['Estado_Producto'] == '✅ EXISTENTE']
                 for idx, row in existentes_actualizar.iterrows():
-                    sku = row['SKU_Interno_Final']
+                    sku = row['SKU_Interno_Final'] # Es el SKU_Interno real de la BD
                     cant = row['Cant_Recibida']
                     costo_nuevo = row['Precio_Unitario']
                     
                     # 1. Sumar Stock (solo si la cantidad recibida es positiva)
+                    # USAMOS .loc con el SKU_Interno de la BD Maestra para asegurarnos de que solo actualizamos una fila
                     if cant > 0:
                          st.session_state.master_db.loc[st.session_state.master_db['SKU_Interno'] == sku, 'Stock_Actual'] += cant
                     
