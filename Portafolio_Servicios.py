@@ -354,7 +354,7 @@ def open_inventory_modal():
             </div>
             <div class="modal-item">
                 <span class="modal-bullet">➤</span>
-                <div><span class="modal-highlight">Pestaña: Nivel de Servicio.</span> Mide la disponibilidad real de inventario y prioriza acciones para cerrar las brechas de quiebre de stock.</div>
+                <div><span class="modal-highlight">Pestaña: Rotacion Inventario.</span> Mide la disponibilidad real de inventario y prioriza acciones para cerrar las brechas de quiebre de stock.</div>
             </div>
         </div>
         <div class="modal-quote">
