@@ -467,7 +467,7 @@ with col2:
     <div class="flow-card">
         <div>
             <div class="card-icon">🚚</div>
-            <div class="card-title">2. Logística Inteligente</div>
+            <div class="card-title">2. Abastecimiento Inteligente</div>
             <div class="card-desc">El brazo ejecutor. Automatización de compras y rebalanceo autónomo de stock entre bodegas.</div>
         </div>
     </div>
