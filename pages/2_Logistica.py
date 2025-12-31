@@ -329,7 +329,7 @@ def generar_pdf(df, titulo):
 
 # --- 5. UI: BARRA LATERAL DE NAVEGACIÓN ---
 with st.sidebar:
-    st.page_link("Portafolio_Servicios.py", label="🏠 Volver al Inicio", icon="🔙")
+    st.page_link("Home.py", label="🏠 Volver al Inicio", icon="🔙")
     st.divider()
     
     # Simulación de logo
