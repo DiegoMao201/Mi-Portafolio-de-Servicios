@@ -253,7 +253,7 @@ def recomendar_mejor_proveedor(row):
 # ==============================================================================
 with st.sidebar:
     st.markdown("### 🧭 Navegación")
-    st.page_link("Portafolio_Servicios.py", label="Volver al Inicio", icon="🏠")
+    st.page_link("Home.py", label="Volver al Inicio", icon="🏠")
     st.divider()
     
     st.header("🎛️ Filtros Globales")
