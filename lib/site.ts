@@ -6,7 +6,7 @@ export const SITE = {
   title: 'Automatización, sistemas e IA que operan empresas reales',
   description:
     'Ingeniero de software en Pereira, Colombia. Construyo automatizaciones, integraciones de sistemas, aplicaciones a la medida y agentes de IA que ya mueven la tesorería, el inventario y las ventas de empresas reales — incluida la mía.',
-  email: 'contacto@datovatenexuspro.com',
+  email: 'diegomao.201@gmail.com',
   whatsapp: process.env.WHATSAPP_NUMBER || '573205046277',
   city: 'Pereira',
   region: 'Risaralda',

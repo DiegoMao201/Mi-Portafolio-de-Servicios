@@ -23,7 +23,7 @@ export default function PrivacidadPage() {
           Pereira, Colombia. Los datos se usan para responder tu solicitud y mantener
           comunicación comercial contigo; no se venden ni se comparten con terceros con fines
           comerciales. Puedes conocer, actualizar, rectificar o suprimir tus datos escribiendo a
-          contacto@datovatenexuspro.com.
+          diegomao.201@gmail.com.
         </p>
         <h2>Medición del sitio</h2>
         <p>

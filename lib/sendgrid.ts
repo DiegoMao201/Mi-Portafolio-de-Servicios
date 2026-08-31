@@ -33,7 +33,7 @@ export async function sendMail(args: {
 }
 
 export async function notifyLead(lead: Record<string, unknown>, transcript?: string) {
-  const to = process.env.MAIL_TO || 'contacto@datovatenexuspro.com';
+  const to = process.env.MAIL_TO || 'diegomao.201@gmail.com';
   const lines = Object.entries(lead)
     .filter(([, v]) => v !== undefined && v !== null && v !== '')
     .map(([k, v]) => `${k}: ${v}`)

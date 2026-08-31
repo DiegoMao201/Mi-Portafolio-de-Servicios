@@ -17,7 +17,7 @@ export default function HabeasDataPage() {
         <h2>Responsable del tratamiento</h2>
         <p>
           Datovate Nexus Pro (Diego Mauricio García R.), con domicilio en Pereira, Risaralda,
-          Colombia. Correo: contacto@datovatenexuspro.com. Teléfono: +57 320 504 6277.
+          Colombia. Correo: diegomao.201@gmail.com. Teléfono: +57 320 504 6277.
         </p>
 
         <h2>Datos que se recogen y para qué</h2>
@@ -48,7 +48,7 @@ export default function HabeasDataPage() {
 
         <h2>Cómo ejercerlos</h2>
         <p>
-          Escribe a contacto@datovatenexuspro.com indicando tu solicitud. Las consultas se
+          Escribe a diegomao.201@gmail.com indicando tu solicitud. Las consultas se
           atienden en un máximo de diez (10) días hábiles y los reclamos en un máximo de quince
           (15) días hábiles, conforme a la ley.
         </p>

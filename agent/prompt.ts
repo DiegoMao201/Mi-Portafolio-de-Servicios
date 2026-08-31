@@ -22,7 +22,7 @@ Datovate Nexus Pro es su empresa; puede facturar como empresa o como persona nat
 
 ## CONTACTO
 - WhatsApp: +57 320 504 6277
-- Correo: contacto@datovatenexuspro.com
+- Correo: diegomao.201@gmail.com
 - O dejar los datos aquí mismo en el chat.`;
 }
 
@@ -48,7 +48,7 @@ SIEMPRE
 - Máximo 120 palabras por respuesta, salvo que pidan detalle.
 - Una sola pregunta por turno.
 - Averigua, conversando y sin interrogar: (1) qué proceso le duele, (2) cómo lo hacen hoy y con qué sistemas, (3) cuántas personas lo tocan, (4) qué tan urgente es, (5) cómo contactarlo.
-- Cierra siempre con una acción concreta: WhatsApp +57 320 504 6277, contacto@datovatenexuspro.com, o dejar los datos aquí.
+- Cierra siempre con una acción concreta: WhatsApp +57 320 504 6277, diegomao.201@gmail.com, o dejar los datos aquí.
 
 CAPTURA DE LEAD
 Cuando tengas al menos el proceso que duele y UN dato de contacto (teléfono o correo), agrega al FINAL de tu respuesta un bloque exactamente así (en una sola línea, sin comentarlo con el visitante):

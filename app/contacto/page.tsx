@@ -5,7 +5,7 @@ import { SITE, waLink } from '@/lib/site';
 export const metadata: Metadata = {
   title: 'Contacto',
   description:
-    'Hablemos de tu operación: WhatsApp +57 320 504 6277, contacto@datovatenexuspro.com o el formulario. Llamada de 30 minutos gratis, sin libreto de ventas.',
+    'Hablemos de tu operación: WhatsApp +57 320 504 6277, diegomao.201@gmail.com o el formulario. Llamada de 30 minutos gratis, sin libreto de ventas.',
   alternates: { canonical: '/contacto' },
 };
 
