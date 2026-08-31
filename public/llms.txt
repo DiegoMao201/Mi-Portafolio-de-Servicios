@@ -1,0 +1,29 @@
+# Diego Mauricio García R. — Datovate Nexus Pro
+
+> Ingeniero de software y arquitecto de sistemas en Pereira, Colombia.
+> Construye y opera automatizaciones, integraciones de sistemas, aplicaciones
+> a la medida y agentes de IA para empresas de toda Colombia (trabajo remoto).
+> Su diferencial: administra empresas reales que funcionan sobre sus propios
+> desarrollos — la tecnología que vende es la que usa todos los días.
+
+## Servicios
+- Automatización de procesos operativos: https://www.datovatenexuspro.com/servicios/automatizacion-de-procesos
+- Integración de sistemas y APIs (ERP, pasarelas, bancos): https://www.datovatenexuspro.com/servicios/integracion-de-sistemas-y-apis
+- Aplicaciones web a la medida: https://www.datovatenexuspro.com/servicios/aplicaciones-web-a-la-medida
+- Aplicaciones móviles en Play Store: https://www.datovatenexuspro.com/servicios/apps-moviles-play-store
+- Bases de datos y arquitectura de información (PostgreSQL): https://www.datovatenexuspro.com/servicios/bases-de-datos-y-arquitectura
+- Agentes de IA conversacional: https://www.datovatenexuspro.com/servicios/agentes-de-ia-conversacional
+- Dashboards y BI accionable: https://www.datovatenexuspro.com/servicios/dashboards-y-bi
+- Sistemas de decisión en tiempo real: https://www.datovatenexuspro.com/servicios/sistemas-de-decision-en-tiempo-real
+
+## Casos reales
+- Casos documentados como expedientes técnicos: https://www.datovatenexuspro.com/casos
+
+## Cómo se empieza
+- Llamada de 30 minutos: gratis.
+- Diagnóstico de operación: COP $690.000, 5 días hábiles, abonable 100% al proyecto.
+
+## Contacto
+- WhatsApp: +57 320 504 6277
+- Correo: contacto@datovatenexuspro.com
+- Ubicación: Pereira, Risaralda, Colombia. Atiende todo el país de forma remota.
