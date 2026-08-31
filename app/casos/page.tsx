@@ -5,7 +5,7 @@ import { CASOS } from '@/content/casos';
 export const metadata: Metadata = {
   title: 'Casos reales: sistemas en operación',
   description:
-    'Expedientes técnicos de sistemas construidos y en operación: tesorería automatizada, recaudo digital, e-commerce con fidelización, motores de decisión en tiempo real y agentes de IA.',
+    'Expedientes técnicos de sistemas en operación: tesorería automatizada, recaudo digital, e-commerce, motores de decisión y agentes de IA.',
   alternates: { canonical: '/casos' },
 };
 

@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const n = getNota(slug);
   if (!n) return {};
   return {
-    title: n.titulo,
+    title: n.tituloSeo || n.titulo,
     description: n.descripcion.slice(0, 155),
     alternates: { canonical: `/notas/${n.slug}` },
   };

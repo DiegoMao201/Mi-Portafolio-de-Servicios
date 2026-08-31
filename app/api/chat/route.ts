@@ -131,6 +131,13 @@ export async function POST(req: NextRequest) {
             const m = full.match(/<lead>([\s\S]*?)<\/lead>/);
             if (m) {
               const lead = JSON.parse(m[1]);
+              // Candado: sin teléfono ni correo el lead no sirve (no hay a quién
+              // responderle). El modelo a veces emite el bloque antes de tiempo.
+              const contacto = String(lead.telefono || '').trim() || String(lead.email || '').trim();
+              if (!contacto) {
+                console.warn('[chat] lead descartado: sin teléfono ni correo', { session });
+                return;
+              }
               const transcript = messages.map((x) => `${x.role}: ${x.content}`).join('\n');
               await saveLead({
                 nombre: lead.nombre || undefined,

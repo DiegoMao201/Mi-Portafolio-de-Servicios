@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Política de tratamiento de datos personales',
+  title: 'Tratamiento de datos personales',
   description: 'Política de tratamiento de datos personales de Datovate Nexus Pro conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013 (Colombia).',
   alternates: { canonical: '/habeas-data' },
 };

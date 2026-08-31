@@ -1,6 +1,8 @@
 export type Nota = {
   slug: string;
   titulo: string;
+  /** Título corto para <title> cuando el titular visible pasa de 39 caracteres. */
+  tituloSeo?: string;
   descripcion: string;
   fecha: string; // ISO
   parrafos: { h?: string; t: string }[];
@@ -10,6 +12,7 @@ export const NOTAS: Nota[] = [
   {
     slug: 'migrar-streamlit-a-produccion',
     titulo: 'Migrar una app de Streamlit a producción: cuándo y cómo hacerlo',
+    tituloSeo: 'Migrar de Streamlit a producción',
     descripcion: 'Streamlit es excelente para prototipar y malo para ser tu producto. Cómo saber cuándo migrar y qué arquitectura usar sin botar lo aprendido.',
     fecha: '2026-08-31',
     parrafos: [
@@ -23,6 +26,7 @@ export const NOTAS: Nota[] = [
   {
     slug: 'conectar-sql-server-con-postgresql-sin-tocar-el-erp',
     titulo: 'Conectar SQL Server con PostgreSQL sin tocar el ERP',
+    tituloSeo: 'Conectar SQL Server con PostgreSQL',
     descripcion: 'Cómo sacarle los datos a un ERP que no se puede modificar, construir una base intermedia confiable y automatizar procesos encima — sin poner en riesgo la operación.',
     fecha: '2026-08-31',
     parrafos: [
@@ -36,6 +40,7 @@ export const NOTAS: Nota[] = [
   {
     slug: 'agente-de-ia-que-no-tumba-tu-sistema',
     titulo: 'Un agente de IA que atiende clientes sin poner en riesgo tu operación',
+    tituloSeo: 'Agentes de IA sin riesgo operativo',
     descripcion: 'El diseño que separa al agente conversacional de tus sistemas críticos: base propia sincronizada, doble modelo por costo y salida idempotente.',
     fecha: '2026-08-31',
     parrafos: [

@@ -5,7 +5,7 @@ import { NOTAS } from '@/content/notas';
 export const metadata: Metadata = {
   title: 'Notas técnicas',
   description:
-    'Notas de ingeniería desde la trinchera: migrar Streamlit a producción, conectar SQL Server con PostgreSQL sin tocar el ERP, agentes de IA que no ponen en riesgo la operación.',
+    'Notas de ingeniería desde la trinchera: migrar Streamlit a producción, conectar SQL Server con PostgreSQL, agentes de IA que no tumban la operación.',
   alternates: { canonical: '/notas' },
 };
 

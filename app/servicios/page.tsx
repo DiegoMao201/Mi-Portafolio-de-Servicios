@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { SERVICIOS } from '@/content/servicios';
 
 export const metadata: Metadata = {
-  title: 'Servicios de automatización, software a la medida e IA',
+  title: 'Servicios de automatización e IA',
   description:
-    'Automatización de procesos, integración de sistemas y APIs, aplicaciones web y móviles, bases de datos, agentes de IA, dashboards y sistemas de decisión en tiempo real. Pereira, Colombia — atiendo todo el país.',
+    'Automatización de procesos, integración de sistemas y APIs, apps web y móviles, bases de datos, agentes de IA y dashboards. Desde Pereira, para todo el país.',
   alternates: { canonical: '/servicios' },
 };
 

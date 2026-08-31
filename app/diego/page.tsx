@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { waLink } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Diego Mauricio García R. — quién está detrás',
+  title: 'Diego Mauricio García R.',
   description:
-    'Ingeniero de software autodidacta y administrador de empresas reales en Pereira, Colombia. Construyo y opero los sistemas que uso todos los días: automatización, datos, IA.',
+    'Ingeniero de software autodidacta y administrador de empresas reales en Pereira. Construyo y opero los sistemas que uso todos los días.',
   alternates: { canonical: '/diego' },
 };
 

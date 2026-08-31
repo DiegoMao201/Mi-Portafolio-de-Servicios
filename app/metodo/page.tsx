@@ -5,7 +5,7 @@ import ArchGraph from '@/components/ArchGraph';
 export const metadata: Metadata = {
   title: 'Método de trabajo',
   description:
-    'Cómo trabajo: diagnóstico con datos reales, arquitectura antes que código, construcción por fases verificables y operación continua. Método empírico: nada se afirma sin verificarse.',
+    'Cómo trabajo: diagnóstico con datos reales, arquitectura antes que código, construcción por fases verificables y operación continua.',
   alternates: { canonical: '/metodo' },
 };
 

@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const c = getCaso(slug);
   if (!c) return {};
   return {
-    title: `${c.codigo} · ${c.titulo}`,
+    title: c.titulo,
     description: c.resumen.slice(0, 155),
     alternates: { canonical: `/casos/${c.slug}` },
   };

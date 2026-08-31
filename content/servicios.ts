@@ -1,6 +1,8 @@
 export type Servicio = {
   slug: string;
   titulo: string;
+  /** Título corto para <title> cuando el titular visible pasa de 39 caracteres. */
+  tituloSeo?: string;
   corto: string;
   respuesta: string;
   problema: string[];
@@ -131,6 +133,7 @@ export const SERVICIOS: Servicio[] = [
   {
     slug: 'bases-de-datos-y-arquitectura',
     titulo: 'Bases de datos y arquitectura de información',
+    tituloSeo: 'Bases de datos y arquitectura',
     corto: 'Que el dato de tu empresa viva en un solo lugar confiable, y no repartido entre Excels, correos y la memoria de alguien.',
     respuesta: 'Diseño bases de datos PostgreSQL que se vuelven la fuente única de verdad de la empresa: modelan el negocio real, absorben los datos dispersos en archivos y sistemas, y quedan listas para reportes, aplicaciones e inteligencia artificial.',
     problema: [
