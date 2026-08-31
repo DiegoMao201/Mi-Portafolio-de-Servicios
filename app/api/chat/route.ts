@@ -1,0 +1,166 @@
+import { NextRequest } from 'next/server';
+import { systemPrompt } from '@/agent/prompt';
+import { allow, clientIp, ipHash } from '@/lib/ratelimit';
+import { monthSpendUSD, saveLead, logConversation } from '@/lib/db';
+import { notifyLead } from '@/lib/sendgrid';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const MAX_TURNS = 12;
+const MAX_LEN = 1200;
+
+type Msg = { role: 'user' | 'assistant'; content: string };
+
+export async function POST(req: NextRequest) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return Response.json({ error: 'chat_off' }, { status: 503 });
+
+  const ip = clientIp(req);
+  const hash = ipHash(ip);
+  if (!allow(`chat:${hash}`, 40, 24 * 60 * 60 * 1000) || !allow(`chatmin:${hash}`, 8, 60 * 1000)) {
+    return Response.json({ error: 'rate_limit' }, { status: 429 });
+  }
+
+  const budget = parseFloat(process.env.LLM_BUDGET_USD || '25');
+  if ((await monthSpendUSD()) >= budget) {
+    return Response.json({ error: 'budget' }, { status: 503 });
+  }
+
+  let body: { messages?: Msg[]; session?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: 'bad_request' }, { status: 400 });
+  }
+  const messages = (body.messages || [])
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .slice(-MAX_TURNS * 2)
+    .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_LEN) }));
+  if (!messages.length || messages[messages.length - 1].role !== 'user') {
+    return Response.json({ error: 'bad_request' }, { status: 400 });
+  }
+  const userTurns = messages.filter((m) => m.role === 'user').length;
+  if (userTurns > MAX_TURNS) return Response.json({ error: 'session_limit' }, { status: 429 });
+
+  const model = process.env.OPENROUTER_MODEL || 'openrouter/auto';
+  const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': process.env.SITE_URL || 'https://www.datovatenexuspro.com',
+      'X-Title': 'Datovate Nexus Pro',
+    },
+    body: JSON.stringify({
+      model,
+      stream: true,
+      usage: { include: true },
+      max_tokens: 900,
+      temperature: 0.4,
+      messages: [{ role: 'system', content: systemPrompt() }, ...messages],
+    }),
+  });
+
+  if (!upstream.ok || !upstream.body) {
+    console.error('[chat] OpenRouter error', upstream.status, await upstream.text().catch(() => ''));
+    return Response.json({ error: 'upstream' }, { status: 502 });
+  }
+
+  let full = '';
+  let cost = 0;
+  let tokensIn = 0;
+  let tokensOut = 0;
+  const decoder = new TextDecoder();
+  let carry = '';
+
+  const session = (body.session || '').slice(0, 64) || 'anon';
+
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const encoder = new TextEncoder();
+      const reader = upstream.body!.getReader();
+      try {
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          carry += decoder.decode(value, { stream: true });
+          const lines = carry.split('\n');
+          carry = lines.pop() || '';
+          for (const line of lines) {
+            const t = line.trim();
+            if (!t.startsWith('data:')) continue;
+            const data = t.slice(5).trim();
+            if (data === '[DONE]') continue;
+            try {
+              const j = JSON.parse(data);
+              const delta = j.choices?.[0]?.delta?.content;
+              if (typeof delta === 'string' && delta) {
+                full += delta;
+                controller.enqueue(encoder.encode(delta));
+              }
+              if (j.usage) {
+                cost = j.usage.cost ?? cost;
+                tokensIn = j.usage.prompt_tokens ?? tokensIn;
+                tokensOut = j.usage.completion_tokens ?? tokensOut;
+              }
+            } catch {
+              /* línea parcial, se ignora */
+            }
+          }
+        }
+      } catch (e) {
+        console.error('[chat] stream error', e);
+      } finally {
+        controller.close();
+        // Efectos secundarios después de cerrar el stream (servidor persistente)
+        void (async () => {
+          try {
+            const convId = await logConversation({
+              session_id: session,
+              ip_hash: hash,
+              modelo: model,
+              tokens_in: tokensIn,
+              tokens_out: tokensOut,
+              costo_usd: cost,
+              mensajes: [...messages, { rol: 'assistant', contenido: full }].map((m) => ({
+                rol: 'role' in m ? (m as Msg).role : (m as { rol: string }).rol,
+                contenido: 'content' in m ? (m as Msg).content : (m as { contenido: string }).contenido,
+              })),
+            });
+            const m = full.match(/<lead>([\s\S]*?)<\/lead>/);
+            if (m) {
+              const lead = JSON.parse(m[1]);
+              const transcript = messages.map((x) => `${x.role}: ${x.content}`).join('\n');
+              await saveLead({
+                nombre: lead.nombre || undefined,
+                empresa: lead.empresa || undefined,
+                telefono: lead.telefono || undefined,
+                email: lead.email || undefined,
+                canal: 'chat',
+                proceso_dolor: lead.proceso_dolor || undefined,
+                sistemas_actuales: lead.sistemas_actuales || undefined,
+                urgencia: lead.urgencia || undefined,
+                calificacion: typeof lead.calificacion === 'number' ? lead.calificacion : undefined,
+                resumen_agente: lead.resumen || undefined,
+                ip_hash: hash,
+                conversation_id: convId,
+              });
+              await notifyLead(lead, transcript);
+            }
+          } catch (e) {
+            console.error('[chat] post-proceso falló', e);
+          }
+        })();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Accel-Buffering': 'no',
+    },
+  });
+}
