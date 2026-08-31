@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Brain from '@/components/Brain';
+import Wordmark from '@/components/Wordmark';
 import Console from '@/components/Console';
 import Conduit from '@/components/Conduit';
 import Ticker from '@/components/Ticker';
@@ -15,6 +16,7 @@ export default function Home() {
       <section className="machine">
         <Brain />
         <div className="wrap">
+          <Wordmark />
           <p className="hero-eyebrow">Pereira, Colombia · Sistemas en operación continua</p>
           <h1>
             No vendo software.

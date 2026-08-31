@@ -3,16 +3,40 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * El cerebro de luces: red neuronal viva dibujada en canvas.
- * Nodos orgánicos conectados por sinapsis; pulsos de luz viajan por las
- * conexiones y encienden los nodos al llegar. El cursor excita la zona cercana.
+ * El cerebro de luces: una silueta de cerebro dibujada con nodos y sinapsis,
+ * compacta arriba a la derecha del hero. Los pulsos nacen dentro del cerebro,
+ * recorren sus circunvoluciones y salen por axones —trazas tipo circuito— que
+ * llevan la luz hacia el resto de la página. El cursor excita la zona cercana.
  */
-type Node = { x: number; y: number; ox: number; oy: number; r: number; glow: number; hue: 'a' | 'b'; ph: number };
-type Edge = { i: number; j: number; d: number };
+type Kind = 'brain' | 'axon';
+type Node = { x: number; y: number; ox: number; oy: number; r: number; glow: number; hue: 'a' | 'b'; ph: number; kind: Kind };
+type Edge = { i: number; j: number; d: number; kind: Kind };
 type Pulse = { e: number; t: number; v: number; dir: 1 | -1; hue: 'a' | 'b' };
 
 const GLOW_A = { r: 255, g: 116, b: 64 };   // naranja señal
-const GLOW_B = { r: 63, g: 216, b: 206 };   // cian técnico
+const GLOW_B = { r: 63, g: 216, b: 206 };   // cian sináptico
+
+// Silueta del cerebro, en una caja de 100 x 80, mirando a la derecha.
+// El contorno lleva los lóbulos marcados; los pliegues son las circunvoluciones;
+// el cerebelo y el tronco son lo que lo vuelve inconfundible.
+const BRAIN_OUTLINE =
+  'M18 44 C10 40 10 30 18 26 C18 17 27 12 35 16 C38 8 48 7 53 13 ' +
+  'C58 6 68 7 72 14 C80 12 89 18 88 27 C96 30 96 40 88 44 ' +
+  'C92 50 86 57 78 56 C76 63 66 66 60 61 C54 65 46 64 43 58 ' +
+  'C36 62 26 60 24 53 C18 52 16 48 18 44 Z';
+const BRAIN_FOLDS = [
+  'M22 38 C30 32 32 44 40 38 C48 32 50 44 58 38 C66 32 68 42 76 37',
+  'M24 30 C32 25 36 34 44 29 C52 24 56 33 64 28 C72 23 76 30 82 27',
+  'M26 47 C34 42 38 51 46 46 C54 41 58 50 66 46 C74 42 78 48 84 45',
+  'M30 20 C38 16 44 23 52 19 C60 15 66 21 73 18',
+  'M34 55 C42 51 48 58 56 54 C64 50 70 55 76 52',
+  'M84 22 C90 26 92 34 86 39',
+];
+// Cerebelo (abajo a la izquierda) y tronco encefálico
+const BRAIN_STEM = [
+  'M22 54 C28 52 33 57 31 62 C28 67 21 65 20 59 Z',
+  'M30 63 C31 68 33 72 36 75',
+];
 
 export default function Brain() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -27,55 +51,138 @@ export default function Brain() {
     let W = 0, H = 0, dpr = 1;
     let nodes: Node[] = [];
     let edges: Edge[] = [];
+    let axonEdges: number[] = [];
     let pulses: Pulse[] = [];
     let raf = 0;
     let running = true;
+    let small = false;
     const mouse = { x: -9999, y: -9999 };
 
-    function seed() {
-      const n = W < 700 ? 64 : 110;
-      nodes = [];
-      // Nubes orgánicas: tres cúmulos con densidad hacia la derecha del hero
-      const clusters = [
-        { cx: W * 0.68, cy: H * 0.42, rx: W * 0.26, ry: H * 0.36, w: 0.55 },
-        { cx: W * 0.88, cy: H * 0.68, rx: W * 0.18, ry: H * 0.26, w: 0.25 },
-        { cx: W * 0.30, cy: H * 0.78, rx: W * 0.30, ry: H * 0.22, w: 0.20 },
-      ];
-      for (let i = 0; i < n; i++) {
-        let c = clusters[0];
-        const p = Math.random();
-        if (p > clusters[0].w && p <= clusters[0].w + clusters[1].w) c = clusters[1];
-        else if (p > clusters[0].w + clusters[1].w) c = clusters[2];
-        const ang = Math.random() * Math.PI * 2;
-        const rad = Math.sqrt(Math.random());
-        const x = c.cx + Math.cos(ang) * c.rx * rad;
-        const y = c.cy + Math.sin(ang) * c.ry * rad;
-        nodes.push({
-          x, y, ox: x, oy: y,
-          r: 1 + Math.random() * 1.8,
-          glow: Math.random() * 0.3,
-          hue: Math.random() < 0.24 ? 'a' : 'b',
-          ph: Math.random() * Math.PI * 2,
-        });
+    // Muestrea puntos equiespaciados a lo largo de un path SVG.
+    function samplePath(d: string, count: number): { x: number; y: number }[] {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '0');
+      svg.setAttribute('height', '0');
+      svg.style.position = 'absolute';
+      svg.style.opacity = '0';
+      svg.style.pointerEvents = 'none';
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      svg.appendChild(path);
+      document.body.appendChild(svg);
+      const out: { x: number; y: number }[] = [];
+      try {
+        const len = path.getTotalLength();
+        for (let i = 0; i < count; i++) {
+          const p = path.getPointAtLength((len * i) / count);
+          out.push({ x: p.x, y: p.y });
+        }
+      } catch {
+        /* navegador sin soporte: el cerebro simplemente queda vacío */
       }
-      // Sinapsis: k vecinos más cercanos
+      document.body.removeChild(svg);
+      return out;
+    }
+
+    function seed() {
+      nodes = [];
       edges = [];
+      axonEdges = [];
+      pulses = [];
+
+      small = W < 760;
+      // El cerebro: pequeño y compacto, arriba a la derecha. Nunca domina el titular.
+      // En móvil se recuesta contra el borde derecho para no montarse sobre el letrero.
+      const bw = Math.min(small ? W * 0.46 : W * 0.25, 330);
+      const bh = bw * 0.8;
+      const bx = small ? W - bw * 0.88 : W - bw - W * 0.09;
+      const by = small ? H * 0.03 : H * 0.13;
+      const toHero = (p: { x: number; y: number }) => ({
+        x: bx + (p.x / 100) * bw,
+        y: by + (p.y / 80) * bh,
+      });
+
+      const density = small ? 0.7 : 1;
+      const push = (p: { x: number; y: number }, kind: Kind, hueBias: number, r: number) => {
+        nodes.push({
+          x: p.x, y: p.y, ox: p.x, oy: p.y,
+          r, glow: Math.random() * 0.25,
+          hue: Math.random() < hueBias ? 'a' : 'b',
+          ph: Math.random() * Math.PI * 2,
+          kind,
+        });
+      };
+
+      // 1. Contorno del cerebro
+      for (const p of samplePath(BRAIN_OUTLINE, Math.round(58 * density))) {
+        push(toHero(p), 'brain', 0.18, 1.5 + Math.random() * 1.5);
+      }
+      // 2. Circunvoluciones internas
+      for (const d of BRAIN_FOLDS) {
+        for (const p of samplePath(d, Math.round(14 * density))) {
+          push(toHero(p), 'brain', 0.3, 1.1 + Math.random() * 1.3);
+        }
+      }
+      // 3. Cerebelo y tronco: lo que lo vuelve inconfundible
+      for (const d of BRAIN_STEM) {
+        for (const p of samplePath(d, Math.round(10 * density))) {
+          push(toHero(p), 'brain', 0.22, 1.1 + Math.random() * 1.1);
+        }
+      }
+      const brainCount = nodes.length;
+
+      // Sinapsis del cerebro: k vecinos más cercanos, para que sigan los pliegues
       const seen = new Set<string>();
-      for (let i = 0; i < nodes.length; i++) {
-        const dists = nodes
-          .map((m, j) => ({ j, d: (m.x - nodes[i].x) ** 2 + (m.y - nodes[i].y) ** 2 }))
+      const maxLink = bw * 0.105;
+      for (let i = 0; i < brainCount; i++) {
+        const near = nodes
+          .slice(0, brainCount)
+          .map((m, j) => ({ j, d: Math.hypot(m.x - nodes[i].x, m.y - nodes[i].y) }))
           .filter((o) => o.j !== i)
           .sort((a, b) => a.d - b.d)
           .slice(0, 3);
-        for (const { j, d } of dists) {
+        for (const { j, d } of near) {
           const key = i < j ? `${i}-${j}` : `${j}-${i}`;
-          if (!seen.has(key) && Math.sqrt(d) < W * 0.16) {
+          if (!seen.has(key) && d < maxLink) {
             seen.add(key);
-            edges.push({ i: Math.min(i, j), j: Math.max(i, j), d: Math.sqrt(d) });
+            edges.push({ i: Math.min(i, j), j: Math.max(i, j), d, kind: 'brain' });
           }
         }
       }
-      pulses = [];
+
+      // 3. Axones: trazas tipo circuito que salen del cerebro hacia la página.
+      //    Nacen en los nodos más a la izquierda/abajo y avanzan en ángulo recto.
+      const anchors = nodes
+        .slice(0, brainCount)
+        .map((n, i) => ({ i, score: n.x - n.y * 0.55 }))
+        .sort((a, b) => a.score - b.score)
+        .slice(0, small ? 3 : 5);
+
+      for (const a of anchors) {
+        let from = a.i;
+        let { x, y } = nodes[from];
+        const legs = 2 + Math.floor(Math.random() * 2);
+        let horizontal = true;
+        for (let l = 0; l < legs; l++) {
+          const reach = (horizontal ? W : H) * (0.09 + Math.random() * 0.13);
+          const tx = horizontal ? x - reach : x;
+          const ty = horizontal ? y : y + reach * 0.7;
+          if (tx < W * 0.04 || ty > H * 0.94) break;
+          // nodos intermedios cada ~46px para que el pulso tenga por dónde viajar
+          const steps = Math.max(1, Math.round(Math.hypot(tx - x, ty - y) / 46));
+          for (let s = 1; s <= steps; s++) {
+            const px = x + ((tx - x) * s) / steps;
+            const py = y + ((ty - y) * s) / steps;
+            push({ x: px, y: py }, 'axon', 0.35, s === steps && l === legs - 1 ? 2.4 : 1.1);
+            const to = nodes.length - 1;
+            axonEdges.push(edges.length);
+            edges.push({ i: from, j: to, d: Math.hypot(px - x, py - y) / steps, kind: 'axon' });
+            from = to;
+          }
+          x = tx; y = ty;
+          horizontal = !horizontal;
+        }
+      }
     }
 
     function resize() {
@@ -91,11 +198,15 @@ export default function Brain() {
 
     function spawnPulse() {
       if (!edges.length) return;
-      const e = Math.floor(Math.random() * edges.length);
+      // 45% de los pulsos salen por los axones: es la luz que va hacia la página
+      const useAxon = axonEdges.length > 0 && Math.random() < 0.45;
+      const e = useAxon
+        ? axonEdges[Math.floor(Math.random() * axonEdges.length)]
+        : Math.floor(Math.random() * edges.length);
       pulses.push({
         e, t: 0,
         v: 0.008 + Math.random() * 0.016,
-        dir: Math.random() < 0.5 ? 1 : -1,
+        dir: useAxon ? 1 : (Math.random() < 0.5 ? 1 : -1),
         hue: Math.random() < 0.3 ? 'a' : 'b',
       });
     }
@@ -119,18 +230,20 @@ export default function Brain() {
     function drawFrame(time: number) {
       ctx!.clearRect(0, 0, W, H);
       const t = time * 0.001;
+      ctx!.globalAlpha = small ? 0.55 : 1; // en móvil el cerebro no compite con el texto
 
-      // sinapsis (se iluminan cuando sus nodos están excitados)
+      // sinapsis y trazas (se iluminan cuando sus nodos están excitados)
       for (const e of edges) {
         const a = nodes[e.i], b = nodes[e.j];
         const excite = Math.max(a.glow, b.glow);
-        const alpha = Math.max(0.06, 0.17 - e.d / (W * 1.4)) + excite * 0.3;
+        const axon = e.kind === 'axon';
+        const alpha = (axon ? 0.13 : Math.max(0.16, 0.34 - e.d / (W * 0.9))) + excite * 0.34;
         if (excite > 0.25) {
           const c = (a.hue === 'a' || b.hue === 'a') ? GLOW_A : GLOW_B;
           ctx!.strokeStyle = `rgba(${c.r},${c.g},${c.b},${Math.min(0.55, alpha)})`;
-          ctx!.lineWidth = 1.4;
+          ctx!.lineWidth = axon ? 1.2 : 1.4;
         } else {
-          ctx!.strokeStyle = `rgba(120,150,158,${alpha})`;
+          ctx!.strokeStyle = `rgba(135,168,176,${alpha})`;
           ctx!.lineWidth = 1;
         }
         ctx!.beginPath();
@@ -175,10 +288,11 @@ export default function Brain() {
 
       // nodos
       for (const nd of nodes) {
-        // deriva orgánica visible
+        // deriva orgánica: el cerebro respira, los axones casi no se mueven
         if (!reduced) {
-          nd.x = nd.ox + Math.sin(t * 0.6 + nd.ph) * 9 + Math.sin(t * 0.23 + nd.ph * 2.1) * 5;
-          nd.y = nd.oy + Math.cos(t * 0.5 + nd.ph * 1.3) * 9 + Math.cos(t * 0.19 + nd.ph) * 5;
+          const amp = nd.kind === 'brain' ? 2.2 : 0.8;
+          nd.x = nd.ox + Math.sin(t * 0.6 + nd.ph) * amp + Math.sin(t * 0.23 + nd.ph * 2.1) * amp * 0.5;
+          nd.y = nd.oy + Math.cos(t * 0.5 + nd.ph * 1.3) * amp + Math.cos(t * 0.19 + nd.ph) * amp * 0.5;
         }
         // excitación por cercanía del cursor
         const dm = Math.hypot(nd.x - mouse.x, nd.y - mouse.y);
@@ -186,7 +300,7 @@ export default function Brain() {
         nd.glow *= 0.965; // decaimiento
 
         const c = nd.hue === 'a' ? GLOW_A : GLOW_B;
-        const base = 0.35 + nd.glow * 0.65;
+        const base = (nd.kind === 'brain' ? 0.6 : 0.3) + nd.glow * 0.4;
         if (nd.glow > 0.06) {
           const halo = ctx!.createRadialGradient(nd.x, nd.y, 0, nd.x, nd.y, 16 * nd.glow + 4);
           halo.addColorStop(0, `rgba(${c.r},${c.g},${c.b},${0.5 * nd.glow})`);
@@ -208,7 +322,7 @@ export default function Brain() {
       if (!running) return;
       if (time - last > 1000 / 60) {
         last = time;
-        if (Math.random() < 0.45) spawnPulse();
+        if (Math.random() < 0.5) spawnPulse();
         if (pulses.length > 70) pulses.splice(0, pulses.length - 70);
         drawFrame(time);
       }
