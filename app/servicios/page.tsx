@@ -5,7 +5,7 @@ import { SERVICIOS } from '@/content/servicios';
 export const metadata: Metadata = {
   title: 'Servicios de automatización e IA',
   description:
-    'Automatización de procesos, integración de sistemas y APIs, apps web y móviles, bases de datos, agentes de IA y dashboards. Desde Pereira, para todo el país.',
+    'Automatización de procesos, integración de sistemas y APIs, apps web y móviles, bases de datos, agentes de IA y dashboards. Pereira, todo el país.',
   alternates: { canonical: '/servicios' },
 };
 
