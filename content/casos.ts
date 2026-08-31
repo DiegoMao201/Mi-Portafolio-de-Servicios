@@ -100,7 +100,7 @@ export const CASOS: Caso[] = [
     slug: 'bigotes-y-paticas',
     codigo: 'E-03',
     titulo: 'Bigotes y Paticas: retail completo',
-    cliente: 'Bigotes y Paticas · Dosquebradas — empresa propia, con nombre y todo',
+    cliente: 'Bigotes y Paticas · Dosquebradas — empresa propia',
     resumen: 'E-commerce, portal de fidelización instalable, catálogo sincronizado y programa de puntos, sobre un monorepo con tienda, administración y API.',
     contexto: [
       'Bigotes y Paticas es mi tienda de mascotas en Dosquebradas. Es el caso donde no tengo que pedirte que me creas: puedes ver el resultado funcionando en vivo, porque el cliente soy yo y las consecuencias de cada decisión técnica las pago yo.',

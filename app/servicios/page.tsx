@@ -20,7 +20,7 @@ export default function ServiciosPage() {
           sistemas que no tocan tu operación crítica, y registro auditable de cada cosa que pasa.
           El frente cambia; la ingeniería no.
         </p>
-        <div className="grid g2" style={{ marginTop: 30 }}>
+        <div className="grid g-servicios" style={{ marginTop: 30 }}>
           {SERVICIOS.map((s) => (
             <Link key={s.slug} href={`/servicios/${s.slug}`} className="card">
               <h3>{s.titulo}</h3>

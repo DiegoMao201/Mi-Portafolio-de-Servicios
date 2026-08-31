@@ -22,7 +22,7 @@ export default function CasosPage() {
           encontrar: URLs de clientes ni el mecanismo interno de nada — esa misma discreción
           te cubre a ti cuando trabajemos juntos.
         </p>
-        <div className="grid g2" style={{ marginTop: 30 }}>
+        <div className="grid g-casos" style={{ marginTop: 30 }}>
           {CASOS.map((c) => (
             <Link key={c.slug} href={`/casos/${c.slug}`} className="card">
               <span className="label">{c.codigo} · {c.cliente}</span>

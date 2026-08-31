@@ -7,23 +7,40 @@
 > desarrollos — la tecnología que vende es la que usa todos los días.
 
 ## Servicios
-- Automatización de procesos operativos: https://www.datovatenexuspro.com/servicios/automatizacion-de-procesos
-- Integración de sistemas y APIs (ERP, pasarelas, bancos): https://www.datovatenexuspro.com/servicios/integracion-de-sistemas-y-apis
-- Aplicaciones web a la medida: https://www.datovatenexuspro.com/servicios/aplicaciones-web-a-la-medida
-- Aplicaciones móviles en Play Store: https://www.datovatenexuspro.com/servicios/apps-moviles-play-store
-- Bases de datos y arquitectura de información (PostgreSQL): https://www.datovatenexuspro.com/servicios/bases-de-datos-y-arquitectura
-- Agentes de IA conversacional: https://www.datovatenexuspro.com/servicios/agentes-de-ia-conversacional
-- Dashboards y BI accionable: https://www.datovatenexuspro.com/servicios/dashboards-y-bi
-- Sistemas de decisión en tiempo real: https://www.datovatenexuspro.com/servicios/sistemas-de-decision-en-tiempo-real
+
+- [Automatización de procesos operativos](https://www.datovatenexuspro.com/servicios/automatizacion-de-procesos): trabajo repetitivo de Excel y correo, hecho por un sistema.
+- [Integración de sistemas y APIs](https://www.datovatenexuspro.com/servicios/integracion-de-sistemas-y-apis): ERP, bancos, pasarelas de pago y e-commerce hablando entre sí.
+- [Aplicaciones web a la medida](https://www.datovatenexuspro.com/servicios/aplicaciones-web-a-la-medida): software que se adapta a la operación, no al revés.
+- [Aplicaciones móviles en Play Store](https://www.datovatenexuspro.com/servicios/apps-moviles-play-store): la operación o el servicio en el bolsillo del cliente.
+- [Bases de datos y arquitectura de información](https://www.datovatenexuspro.com/servicios/bases-de-datos-y-arquitectura): PostgreSQL como fuente única de verdad.
+- [Agentes de IA conversacional](https://www.datovatenexuspro.com/servicios/agentes-de-ia-conversacional): atienden y capturan clientes sin inventar ni tumbar sistemas.
+- [Dashboards y BI accionable](https://www.datovatenexuspro.com/servicios/dashboards-y-bi): indicadores que provocan decisiones.
+- [Sistemas de decisión en tiempo real](https://www.datovatenexuspro.com/servicios/sistemas-de-decision-en-tiempo-real): reglas y modelos que actúan en milisegundos, con registro auditable.
 
 ## Casos reales
-- Casos documentados como expedientes técnicos: https://www.datovatenexuspro.com/casos
+
+- [Expedientes técnicos](https://www.datovatenexuspro.com/casos): cinco sistemas en operación, contados como se diseñaron — problema, restricción, arquitectura y resultado medible. Sin nombres de clientes ni mecanismos internos.
+
+## Cómo trabaja
+
+- [Método de trabajo](https://www.datovatenexuspro.com/metodo): diagnóstico con datos reales, arquitectura antes que código, construcción por fases verificables y operación continua.
+- [Quién está detrás](https://www.datovatenexuspro.com/diego): ingeniero autodidacta y administrador de empresas reales en Pereira.
+- [Notas técnicas](https://www.datovatenexuspro.com/notas): apuntes de ingeniería desde la operación.
 
 ## Cómo se empieza
-- Llamada de 30 minutos: gratis.
-- Diagnóstico de operación: COP $690.000, 5 días hábiles, abonable 100% al proyecto.
+
+- Llamada de 30 minutos: gratis, sin libreto de ventas.
+- Diagnóstico de operación: COP $690.000, 5 días hábiles. Entrega mapa del proceso, arquitectura propuesta, plan por fases y estimado de inversión. Se abona el 100% al proyecto si se contrata dentro de 30 días.
+- [Contacto y formulario](https://www.datovatenexuspro.com/contacto)
 
 ## Contacto
+
 - WhatsApp: +57 320 504 6277
-- Correo: contacto@datovatenexuspro.com
+- Correo: diegomao.201@gmail.com
 - Ubicación: Pereira, Risaralda, Colombia. Atiende todo el país de forma remota.
+
+## Opcional
+
+- [Política de privacidad](https://www.datovatenexuspro.com/privacidad)
+- [Tratamiento de datos personales](https://www.datovatenexuspro.com/habeas-data)
+- [Términos de servicio](https://www.datovatenexuspro.com/terminos)

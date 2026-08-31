@@ -12,6 +12,7 @@ import { SITE, JSONLD_BASE, waLink } from '@/lib/site';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Fx from '@/components/Fx';
+import Spotlight from '@/components/Spotlight';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <Footer />
         <Fx />
+        <Spotlight />
         <a
           className="wa-float"
           href={waLink('Hola Diego, vengo de datovatenexuspro.com y quiero hablar sobre un proyecto.')}
