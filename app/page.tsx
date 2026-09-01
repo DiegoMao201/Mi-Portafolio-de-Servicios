@@ -159,8 +159,8 @@ export default function Home() {
                   </tr>
                   <tr>
                     <td><strong>Operación y evolución</strong></td>
-                    <td data-col="Qué recibes">El sistema vivo: monitoreo, soporte, mejoras y nuevas automatizaciones cada mes.</td>
-                    <td className="mono tnum" data-col="Inversión">desde $890.000/mes</td>
+                    <td data-col="Qué recibes">El sistema vivo: monitoreo, soporte, mejoras y nuevas automatizaciones cada mes. El valor depende de la complejidad de lo que hay que vigilar.</td>
+                    <td className="mono tnum" data-col="Inversión">desde $150.000/mes</td>
                   </tr>
                 </tbody>
               </table>

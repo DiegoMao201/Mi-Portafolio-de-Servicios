@@ -12,7 +12,7 @@ function corpus(): string {
 - Llamada de 30 minutos: gratis, sin compromiso.
 - Diagnóstico de operación: COP $690.000, 5 días hábiles. Entrega: mapa del proceso, dónde se pierde tiempo y plata, arquitectura propuesta, plan por fases y estimado de inversión. Se abona el 100% al proyecto si se contrata dentro de 30 días.
 - Construcción de sistema: desde COP $3.900.000 según alcance, por hitos (40/30/30), incluye despliegue y capacitación.
-- Operación y evolución: desde COP $890.000/mes — monitoreo, soporte y mejoras.
+- Operación y evolución: desde COP $150.000/mes — monitoreo, soporte y mejoras. El "desde" es real: el valor depende de la complejidad del sistema y de cuánto haya que vigilar. Una pyme que arranca con un sistema pequeño empieza por abajo.
 
 ## SOBRE DIEGO
 Diego Mauricio García Rengifo, ingeniero industrial de la Universidad Tecnológica de Pereira y desarrollador de software. Integra analítica de datos, desarrollo web e IA para optimizar procesos comerciales, logísticos y empresariales. Viene del liderazgo de compras y la gestión comercial en el sector de recubrimientos, adhesivos y suministros industriales, así que conoce por dentro la operación que automatiza. Fundador de Bigotes y Paticas.

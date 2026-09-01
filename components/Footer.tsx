@@ -38,6 +38,7 @@ export default function Footer() {
         <div>
           <h4>Sitio</h4>
           <Link href="/casos">Casos reales</Link>
+          <Link href="/preguntas">Preguntas frecuentes</Link>
           <Link href="/metodo">Método de trabajo</Link>
           <Link href="/notas">Notas técnicas</Link>
           <Link href="/diego">Quién está detrás</Link>

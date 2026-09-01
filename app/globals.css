@@ -891,6 +891,22 @@ a.card--fila:hover .fila-num{-webkit-text-stroke-color:var(--signal)}
 /* La banda ya es oscura: el diagrama no necesita su propia caja dentro. */
 .banda .arch{border:0; border-top:2px solid var(--cyan); background:none; box-shadow:none; margin:0}
 
+/* --- Preguntas frecuentes: cada pregunta es un encabezado real ----------
+   Una IA cita lo que responde la pregunta que le hicieron, y para eso la
+   pregunta tiene que ser el encabezado, no una linea escondida en un parrafo. */
+.preguntas{display:grid; gap:0; margin-top:6px}
+.pregunta{padding:22px 0; border-top:1px solid var(--line)}
+.preguntas > .pregunta:last-child{border-bottom:1px solid var(--line)}
+.pregunta h2{
+  font-size:clamp(18px,2vw,23px); line-height:1.25; letter-spacing:-.015em;
+  margin-bottom:8px; max-width:52ch;
+}
+.pregunta p{margin:0; color:var(--ink-2); max-width:70ch; font-size:16.5px}
+@media(min-width:1000px){
+  .pregunta{display:grid; grid-template-columns:minmax(0,38%) minmax(0,1fr); gap:clamp(20px,3vw,48px); align-items:start}
+  .pregunta h2{margin-bottom:0}
+}
+
 /* --- Anclaje asimetrico: el bloque se para a la derecha ---------------- */
 .bloque--derecha{margin-left:auto; max-width:min(660px,100%)}
 .bloque--angosto{max-width:min(560px,100%)}

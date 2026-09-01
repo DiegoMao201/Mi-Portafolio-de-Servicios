@@ -58,7 +58,10 @@ export const JSONLD_BASE = {
       sameAs: ['https://github.com/DiegoMao201'] as string[],
     },
     {
-      '@type': 'Organization',
+      /* ProfessionalService en vez de solo Organization: le dice a un buscador
+         y a un asistente QUÉ se vende, DÓNDE y POR CUÁNTO. Los precios son los
+         mismos que ya están publicados en la página; no hay cifra nueva. */
+      '@type': ['Organization', 'ProfessionalService'],
       '@id': `${SITE.url}/#org`,
       name: 'Datovate Nexus Pro',
       url: SITE.url,
@@ -66,7 +69,65 @@ export const JSONLD_BASE = {
       telephone: '+57 320 504 6277',
       founder: { '@id': `${SITE.url}/#diego` },
       sameAs: ['https://github.com/DiegoMao201'],
-      areaServed: 'CO',
+      description:
+        'Automatización de procesos operativos, integración de sistemas y APIs, análisis ' +
+        'de datos e inteligencia de negocios, bases de datos, agentes de IA conversacional ' +
+        'y aplicaciones a la medida para empresas colombianas. Opera desde Pereira para ' +
+        'todo el país, de forma remota.',
+      knowsLanguage: 'es-CO',
+      priceRange: 'COP $690.000 – $3.900.000+',
+      currenciesAccepted: 'COP',
+      areaServed: { '@type': 'Country', name: 'Colombia' },
+      serviceArea: { '@type': 'Country', name: 'Colombia' },
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Servicios de automatización e IA aplicada',
+        itemListElement: [
+          {
+            '@type': 'Offer',
+            name: 'Llamada de diagnóstico inicial',
+            description: 'Conversación técnica de 30 minutos sobre tu operación, sin compromiso.',
+            price: '0',
+            priceCurrency: 'COP',
+          },
+          {
+            '@type': 'Offer',
+            name: 'Diagnóstico de operación',
+            description:
+              'Cinco días hábiles: mapa del proceso, dónde se pierde tiempo y dinero, ' +
+              'arquitectura propuesta, plan por fases y estimado de inversión. Se abona el ' +
+              '100% al proyecto si se contrata dentro de 30 días.',
+            price: '690000',
+            priceCurrency: 'COP',
+          },
+          {
+            '@type': 'Offer',
+            name: 'Construcción del sistema',
+            description:
+              'Sistema completo en producción: datos, integraciones, aplicación, despliegue ' +
+              'y capacitación. Por hitos verificables (40/30/30).',
+            priceCurrency: 'COP',
+            priceSpecification: {
+              '@type': 'PriceSpecification',
+              minPrice: '3900000',
+              priceCurrency: 'COP',
+            },
+          },
+          {
+            '@type': 'Offer',
+            name: 'Operación y evolución',
+            description: 'Monitoreo, soporte, ajustes y nuevas automatizaciones cada mes.',
+            priceCurrency: 'COP',
+            priceSpecification: {
+              '@type': 'PriceSpecification',
+              minPrice: '150000',
+              priceCurrency: 'COP',
+              billingDuration: 1,
+              billingIncrement: 1,
+            },
+          },
+        ],
+      },
       address: { '@type': 'PostalAddress', addressLocality: 'Pereira', addressRegion: 'Risaralda', addressCountry: 'CO' },
     },
   ],

@@ -12,6 +12,7 @@ export default function Header() {
           <Link href="/servicios">Servicios</Link>
           <Link href="/casos">Casos</Link>
           <Link href="/metodo">Método</Link>
+          <Link href="/preguntas">Preguntas</Link>
           <Link href="/notas">Notas</Link>
           <Link href="/diego">Diego</Link>
           <Link href="/contacto" className="cta">Hablemos</Link>
