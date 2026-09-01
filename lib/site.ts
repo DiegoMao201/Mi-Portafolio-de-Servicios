@@ -54,8 +54,8 @@ export const JSONLD_BASE = {
         'suministros industriales.',
       // sameAs: enlaza esta página con los perfiles públicos de Diego. Es la
       // señal con la que buscadores y asistentes de IA confirman que se trata
-      // de la misma persona. Pendiente: agregar LinkedIn y GitHub.
-      sameAs: [] as string[],
+      // de la misma persona en todas partes.
+      sameAs: ['https://github.com/DiegoMao201'] as string[],
     },
     {
       '@type': 'Organization',
@@ -65,6 +65,7 @@ export const JSONLD_BASE = {
       email: SITE.email,
       telephone: '+57 320 504 6277',
       founder: { '@id': `${SITE.url}/#diego` },
+      sameAs: ['https://github.com/DiegoMao201'],
       areaServed: 'CO',
       address: { '@type': 'PostalAddress', addressLocality: 'Pereira', addressRegion: 'Risaralda', addressCountry: 'CO' },
     },

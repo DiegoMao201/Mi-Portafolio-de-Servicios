@@ -20,6 +20,11 @@ export default function Footer() {
             <a href={waLink('Hola Diego, quiero hablar sobre un proyecto.')} target="_blank" rel="noopener">
               WhatsApp +57 320 504 6277
             </a>
+            {/* El enlace tiene que existir para un humano, no solo en el JSON-LD:
+                es la mitad visible de la conexión sitio ↔ GitHub. */}
+            <a href="https://github.com/DiegoMao201" target="_blank" rel="noopener me">
+              github.com/DiegoMao201
+            </a>
           </p>
         </div>
         <div>
