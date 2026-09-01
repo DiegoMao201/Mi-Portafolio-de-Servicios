@@ -123,7 +123,7 @@ export const JSONLD_BASE = {
       knowsLanguage: 'es-CO',
       // El rango arranca en el plan mensual, que es la puerta de entrada real
       // para una pyme, no en el diagnóstico.
-      priceRange: 'COP $150.000 – $3.900.000+',
+      priceRange: 'COP $150.000 – $5.000.000',
       currenciesAccepted: 'COP',
       areaServed: { '@type': 'Country', name: 'Colombia', sameAs: 'https://www.wikidata.org/wiki/Q739' },
       serviceArea: { '@type': 'Country', name: 'Colombia', sameAs: 'https://www.wikidata.org/wiki/Q739' },
@@ -145,7 +145,7 @@ export const JSONLD_BASE = {
               'Cinco días hábiles: mapa del proceso, dónde se pierde tiempo y dinero, ' +
               'arquitectura propuesta, plan por fases y estimado de inversión. Se abona el ' +
               '100% al proyecto si se contrata dentro de 30 días.',
-            price: '690000',
+            price: '300000',
             priceCurrency: 'COP',
           },
           {
@@ -157,7 +157,8 @@ export const JSONLD_BASE = {
             priceCurrency: 'COP',
             priceSpecification: {
               '@type': 'PriceSpecification',
-              minPrice: '3900000',
+              minPrice: '2000000',
+              maxPrice: '5000000',
               priceCurrency: 'COP',
             },
           },

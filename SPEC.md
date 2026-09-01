@@ -346,8 +346,8 @@ Diego decide; esta es mi recomendación para la etapa de adquisición de cliente
 | Producto | Precio sugerido | Entregable |
 |---|---|---|
 | Llamada de 30 minutos | Gratis | Conversación técnica, sin compromiso |
-| **Diagnóstico de operación** | **COP $690.000** | 5 días hábiles: mapa del proceso actual, dónde se pierde tiempo y plata, arquitectura propuesta, plan por fases y estimado de inversión. **Se abona 100% al proyecto si contrata dentro de 30 días.** |
-| Construcción | desde COP $3.900.000 | Por hitos 40 / 30 / 30. Incluye despliegue y capacitación. |
+| **Diagnóstico de operación** | **COP $300.000** | 5 días hábiles: mapa del proceso actual, dónde se pierde tiempo y plata, arquitectura propuesta, plan por fases y estimado de inversión. **Se abona 100% al proyecto si contrata dentro de 30 días.** |
+| Construcción | COP $2.000.000 a $5.000.000 | Por hitos 40 / 30 / 30. Incluye despliegue y capacitación. El rango lo mueven: número de sistemas a conectar, si entregan datos o hay que extraerlos, excepciones del proceso y limpieza del dato de origen. |
 | Operación y evolución | desde COP $150.000 / mes | Monitoreo, soporte, mejoras y nuevas automatizaciones. El valor depende de la complejidad del sistema. |
 
 Por qué así: el diagnóstico pago filtra curiosos sin espantar a nadie, te paga el tiempo de la propuesta, y el abono del 100% elimina la objeción de "¿y si no sigo?". Es la palanca de adquisición más rápida que existe para un ingeniero solo.

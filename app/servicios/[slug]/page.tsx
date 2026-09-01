@@ -89,7 +89,7 @@ export default async function ServicioPage({ params }: { params: Promise<{ slug:
             <p>{s.tecnologias.join(' · ')}</p>
             <span className="label" style={{ marginTop: 14 }}>Cómo se empieza</span>
             <p>
-              Llamada de 30 minutos gratis. Después, diagnóstico de operación por COP $690.000
+              Llamada de 30 minutos gratis. Después, diagnóstico de operación por COP $300.000
               (5 días hábiles) que se abona completo al proyecto si contratas en 30 días.
             </p>
           </div>

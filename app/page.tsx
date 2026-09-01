@@ -150,12 +150,12 @@ export default function Home() {
                   <tr>
                     <td><strong>Diagnóstico de operación</strong></td>
                     <td data-col="Qué recibes">En 5 días hábiles: mapa de tu proceso, dónde se pierde tiempo y plata, arquitectura propuesta, plan por fases y estimado de inversión. <strong>Se abona el 100% al proyecto</strong> si contratas dentro de los 30 días.</td>
-                    <td className="mono tnum" data-col="Inversión">COP $690.000</td>
+                    <td className="mono tnum" data-col="Inversión">COP $300.000</td>
                   </tr>
                   <tr>
                     <td><strong>Construcción</strong></td>
                     <td data-col="Qué recibes">El sistema completo en producción: datos, integraciones, aplicación, despliegue y capacitación. Por hitos verificables.</td>
-                    <td className="mono tnum" data-col="Inversión">desde $3.900.000</td>
+                    <td className="mono tnum" data-col="Inversión">$2.000.000 a $5.000.000</td>
                   </tr>
                   <tr>
                     <td><strong>Operación y evolución</strong></td>

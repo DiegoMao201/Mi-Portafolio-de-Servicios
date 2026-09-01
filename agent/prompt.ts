@@ -10,8 +10,8 @@ function corpus(): string {
   ).join('\n\n');
   return `## SERVICIOS\n\n${servicios}\n\n## CASOS REALES\n\n${casos}\n\n## PRECIOS
 - Llamada de 30 minutos: gratis, sin compromiso.
-- Diagnóstico de operación: COP $690.000, 5 días hábiles. Entrega: mapa del proceso, dónde se pierde tiempo y plata, arquitectura propuesta, plan por fases y estimado de inversión. Se abona el 100% al proyecto si se contrata dentro de 30 días.
-- Construcción de sistema: desde COP $3.900.000 según alcance, por hitos (40/30/30), incluye despliegue y capacitación.
+- Diagnóstico de operación (la radiografía): COP $300.000, 5 días hábiles. Entrega: mapa del proceso, dónde se pierde tiempo y plata, arquitectura propuesta, plan por fases y estimado de inversión. Se abona el 100% al proyecto si se contrata dentro de 30 días.
+- Construcción de sistema: entre COP $2.000.000 y $5.000.000 segun alcance, por hitos (40/30/30), incluye despliegue y capacitacion. Lo que mueve el rango: cuantos sistemas hay que conectar, si entregan datos o hay que sacarselos a la fuerza, cuantas excepciones tiene el proceso y que tan sucio este el dato de origen. Una vez corriendo no hay licencia mensual por usarlo: solo auditorias periodicas.
 - Operación y evolución: desde COP $150.000/mes — monitoreo, soporte y mejoras. El "desde" es real: el valor depende de la complejidad del sistema y de cuánto haya que vigilar. Una pyme que arranca con un sistema pequeño empieza por abajo.
 
 ## SOBRE DIEGO
