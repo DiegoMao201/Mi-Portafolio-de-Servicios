@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 /**
  * La firma de la casa: la misma luz que enciende el cerebro del hero, ahora en
- * las tarjetas. Al pasar el cursor sobre una rejilla, la tarjeta bajo el cursor
+ * las tarjetas. Al pasar el cursor sobre un contenedor, la pieza bajo el cursor
  * se ilumina desde el punto exacto donde está, y las demás de esa rejilla se
  * atenúan. En reposo no se ve nada: la página queda limpia y el efecto solo
  * aparece cuando alguien explora.
@@ -12,6 +12,11 @@ import { useEffect } from 'react';
  * El trabajo pesado lo hace el CSS: aquí solo se publica la posición del cursor
  * en dos variables (--mx, --my) y se marca la rejilla como activa.
  */
+/* Contenedores que reparten luz: la rejilla, el carril horizontal y la lista
+ * indexada. Antes solo era '.grid', y al pasar los casos a carril el efecto
+ * se apagaba justo en la seccion donde mas se explora. */
+const CONTENEDORES = '.grid, .carril, .lista';
+
 export default function Spotlight() {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -33,7 +38,7 @@ export default function Spotlight() {
     function onMove(ev: PointerEvent) {
       const target = ev.target as HTMLElement | null;
       const card = target?.closest<HTMLElement>('.card');
-      const grid = target?.closest<HTMLElement>('.grid');
+      const grid = target?.closest<HTMLElement>(CONTENEDORES);
       if (!grid) return;
 
       if (card) {
@@ -53,7 +58,7 @@ export default function Spotlight() {
     }
 
     function onLeave(ev: PointerEvent) {
-      const grid = (ev.target as HTMLElement | null)?.closest<HTMLElement>('.grid');
+      const grid = (ev.target as HTMLElement | null)?.closest<HTMLElement>(CONTENEDORES);
       if (!grid) return;
       grid.classList.remove('lit');
       grid.querySelectorAll('.card.on').forEach((c) => c.classList.remove('on'));

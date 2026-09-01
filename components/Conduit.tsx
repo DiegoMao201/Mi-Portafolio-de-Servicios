@@ -4,9 +4,9 @@ export default function Conduit({ x = 50 }: { x?: number }) {
   return (
     <div className="conduit" aria-hidden="true">
       <svg viewBox="0 0 100 56" preserveAspectRatio="none">
-        <path d={d} vectorEffect="non-scaling-stroke" />
-        <path className="flow" d={d} vectorEffect="non-scaling-stroke" />
-        <path className="flow2" d={d} vectorEffect="non-scaling-stroke" />
+        <path d={d} fill="none" vectorEffect="non-scaling-stroke" />
+        <path className="flow" d={d} fill="none" vectorEffect="non-scaling-stroke" />
+        <path className="flow2" d={d} fill="none" vectorEffect="non-scaling-stroke" />
       </svg>
     </div>
   );

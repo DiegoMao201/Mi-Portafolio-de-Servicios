@@ -10,12 +10,16 @@ export type GraphEdge = { de: string; a: string; dato?: string };
  * los nodos encienden en cascada y por cada conexión corren pulsos de luz.
  */
 export default function ArchGraph({
-  nodos, conexiones, caption, dark = false,
+  nodos, conexiones, caption, dark = false, eje = 'vertical',
 }: {
   nodos: GraphNode[];
   conexiones: GraphEdge[];
   caption?: string;
   dark?: boolean;
+  /** Una cadena lineal (una fase tras otra) se lee mejor en horizontal, y
+   *  ademas llena el ancho: en vertical quedaba una columna flaca en el centro
+   *  de una banda enorme. */
+  eje?: 'vertical' | 'horizontal';
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -35,8 +39,14 @@ export default function ArchGraph({
   }
   for (const n of nodos) if (!layers.has(n.id)) layers.set(n.id, 0);
 
-  const W = 900;
-  const BW = 182, BH = 54, ROW = 118, PADX = 24, PADY = 26;
+  const horiz = eje === 'horizontal';
+  const BW = 182, BH = 54, PADX = 24, PADY = 26;
+  const ROW = 118;          // separacion entre capas en vertical
+  // El hueco entre columnas lo manda la etiqueta de cable mas larga: con un
+  // valor fijo, 'sistema en produccion' se montaba encima de las cajas.
+  const anchoChip = (t: string) => t.length * 6.4 + 18;
+  const chipMax = conexiones.reduce((m, e) => Math.max(m, e.dato ? anchoChip(e.dato) : 0), 0);
+  const COL = BW + Math.max(80, Math.ceil(chipMax) + 34);
   const byLayer = new Map<number, GraphNode[]>();
   for (const n of nodos) {
     const l = layers.get(n.id)!;
@@ -44,14 +54,26 @@ export default function ArchGraph({
     byLayer.get(l)!.push(n);
   }
   const maxLayer = Math.max(...Array.from(byLayer.keys()));
-  const H = PADY * 2 + (maxLayer + 1) * BH + maxLayer * (ROW - BH);
+  const anchoGrupo = Math.max(...Array.from(byLayer.values()).map((g) => g.length));
+
+  const W = horiz ? PADX * 2 + (maxLayer + 1) * BW + maxLayer * (COL - BW) : 900;
+  const H = horiz
+    ? PADY * 2 + anchoGrupo * BH + (anchoGrupo - 1) * 64
+    : PADY * 2 + (maxLayer + 1) * BH + maxLayer * (ROW - BH);
 
   const pos = new Map<string, { x: number; y: number }>();
   for (const [l, group] of byLayer) {
-    const slot = (W - PADX * 2) / group.length;
-    group.forEach((n, i) => {
-      pos.set(n.id, { x: PADX + slot * i + (slot - BW) / 2, y: PADY + l * ROW });
-    });
+    if (horiz) {
+      const slot = (H - PADY * 2) / group.length;
+      group.forEach((n, i) => {
+        pos.set(n.id, { x: PADX + l * COL, y: PADY + slot * i + (slot - BH) / 2 });
+      });
+    } else {
+      const slot = (W - PADX * 2) / group.length;
+      group.forEach((n, i) => {
+        pos.set(n.id, { x: PADX + slot * i + (slot - BW) / 2, y: PADY + l * ROW });
+      });
+    }
   }
 
   useEffect(() => {
@@ -81,18 +103,27 @@ export default function ArchGraph({
   function edgeGeo(e: GraphEdge): EdgeGeo | null {
     const a = pos.get(e.de), b = pos.get(e.a);
     if (!a || !b) return null;
-    const x1 = a.x + BW / 2, y1 = a.y + BH;
-    const x2 = b.x + BW / 2, y2 = b.y;
+    // En horizontal el cable sale por el costado derecho y entra por el izquierdo.
+    const x1 = horiz ? a.x + BW : a.x + BW / 2;
+    const y1 = horiz ? a.y + BH / 2 : a.y + BH;
+    const x2 = horiz ? b.x : b.x + BW / 2;
+    const y2 = horiz ? b.y + BH / 2 : b.y;
+    const dx = Math.max(28, (x2 - x1) * 0.55);
     const dy = Math.max(28, (y2 - y1) * 0.55);
-    // curva de circuito: sale vertical, entra vertical
-    const d = `M${x1} ${y1} C ${x1} ${y1 + dy}, ${x2} ${y2 - dy}, ${x2} ${y2}`;
+    const d = horiz
+      ? `M${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`
+      : `M${x1} ${y1} C ${x1} ${y1 + dy}, ${x2} ${y2 - dy}, ${x2} ${y2}`;
     const lx = (x1 + x2) / 2;
     const ly = (y1 + y2) / 2;
     return { d, lx, ly, x1, y1, x2, y2 };
   }
 
   return (
-    <div ref={ref} className={dark ? 'arch diag-arch' : 'arch'}>
+    <div ref={ref} className={`${dark ? 'arch diag-arch' : 'arch'}${horiz ? ' arch--h' : ''}`}>
+      {/* El lienzo se separa del pie: en pantallas estrechas un diagrama
+          horizontal se desplaza en lugar de aplastarse hasta ser ilegible,
+          y el pie de figura se queda quieto. */}
+      <div className="arch-lienzo">
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Diagrama de arquitectura del sistema">
         {/* conexiones */}
         {conexiones.map((e, i) => {
@@ -101,10 +132,10 @@ export default function ArchGraph({
           const chipW = e.dato ? e.dato.length * 6.4 + 18 : 0;
           return (
             <g key={`e${i}`}>
-              <path className="e-glow" d={g.d} />
-              <path className="e-line draw" d={g.d} />
-              <path className={`e-flow ${i % 2 ? 'b' : ''}`} d={g.d} style={{ animationDelay: `${i * 0.5}s` }} />
-              <path className={`e-flow ${i % 2 ? '' : 'b'}`} d={g.d} style={{ animationDelay: `${i * 0.5 + 1.3}s` }} />
+              <path className="e-glow" d={g.d} fill="none" />
+              <path className="e-line draw" d={g.d} fill="none" />
+              <path className={`e-flow ${i % 2 ? 'b' : ''}`} d={g.d} fill="none" style={{ animationDelay: `${i * 0.5}s` }} />
+              <path className={`e-flow ${i % 2 ? '' : 'b'}`} d={g.d} fill="none" style={{ animationDelay: `${i * 0.5 + 1.3}s` }} />
               <circle className="port out" cx={g.x1} cy={g.y1} r={3.2} />
               <circle className="port" cx={g.x2} cy={g.y2} r={3.2} />
               {e.dato ? (
@@ -131,6 +162,7 @@ export default function ArchGraph({
           );
         })}
       </svg>
+      </div>
       {caption ? <div className="arch-cap">{caption}</div> : null}
     </div>
   );

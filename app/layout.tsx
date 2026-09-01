@@ -13,6 +13,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Fx from '@/components/Fx';
 import Spotlight from '@/components/Spotlight';
+import Corriente from '@/components/Corriente';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -42,6 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es-CO">
       <body>
+        {/* El sustrato eléctrico: va antes que nada y vive detrás de todo. */}
+        <Corriente />
         <Header />
         {children}
         <Footer />

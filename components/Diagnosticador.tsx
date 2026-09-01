@@ -2,9 +2,17 @@
 
 import { useRef, useState } from 'react';
 import ArchGraph, { GraphEdge, GraphNode } from './ArchGraph';
+import RedPensando from './RedPensando';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
-type Arch = { titulo?: string; nodos: GraphNode[]; conexiones: GraphEdge[]; fases?: { titulo: string; detalle: string }[] };
+type Arch = {
+  titulo?: string;
+  nodos: GraphNode[];
+  conexiones: GraphEdge[];
+  fases?: { titulo: string; detalle: string }[];
+  /** Qué deja de hacerse a mano. Es lo que convierte el boceto en respuesta. */
+  gana?: string[];
+};
 
 function visible(text: string): string {
   return text
@@ -162,16 +170,29 @@ export default function Diagnosticador() {
                 ))}
               </div>
             ) : null}
+            {arch.gana?.length ? (
+              <div className="gana">
+                <span className="label">Qué deja de hacerse a mano</span>
+                <ul>
+                  {arch.gana.slice(0, 5).map((g, i) => <li key={i}>{g}</li>)}
+                </ul>
+              </div>
+            ) : null}
             <p style={{ fontSize: 12, color: 'var(--machine-dim)', marginTop: 12 }}>
               Boceto preliminar generado por IA. El diagnóstico formal lo confirma con tus datos reales.
             </p>
           </>
         ) : (
-          <div className="diag-empty">
-            <p>
-              Aquí aparecerá el diagrama de tu solución:<br />
-              qué sistemas se conectan, qué datos viajan y en qué fases.
-            </p>
+          <div className="diag-red">
+            <RedPensando activa={busy} />
+            <div className="diag-red-texto">
+              <span className="diag-estado">{busy ? 'Pensando…' : 'En espera'}</span>
+              <p>
+                {busy
+                  ? 'Leyendo tu proceso y trazando la arquitectura que lo resolvería.'
+                  : 'Aquí se dibuja el diagrama de tu solución: qué sistemas se conectan, qué datos viajan y en qué fases.'}
+              </p>
+            </div>
           </div>
         )}
       </div>

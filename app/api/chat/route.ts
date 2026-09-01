@@ -43,7 +43,20 @@ export async function POST(req: NextRequest) {
   const userTurns = messages.filter((m) => m.role === 'user').length;
   if (userTurns > MAX_TURNS) return Response.json({ error: 'session_limit' }, { status: 429 });
 
-  const model = process.env.OPENROUTER_MODEL || 'openrouter/auto';
+  // 'openrouter/auto' enruta a lo que esté barato en ese momento: por eso el
+  // Diagnosticador respondía flojo y con el mismo esquema siempre. El modelo se
+  // fija; la variable de entorno sigue mandando si Diego quiere cambiarlo.
+  const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-opus-5';
+
+  // El corpus (servicios, casos, precios) es el mismo en cada turno y es la
+  // mayor parte del prompt. En los modelos de Anthropic se marca como cacheable
+  // y se cobra a una fracción a partir del segundo turno. Solo se manda esta
+  // forma cuando el modelo la entiende: en otros proveedores rompería.
+  const sistema = systemPrompt();
+  const anthropic = model.startsWith('anthropic/');
+  const mensajeSistema = anthropic
+    ? { role: 'system', content: [{ type: 'text', text: sistema, cache_control: { type: 'ephemeral' } }] }
+    : { role: 'system', content: sistema };
   const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -56,9 +69,12 @@ export async function POST(req: NextRequest) {
       model,
       stream: true,
       usage: { include: true },
-      max_tokens: 900,
+      // 900 no alcanzaba: la respuesta lleva el texto, el bloque de
+      // arquitectura (hasta 8 nodos) y a veces el de lead. Se truncaba el JSON
+      // y el diagrama no llegaba a dibujarse.
+      max_tokens: 2400,
       temperature: 0.4,
-      messages: [{ role: 'system', content: systemPrompt() }, ...messages],
+      messages: [mensajeSistema, ...messages],
     }),
   });
 

@@ -11,39 +11,54 @@ export const metadata: Metadata = {
 
 export default function ContactoPage() {
   return (
-    <main className="sec">
-      <div className="wrap">
-        <p className="label sec-kicker">Contacto</p>
-        <h1 style={{ fontSize: 'clamp(30px,4.4vw,48px)' }}>Cuéntame qué te duele</h1>
-        <p className="lede">
-          Empezamos con una llamada de 30 minutos, gratis y sin libreto de ventas: tú me cuentas
-          tu operación, yo te digo con franqueza qué se puede resolver y qué no vale la pena.
-        </p>
-
-        <div className="grid g3" style={{ margin: '26px 0 34px' }}>
-          <a className="card" href={waLink('Hola Diego, quiero agendar la llamada de 30 minutos.')} target="_blank" rel="noopener">
-            <span className="label">La vía rápida</span>
-            <h3>WhatsApp</h3>
-            <p>+57 320 504 6277 — respondo personalmente.</p>
-            <span className="go">Abrir chat →</span>
-          </a>
-          <a className="card" href={`mailto:${SITE.email}`}>
-            <span className="label">Para propuestas y documentos</span>
-            <h3>Correo</h3>
-            <p>{SITE.email}</p>
-            <span className="go">Escribir →</span>
-          </a>
-          <a className="card" href="/#diagnosticador">
-            <span className="label">¿Aún explorando?</span>
-            <h3>El Diagnosticador</h3>
-            <p>Descríbele tu problema a la IA y mira el boceto de la solución.</p>
-            <span className="go">Probar →</span>
-          </a>
+    <main>
+      <section className="sec sec--air">
+        <div className="wrap">
+          <p className="label sec-kicker">Contacto</p>
+          <h1>Cuéntame<br />qué te duele</h1>
+          <p className="lede bloque--angosto">
+            Empezamos con una llamada de 30 minutos, gratis y sin libreto de ventas: tú me cuentas
+            tu operación, yo te digo con franqueza qué se puede resolver y qué no vale la pena.
+          </p>
         </div>
+      </section>
 
-        <h2 style={{ marginBottom: 16 }}>O deja el mensaje aquí</h2>
-        <LeadForm />
-      </div>
+      {/* Las tres vías quedan fijas a la izquierda mientras se llena el formulario */}
+      <section className="sec sec--tight sec--split">
+        <div className="wrap">
+          <div className="riel-fijo">
+            <p className="label sec-kicker">Por dónde prefieras</p>
+            <div className="lista" style={{ marginTop: 14 }}>
+              <a className="card card--fila card--via" href={waLink('Hola Diego, quiero agendar la llamada de 30 minutos.')} target="_blank" rel="noopener">
+                <span>
+                  <h3>WhatsApp</h3>
+                  <p>+57 320 504 6277 — respondo personalmente.</p>
+                </span>
+                <span className="go">Abrir chat →</span>
+              </a>
+              <a className="card card--fila card--via" href={`mailto:${SITE.email}`}>
+                <span>
+                  <h3>Correo</h3>
+                  <p>{SITE.email}</p>
+                </span>
+                <span className="go">Escribir →</span>
+              </a>
+              <a className="card card--fila card--via" href="/#diagnosticador">
+                <span>
+                  <h3>El Diagnosticador</h3>
+                  <p>Descríbele tu problema a la IA y mira el boceto de la solución.</p>
+                </span>
+                <span className="go">Probar →</span>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h2 style={{ marginBottom: 20 }}>O deja el mensaje aquí</h2>
+            <LeadForm />
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

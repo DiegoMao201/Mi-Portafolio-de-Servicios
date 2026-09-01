@@ -8,7 +8,9 @@ export default function Footer() {
         <div>
           <div className="f-sign">Diego Mauricio García R.</div>
           <div className="f-sub">DATOVATE NEXUS PRO</div>
-          <p style={{ color: 'var(--machine-dim)', fontSize: 14.5, maxWidth: '42ch' }}>
+          {/* --machine-dim es tinta de zona oscura. Aqui el fondo es claro (--void):
+              daba 2.47:1, muy por debajo de AA. */}
+          <p style={{ color: 'var(--ink-2)', fontSize: 14.5, maxWidth: '42ch' }}>
             Automatización, sistemas e inteligencia artificial construidos y operados desde
             Pereira, Colombia, para empresas de todo el país. La tecnología que vendo es la que
             uso todos los días en mis propias operaciones.

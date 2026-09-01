@@ -11,28 +11,38 @@ export const metadata: Metadata = {
 
 export default function CasosPage() {
   return (
-    <main className="sec">
-      <div className="wrap">
-        <p className="label sec-kicker">Casos</p>
-        <h1 style={{ fontSize: 'clamp(30px,4.4vw,48px)' }}>Expedientes técnicos</h1>
-        <p className="lede">
-          Aquí no hay testimonios con foto de banco de imágenes. Hay cinco sistemas reales,
-          contados como se diseñaron: el problema, la restricción que lo hacía difícil,
-          la arquitectura que lo resolvió y el resultado que se puede medir. Lo que no vas a
-          encontrar: URLs de clientes ni el mecanismo interno de nada — esa misma discreción
-          te cubre a ti cuando trabajemos juntos.
-        </p>
-        <div className="grid g-casos" style={{ marginTop: 30 }}>
-          {CASOS.map((c) => (
-            <Link key={c.slug} href={`/casos/${c.slug}`} className="card">
-              <span className="label">{c.codigo} · {c.cliente}</span>
-              <h3>{c.titulo}</h3>
-              <p>{c.resumen}</p>
-              <span className="go">Abrir expediente →</span>
-            </Link>
-          ))}
+    <main>
+      <section className="sec sec--air">
+        <div className="wrap">
+          <p className="label sec-kicker">Casos</p>
+          <h1>Expedientes<br />técnicos</h1>
+          <p className="lede bloque--angosto">
+            Aquí no hay testimonios con foto de banco de imágenes. Hay cinco sistemas reales,
+            contados como se diseñaron: el problema, la restricción que lo hacía difícil,
+            la arquitectura que lo resolvió y el resultado que se puede medir.
+          </p>
+          <p className="lede bloque--angosto" style={{ marginTop: 12 }}>
+            Lo que no vas a encontrar: URLs de clientes ni el mecanismo interno de nada — esa
+            misma discreción te cubre a ti cuando trabajemos juntos.
+          </p>
         </div>
-      </div>
+      </section>
+
+      <section className="sec sec--tight">
+        <div className="wrap">
+          <div className="grid expedientes">
+            {CASOS.map((c) => (
+              <Link key={c.slug} href={`/casos/${c.slug}`} className="card card--exp">
+                <span className="exp-cod" aria-hidden="true">{c.codigo}</span>
+                <span className="label">{c.codigo} · {c.cliente}</span>
+                <h3>{c.titulo}</h3>
+                <p>{c.resumen}</p>
+                <span className="go">Abrir expediente →</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

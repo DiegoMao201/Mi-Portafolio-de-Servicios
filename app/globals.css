@@ -29,7 +29,7 @@
   --signal:#FF7440;        /* naranja señal */
   --signal-2:#FF8B5E;
   --signal-dim:rgba(255,116,64,.10);
-  --signal-ink:#C8461A;    /* naranja legible (4.8:1 sobre blanco) */
+  --signal-ink:#BC4117;    /* naranja legible: 5.4:1 sobre blanco, 4.9:1 sobre --void */
   --cyan:#3FD8CE;          /* cian sináptico */
   --cyan-2:#7FE9E1;
   --cyan-dim:rgba(63,216,206,.14);
@@ -56,7 +56,7 @@ body{
 
 /* Retícula de plano + respiración de luz en todo el sitio */
 body::before{
-  content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
+  content:""; position:fixed; inset:0; z-index:-4; pointer-events:none;
   background:
     linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
@@ -64,11 +64,33 @@ body::before{
   background-size:44px 44px, 44px 44px, auto;
 }
 body::after{
-  content:""; position:fixed; inset:-30%; z-index:-1; pointer-events:none;
+  content:""; position:fixed; inset:-30%; z-index:-3; pointer-events:none;
   background:
     radial-gradient(38% 30% at 20% 18%, rgba(63,216,206,.13), transparent 68%),
     radial-gradient(30% 26% at 82% 72%, rgba(255,116,64,.10), transparent 70%);
   animation:breathe 16s ease-in-out infinite alternate;
+}
+/* La corriente: la red viva detrás de todo el sitio. Va por encima de la
+   retícula y del resplandor, y por debajo de absolutamente todo el contenido.
+
+   La máscara es la decisión de diseño importante: la electricidad vive en el
+   espacio negativo que abrió el rediseño —los márgenes anchos, las zonas donde
+   sangran los numerales— y se calma justo sobre la columna de lectura. Así se
+   ve por todas partes sin cruzarle un cable por encima a un párrafo. */
+.corriente{
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  width:100%; height:100%;
+  --calma:linear-gradient(90deg,
+    #000 0%, #000 10%,
+    rgba(0,0,0,.30) 27%, rgba(0,0,0,.30) 73%,
+    #000 90%, #000 100%);
+  -webkit-mask-image:var(--calma);
+          mask-image:var(--calma);
+}
+@media(max-width:900px){
+  /* En móvil no hay márgenes que aprovechar: la columna es la pantalla entera.
+     Se quita la máscara y se baja la intensidad de todo el lienzo. */
+  .corriente{-webkit-mask-image:none; mask-image:none; opacity:.42}
 }
 @keyframes breathe{
   0%{transform:translate3d(0,0,0) scale(1)}
@@ -76,8 +98,10 @@ body::after{
 }
 
 h1,h2,h3,h4{font-family:var(--font-archivo), system-ui, sans-serif; margin:0; text-wrap:balance; color:var(--ink)}
-h1{font-size:clamp(34px,5.6vw,62px); line-height:1.02; font-weight:700; letter-spacing:-.025em}
-h2{font-size:clamp(25px,3.4vw,36px); line-height:1.08; font-weight:700; letter-spacing:-.02em}
+/* La escala manda. Un titular de pagina y una etiqueta mono de 11px se
+   diferencian ahora ~8x, no ~3x: ese salto es la mitad del caracter. */
+h1{font-size:clamp(42px,7.6vw,96px); line-height:.94; font-weight:700; letter-spacing:-.038em}
+h2{font-size:clamp(30px,4.6vw,58px); line-height:1.02; font-weight:700; letter-spacing:-.03em}
 h3{font-size:19px; line-height:1.3; font-weight:600; letter-spacing:-.01em}
 p{margin:0 0 16px; max-width:66ch}
 a{color:var(--signal-ink); text-underline-offset:2px}
@@ -135,6 +159,10 @@ strong{font-weight:600; color:var(--ink)}
 .machine p, .machine li, .machine span:not([class]){ color:var(--machine-dim) }
 .machine strong, .diag strong{ color:var(--machine-ink) }
 .arch-cap{ color:var(--machine-dim) }
+/* El texto SVG no hereda de `color`: `fill` es una propiedad aparte y por eso
+   se escapaba de la red. Este es el valor por defecto dentro de un diagrama;
+   las reglas concretas de .n-t/.n-s/.e-label lo afinan mas abajo. */
+.arch svg text{ fill:var(--machine-ink) }
 
 /* ---------- hero ---------- */
 .machine{position:relative; background:var(--machine); overflow:hidden; border-bottom:1px solid var(--line-soft)}
@@ -160,7 +188,7 @@ strong{font-weight:600; color:var(--ink)}
   display:flex; align-items:center; gap:10px;
 }
 .hero-eyebrow::before{content:""; width:26px; height:1px; background:var(--glow-b); box-shadow:0 0 12px var(--glow-b)}
-.machine h1{max-width:15ch; text-shadow:0 2px 40px rgba(0,0,0,.6)}
+.machine h1{max-width:14ch; font-size:clamp(38px,6.4vw,78px); text-shadow:0 2px 40px rgba(0,0,0,.6)}
 .machine h1 em{
   font-style:normal; color:var(--glow-a);
   text-shadow:0 0 34px rgba(255,116,64,.55);
@@ -230,18 +258,46 @@ strong{font-weight:600; color:var(--ink)}
 .ticker span::after{content:"▮"; color:var(--signal-ink); font-size:9px}
 
 /* ---------- secciones ---------- */
-.sec{padding:78px 0 66px; border-bottom:1px solid var(--line-soft); position:relative}
-.sec-head{display:flex; align-items:baseline; gap:18px; margin-bottom:14px}
+/* Antes: padding identico y una linea al pie de cada seccion, ocho veces.
+   Ahora el aire es la variable: unas respiran y otras van apretadas.
+   overflow-x:clip (no hidden) recorta lo que sangra SIN crear un contenedor
+   de scroll, que es lo que rompe position:sticky. */
+.sec{padding:clamp(58px,9.5vw,138px) 0; position:relative; overflow-x:clip}
+.sec--tight{padding:clamp(42px,5vw,66px) 0}
+/* El aire va arriba de la seccion, no repartido: sumar el respiro de una
+   con el de la siguiente dejaba 370px de nada entre dos bloques. */
+.sec--air{padding:clamp(96px,13vw,190px) 0 clamp(50px,5.5vw,86px)}
+.sec--linea{border-bottom:1px solid var(--line-soft)}
+.sec > .wrap{position:relative; z-index:1}
+.sec-head{margin-bottom:14px; position:relative; z-index:1}
+/* El numeral deja de ser una vinieta de 36px dentro del margen y pasa a ser
+   arquitectura: 260px, contorneado, sangrando por el borde izquierdo. */
 .sec-num{
-  font-family:var(--font-archivo),sans-serif; font-size:36px; font-weight:700;
-  color:transparent; -webkit-text-stroke:1.2px var(--line-bright); letter-spacing:-.03em; line-height:1;
-  text-shadow:0 0 24px rgba(63,216,206,.12);
+  position:absolute; z-index:0; pointer-events:none; user-select:none;
+  left:-.10em; top:clamp(6px,2.2vw,44px);
+  font-family:var(--font-archivo),sans-serif; font-weight:700;
+  font-size:clamp(132px,17vw,264px); line-height:.74; letter-spacing:-.05em;
+  color:transparent; -webkit-text-stroke:1.5px var(--line-bright);
+  opacity:.62;
 }
-.sec-kicker{margin-bottom:8px; color:var(--cyan-ink)}
-.sec .lede{font-size:18px; color:var(--ink-2); max-width:62ch; margin-top:14px}
+.sec--derecha .sec-num{left:auto; right:-.10em}
+.sec-kicker{margin-bottom:10px; color:var(--cyan-ink)}
+.sec .lede{font-size:19px; color:var(--ink-2); max-width:56ch; margin-top:16px}
+@media(max-width:760px){
+  /* En movil el numeral no se pone detras del texto: se apila encima y
+     conserva el gesto de sangrar por la izquierda. */
+  .sec-num{position:static; display:block; font-size:92px; line-height:.86;
+           margin:0 0 4px -12px; opacity:.5}
+  .sec--derecha .sec-num{text-align:right; margin-right:-12px; margin-left:0}
+}
 
 /* tarjetas: paneles con esquinas técnicas y brillo */
 .grid{display:grid; gap:14px}
+/* Filas perfectamente alineadas = rejilla de plantilla. El desfase alterno
+   rompe la linea sin romper la lectura (en movil se apaga: en una sola
+   columna un escalon solo seria un hueco). */
+.grid--escalonada > *:nth-child(even){margin-top:clamp(18px,2.8vw,44px)}
+@media(max-width:760px){ .grid--escalonada > *:nth-child(even){margin-top:0} }
 .g2{grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
 .g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
 /* Rejillas que no dejan filas cojas.
@@ -258,12 +314,18 @@ strong{font-weight:600; color:var(--ink)}
   .g-casos{grid-template-columns:1fr}
   .g-casos > :first-child{grid-column:span 1}
 }
+/* Antes: un borde de 1px por los cuatro lados en cada tarjeta — el gesto
+   que mas grita 'plantilla'. Ahora separa la luz: una sombra corta que
+   apoya la tarjeta en el papel y un filo superior que es lo unico que se
+   colorea al pasar el cursor. */
 .card{
-  background:linear-gradient(180deg, var(--surface-2), var(--surface));
-  border:1px solid var(--line); padding:22px;
+  background:var(--surface);
+  border:0; border-top:2px solid var(--line);
+  padding:26px 24px 24px;
   display:flex; flex-direction:column; gap:8px; position:relative;
   isolation:isolate;
-  transition:border-color .2s ease, transform .2s ease, box-shadow .25s ease, opacity .28s ease;
+  box-shadow:0 1px 1px rgba(14,20,24,.030), 0 12px 28px -20px rgba(14,20,24,.32);
+  transition:border-color .22s ease, transform .22s ease, box-shadow .28s ease, opacity .28s ease;
 }
 
 /* ---------- la firma: luz que sigue el cursor ----------
@@ -280,14 +342,17 @@ strong{font-weight:600; color:var(--ink)}
       rgba(255,116,64,.26), transparent 70%);
 }
 .card.on::after{opacity:1}
-.card.on{border-color:var(--line-bright)}
+.card.on::before{opacity:1}
+.card.on{border-top-color:var(--line-bright)}
 /* las hermanas se apagan: por eso la que está encendida resalta */
-.grid.lit > .card:not(.on){opacity:.52}
+.lit > .card:not(.on){opacity:.52}
 /* Las dos escuadras (superior izquierda e inferior derecha) se dibujan en un
    solo pseudo-elemento, para dejar ::after libre para la luz del cursor. */
+/* Las dos escuadras ya no viven encendidas: son respuesta al cursor, igual
+   que la luz. En reposo la tarjeta es solo papel con sombra. */
 .card::before{
   content:""; position:absolute; inset:-1px; pointer-events:none;
-  --c:var(--line-bright);
+  --c:var(--line-bright); opacity:0; transition:opacity .22s ease;
   background:
     linear-gradient(var(--c),var(--c)) top left / 14px 1px no-repeat,
     linear-gradient(var(--c),var(--c)) top left / 1px 14px no-repeat,
@@ -296,10 +361,10 @@ strong{font-weight:600; color:var(--ink)}
 }
 a.card{text-decoration:none; color:var(--ink)}
 a.card:hover{
-  border-color:var(--signal); transform:translateY(-3px);
-  box-shadow:0 14px 44px rgba(0,0,0,.5), 0 0 24px rgba(255,116,64,.14);
+  border-top-color:var(--signal); transform:translateY(-4px);
+  box-shadow:0 2px 2px rgba(14,20,24,.04), 0 30px 54px -26px rgba(14,20,24,.36);
 }
-a.card:hover::before{--c:var(--signal)}
+a.card:hover::before{--c:var(--signal); opacity:1}
 a.card:hover .go{color:var(--signal-ink)}
 /* El código del caso se limita a 2 líneas para que todos los títulos
    de una fila arranquen a la misma altura. */
@@ -337,6 +402,31 @@ tbody tr{transition:background .15s ease}
 tbody tr:hover{background:rgba(63,216,206,.03)}
 tbody tr:last-child td{border-bottom:0}
 
+/* En movil la tabla dejaba de ser tabla: min-width:520px empujaba la columna
+   de Inversion fuera de la pantalla, justo el dato que se busca. Cada fila
+   pasa a ser una ficha y la cabecera se repite como etiqueta de cada celda. */
+@media(max-width:660px){
+  .scroll-x{overflow-x:visible; border:0; background:transparent; margin:18px 0}
+  .scroll-x table{min-width:0; display:block}
+  .scroll-x thead{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%)}
+  .scroll-x tbody,.scroll-x tr,.scroll-x td{display:block; width:auto}
+  .scroll-x tr{
+    background:var(--surface); border-top:2px solid var(--line);
+    box-shadow:0 1px 1px rgba(14,20,24,.03), 0 12px 28px -20px rgba(14,20,24,.32);
+    padding:16px 18px; margin-bottom:12px;
+  }
+  .scroll-x td{border:0; padding:0 0 10px}
+  .scroll-x td:last-child{padding-bottom:0}
+  .scroll-x td::before{
+    content:attr(data-col); display:block; margin-bottom:3px;
+    font-family:var(--font-mono),monospace; font-size:10px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--cyan-ink);
+  }
+  .scroll-x td:first-child::before{display:none}
+  .scroll-x td:first-child{font-size:17px}
+  .scroll-x td:first-child strong{font-family:var(--font-archivo),sans-serif}
+}
+
 ul.clean{list-style:none; padding:0; margin:0 0 18px}
 ul.clean li{position:relative; padding:0 0 10px 22px; font-size:16px; color:var(--ink-2); max-width:66ch}
 ul.clean li::before{content:""; position:absolute; left:0; top:10px; width:9px; height:2px; background:var(--signal); box-shadow:0 0 8px rgba(255,116,64,.7)}
@@ -348,6 +438,23 @@ ul.clean li::before{content:""; position:absolute; left:0; top:10px; width:9px; 
 .conduit .flow{stroke:var(--signal); stroke-width:2; stroke-dasharray:8 72; animation:flow 2.6s linear infinite; filter:drop-shadow(0 0 4px var(--signal))}
 .conduit .flow2{stroke:var(--cyan); stroke-width:2; stroke-dasharray:5 90; animation:flow 3.8s linear infinite reverse; filter:drop-shadow(0 0 4px var(--cyan))}
 @keyframes flow{to{stroke-dashoffset:-80}}
+
+/* --- Vena: el cable que conecta una sección con la siguiente ---------- */
+.vena{height:clamp(56px,7vw,96px); position:relative; pointer-events:none}
+.vena svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.vena path{stroke:var(--line-bright); stroke-width:1; fill:none}
+.vena .flow{stroke:var(--signal); stroke-width:2; stroke-dasharray:7 78;
+            animation:flow 2.9s linear infinite; filter:drop-shadow(0 0 5px var(--signal))}
+.vena .flow2{stroke:var(--cyan); stroke-width:2; stroke-dasharray:4 96;
+             animation:flow 4.4s linear infinite reverse; filter:drop-shadow(0 0 5px var(--cyan))}
+/* El nodo donde el cable entra a la siguiente sección: late. */
+.vena-nodo{
+  position:absolute; bottom:-3px; width:6px; height:6px; margin-left:-3px;
+  border-radius:50%; background:var(--cyan);
+  box-shadow:0 0 0 3px rgba(63,216,206,.16), 0 0 14px rgba(63,216,206,.75);
+  animation:vena-late 2.6s ease-in-out infinite;
+}
+@keyframes vena-late{0%,100%{transform:scale(.75); opacity:.55} 50%{transform:scale(1.25); opacity:1}}
 
 /* =====================================================================
    GRAFO DE ARQUITECTURA — circuito vivo
@@ -370,6 +477,14 @@ ul.clean li::before{content:""; position:absolute; left:0; top:10px; width:9px; 
   animation:blink 3s infinite;
 }
 .arch svg{display:block; width:100%; height:auto}
+.arch-lienzo{position:relative}
+/* Un diagrama horizontal aplastado en 390px deja los rotulos en 3px de alto.
+   Por debajo de su ancho minimo se desplaza a mano en vez de encogerse. */
+.arch--h .arch-lienzo{overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin;
+                      scrollbar-color:var(--machine-line) transparent}
+.arch--h .arch-lienzo > svg{min-width:700px}
+.arch--h .arch-lienzo::-webkit-scrollbar{height:5px}
+.arch--h .arch-lienzo::-webkit-scrollbar-thumb{background:var(--machine-line)}
 .arch .n-box{
   fill:rgba(16,23,27,.94); stroke:var(--line-bright); stroke-width:1;
 }
@@ -383,8 +498,8 @@ ul.clean li::before{content:""; position:absolute; left:0; top:10px; width:9px; 
   50%{filter:drop-shadow(0 0 16px rgba(255,116,64,.65))}
 }
 .arch .n-tick{stroke:var(--cyan); stroke-width:1.5; opacity:.9}
-.arch .n-t{font-family:var(--font-archivo),sans-serif; font-size:12.5px; font-weight:600; fill:var(--ink)}
-.arch .n-s{font-family:var(--font-mono),monospace; font-size:9px; fill:var(--ink-3); letter-spacing:.05em}
+.arch .n-t{font-family:var(--font-archivo),sans-serif; font-size:12.5px; font-weight:600; fill:var(--machine-ink)}
+.arch .n-s{font-family:var(--font-mono),monospace; font-size:9px; fill:var(--machine-dim); letter-spacing:.05em}
 .arch .e-line{stroke:var(--line-bright); stroke-width:1.2; fill:none}
 .arch .e-glow{stroke:rgba(63,216,206,.16); stroke-width:4; fill:none}
 .arch .e-flow{
@@ -403,7 +518,7 @@ ul.clean li::before{content:""; position:absolute; left:0; top:10px; width:9px; 
 .arch .n-g{opacity:0; transition:opacity .5s ease; transition-delay:var(--nd,0ms)}
 .arch.on .n-g{opacity:1}
 @keyframes drawin{to{stroke-dashoffset:0}}
-.arch-cap{font-family:var(--font-mono),monospace; font-size:11px; color:var(--ink-3); padding:10px 12px 8px; letter-spacing:.02em}
+.arch-cap{font-family:var(--font-mono),monospace; font-size:11px; color:var(--machine-dim); padding:10px 12px 8px; letter-spacing:.02em}
 
 /* ---------- diagnosticador ---------- */
 .diag{
@@ -457,6 +572,28 @@ ul.clean li::before{content:""; position:absolute; left:0; top:10px; width:9px; 
 }
 @keyframes scanx{0%,100%{left:2%}50%{left:97%}}
 .diag-arch{margin:0}
+/* --- El panel piensa: la red ocupa el sitio del boceto hasta que llega -- */
+.diag-red{flex:1; display:flex; flex-direction:column; min-height:0;
+          border:1px solid var(--machine-line); position:relative; overflow:hidden}
+.red-pensando{flex:1; width:100%; min-height:150px; display:block}
+.diag-red-texto{padding:12px 16px 14px; border-top:1px solid var(--machine-line)}
+.diag-red-texto p{margin:0; font-size:13.5px; color:var(--machine-dim); line-height:1.5; max-width:46ch}
+.diag-estado{
+  display:inline-flex; align-items:center; gap:7px; margin-bottom:6px;
+  font-family:var(--font-mono),monospace; font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--glow-b);
+}
+.diag-estado::before{
+  content:""; width:5px; height:5px; border-radius:50%; background:var(--glow-b);
+  box-shadow:0 0 9px var(--glow-b); animation:blink 1.6s infinite;
+}
+/* --- Lo que el visitante gana: convierte el boceto en respuesta -------- */
+.gana{margin-top:14px; border-left:2px solid var(--glow-a); padding:2px 0 2px 14px}
+.gana .label{display:block; margin-bottom:8px; color:var(--glow-a)}
+.gana ul{list-style:none; margin:0; padding:0; display:grid; gap:7px}
+.gana li{position:relative; padding-left:16px; font-size:13.5px; line-height:1.5; color:var(--machine-ink)}
+.gana li::before{content:""; position:absolute; left:0; top:9px; width:8px; height:1px;
+                 background:var(--glow-b); box-shadow:0 0 7px var(--glow-b)}
 .fases{margin-top:14px; display:grid; gap:8px}
 .fase{border:1px solid var(--machine-line); border-left:2px solid var(--glow-b); padding:10px 14px; font-size:13.5px; color:var(--machine-dim); background:rgba(13,20,24,.5)}
 .fase b{color:var(--machine-ink); font-family:var(--font-archivo),sans-serif; font-weight:600; display:block; font-size:13px}
@@ -466,7 +603,7 @@ ul.clean li::before{content:""; position:absolute; left:0; top:10px; width:9px; 
 @keyframes tp{0%,100%{opacity:.2; transform:translateY(0)}50%{opacity:1; transform:translateY(-3px)}}
 
 /* ---------- formulario ---------- */
-.form{display:grid; gap:14px; max-width:560px}
+.form{display:grid; gap:14px; max-width:620px}
 .form label{display:grid; gap:6px}
 .form .lb{font-family:var(--font-mono),monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3)}
 .form input,.form textarea{
@@ -560,6 +697,214 @@ ul.clean li::before{content:""; position:absolute; left:0; top:10px; width:9px; 
   .wordmark-dom{font-size:11px}
 }
 
+/* =====================================================================
+   COMPOSICION — romper el molde
+   Cuatro recursos que no existian: una banda a sangre completa, una
+   columna que se queda fija mientras la otra corre, un carril horizontal
+   que se sale por la derecha, y un anclaje asimetrico.
+   ===================================================================== */
+
+/* --- Banda a sangre: se sale de los 1140px y toca los dos bordes ------- */
+.banda{
+  position:relative;
+  background:var(--machine);
+  border-top:1px solid var(--machine-line);
+  border-bottom:1px solid var(--machine-line);
+  padding:clamp(26px,3.4vw,48px) 0;
+  color:var(--machine-ink);
+}
+.banda::before{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:
+    linear-gradient(rgba(63,216,206,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(63,216,206,.05) 1px, transparent 1px);
+  background-size:30px 30px;
+}
+.banda > *{position:relative; z-index:1}
+/* Dentro de la banda el contenido puede ir mas ancho que la columna de texto. */
+.wrap--ancho{max-width:1320px}
+
+/* --- Dos columnas con la izquierda fija -------------------------------- */
+.sec--split > .wrap{
+  display:grid;
+  grid-template-columns:minmax(0,clamp(260px,26vw,360px)) minmax(0,1fr);
+  gap:clamp(30px,5vw,86px);
+  align-items:start;
+}
+.riel-fijo{position:sticky; top:96px}
+/* Variante espejo: la columna ancha va a la izquierda y la ficha fija a la
+   derecha. Sirve para que no todas las secciones se anclen igual. */
+.sec--invertida > .wrap{grid-template-columns:minmax(0,1fr) minmax(0,clamp(250px,25vw,330px))}
+.riel-fijo .lede{margin-top:14px; font-size:17px; max-width:38ch}
+@media(max-width:900px){
+  .sec--split > .wrap{grid-template-columns:1fr; gap:26px}
+  .riel-fijo{position:static}
+}
+
+/* --- Carril horizontal que sangra por la derecha ----------------------- */
+/* Va suelto dentro de .sec (fuera de .wrap): asi su 100% es el ancho real
+   del contenido y puede alinear la primera tarjeta con la columna de texto
+   mientras la ultima se sale por el borde. Nada de 100vw, que suma la
+   barra de scroll y desborda. */
+.carril{
+  --gutter:max(24px, calc((100% - 1140px) / 2 + 24px));
+  display:flex; gap:16px; align-items:stretch;
+  overflow-x:auto; overscroll-behavior-x:contain;
+  padding:8px var(--gutter) 30px;
+  scroll-snap-type:x proximity;
+  /* Sin esto el snap encaja la primera tarjeta contra el borde del
+     scrollport y se traga el margen: el carril arrancaria pegado al filo. */
+  scroll-padding-inline:var(--gutter);
+  scrollbar-width:thin; scrollbar-color:var(--line-bright) transparent;
+}
+.carril > *{flex:0 0 clamp(258px,25vw,336px); scroll-snap-align:start}
+.carril::-webkit-scrollbar{height:6px}
+.carril::-webkit-scrollbar-thumb{background:var(--line-bright)}
+.carril::-webkit-scrollbar-track{background:transparent}
+.carril-pie{
+  display:flex; align-items:center; gap:14px;
+  font-family:var(--font-mono),monospace; font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3);
+}
+.carril-pie::before{content:""; height:1px; width:clamp(30px,6vw,90px); background:var(--line-bright)}
+
+/* --- Lista indexada -----------------------------------------------------
+   Ocho servicios en ocho tarjetas iguales es la rejilla de siempre. Como
+   fila numerada se lee como un indice: el numeral pesa, el titulo manda y
+   la descripcion respira. Sigue siendo .card, asi que hereda la luz. */
+.lista{display:grid; gap:0}
+.card--fila{
+  display:grid;
+  grid-template-columns:clamp(62px,7vw,112px) minmax(0,1fr) auto;
+  gap:clamp(14px,3vw,44px); align-items:baseline;
+  padding:clamp(22px,3.2vw,40px) clamp(10px,1.6vw,22px);
+  background:transparent; box-shadow:none;
+  border-top:1px solid var(--line);
+}
+.lista > .card--fila:last-child{border-bottom:1px solid var(--line)}
+.card--fila::before{display:none}
+.fila-num{
+  font-family:var(--font-archivo),sans-serif; font-weight:700;
+  font-size:clamp(30px,3.8vw,54px); line-height:.9; letter-spacing:-.04em;
+  color:transparent; -webkit-text-stroke:1.6px var(--line-bright);
+  transition:-webkit-text-stroke-color .22s ease;
+}
+.card--fila h3{font-size:clamp(20px,2.5vw,31px); line-height:1.12; letter-spacing:-.02em}
+.card--fila p{margin-top:8px; max-width:54ch}
+.card--fila .go{margin-top:0; padding-top:0; white-space:nowrap; align-self:baseline}
+a.card--fila:hover{
+  transform:none; background:var(--surface);
+  border-top-color:var(--line-bright);
+  box-shadow:0 1px 1px rgba(14,20,24,.03), 0 18px 34px -26px rgba(14,20,24,.34);
+}
+a.card--fila:hover .fila-num{-webkit-text-stroke-color:var(--signal)}
+/* Variante sin numeral: dos columnas, titulo y accion. */
+.card--via{grid-template-columns:minmax(0,1fr) auto; padding:20px 4px}
+.card--via h3{font-size:19px}
+.card--via p{margin-top:4px; font-size:15px}
+@media(max-width:820px){
+  .card--fila{grid-template-columns:auto minmax(0,1fr); gap:6px 16px}
+  .card--fila .go{grid-column:2; align-self:start; padding-top:10px}
+  .card--via{grid-template-columns:minmax(0,1fr)}
+  .card--via .go{grid-column:1}
+}
+
+/* --- El momento anclado: indice fijo + fases que pasan ------------------ */
+.indice-fases ol{list-style:none; margin:18px 0 0; padding:0; display:grid; gap:2px}
+.indice-fases li{
+  display:grid; grid-template-columns:34px minmax(0,1fr); gap:12px; align-items:baseline;
+  padding:11px 0 11px 14px; border-left:2px solid var(--line);
+  transition:border-color .35s ease, color .35s ease;
+  color:var(--ink-3);
+}
+.indice-fases li.activa{border-left-color:var(--signal); color:var(--ink)}
+.if-n{
+  font-family:var(--font-mono),monospace; font-size:11px; letter-spacing:.14em;
+  color:var(--ink-3); transition:color .35s ease;
+}
+.indice-fases li.activa .if-n{color:var(--signal-ink)}
+.if-t{
+  font-family:var(--font-archivo),sans-serif; font-weight:600; font-size:16px;
+  letter-spacing:-.01em; line-height:1.25;
+}
+.if-pie{margin-top:20px; font-size:14.5px; color:var(--ink-2); max-width:30ch}
+
+.fases-cuerpo{display:grid; gap:clamp(46px,7vw,104px)}
+.fase-bloque{position:relative; transition:opacity .4s ease}
+.fb-n{
+  display:block; font-family:var(--font-archivo),sans-serif; font-weight:700;
+  font-size:clamp(56px,7vw,104px); line-height:.8; letter-spacing:-.05em;
+  color:transparent; -webkit-text-stroke:1.4px var(--line-bright);
+  margin-bottom:10px; transition:-webkit-text-stroke-color .4s ease;
+}
+.fase-bloque.activa .fb-n{-webkit-text-stroke-color:var(--signal)}
+.fase-bloque h2{font-size:clamp(26px,3.4vw,44px); margin-bottom:14px}
+.fase-bloque p{font-size:18px; color:var(--ink-2); max-width:56ch}
+/* Aqui vivia un atenuado al 40% de las fases sin foco. Se quito: eso dejaba
+   cuerpo de texto por debajo del contraste AA mientras se lee. El foco lo
+   marcan el numeral, que se colorea, y la barra del indice — ambos
+   decorativos. El texto siempre se lee al 100%. */
+.fase-bloque.activa h2{color:var(--ink)}
+@media(max-width:900px){
+  .indice-fases{display:none}
+}
+
+/* --- Expedientes: rejilla de 12 con anchos y saltos desiguales ----------
+   Cinco casos en cinco tarjetas iguales vuelven a ser una rejilla. Sobre 12
+   columnas cada expediente ocupa un ancho distinto y arranca a una altura
+   distinta: el desorden es compositivo, la lectura sigue siendo de arriba
+   abajo y de izquierda a derecha. */
+.expedientes{grid-template-columns:repeat(12,minmax(0,1fr)); gap:clamp(14px,2.2vw,28px)}
+.expedientes > *:nth-child(1){grid-column:1 / span 7}
+.expedientes > *:nth-child(2){grid-column:8 / span 5; margin-top:clamp(28px,5vw,74px)}
+.expedientes > *:nth-child(3){grid-column:2 / span 5}
+.expedientes > *:nth-child(4){grid-column:7 / span 6; margin-top:clamp(20px,3.4vw,52px)}
+.expedientes > *:nth-child(5){grid-column:1 / span 8; margin-top:clamp(16px,2.6vw,38px)}
+@media(max-width:900px){
+  .expedientes{grid-template-columns:1fr}
+  .expedientes > *{grid-column:1 / -1 !important; margin-top:0 !important}
+}
+.card--exp{padding:28px 26px 26px; overflow:hidden}
+.exp-cod{
+  position:absolute; right:12px; bottom:-6px; z-index:-1; pointer-events:none;
+  font-family:var(--font-archivo),sans-serif; font-weight:700; font-size:88px;
+  line-height:.8; letter-spacing:-.05em;
+  color:transparent; -webkit-text-stroke:1.4px var(--line);
+}
+.card--exp h3{font-size:clamp(20px,2.2vw,27px); line-height:1.14; letter-spacing:-.02em}
+
+/* --- Ficha lateral: datos que acompanan a la lectura -------------------- */
+.ficha{
+  background:var(--surface); border-top:2px solid var(--cyan);
+  box-shadow:0 1px 1px rgba(14,20,24,.03), 0 12px 28px -20px rgba(14,20,24,.32);
+  padding:22px 22px 20px; display:grid; gap:18px;
+}
+.ficha .label{display:block; margin-bottom:6px; color:var(--cyan-ink)}
+.ficha p{margin:0; font-size:15px; color:var(--ink-2)}
+.ficha-hueco{
+  aspect-ratio:4 / 3; display:grid; place-items:center; text-align:center;
+  background:var(--sunk); border:1px dashed var(--line-bright);
+  font-family:var(--font-mono),monospace; font-size:11px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink-3); padding:16px;
+}
+
+/* La banda ya es oscura: el diagrama no necesita su propia caja dentro. */
+.banda .arch{border:0; border-top:2px solid var(--cyan); background:none; box-shadow:none; margin:0}
+
+/* --- Anclaje asimetrico: el bloque se para a la derecha ---------------- */
+.bloque--derecha{margin-left:auto; max-width:min(660px,100%)}
+.bloque--angosto{max-width:min(560px,100%)}
+
+/* --- Cabecera colgada: la etiqueta cuelga a la izquierda del titulo ---- */
+@media(min-width:1000px){
+  .sec--colgada .sec-head{
+    display:grid; grid-template-columns:196px minmax(0,1fr); gap:26px; align-items:baseline;
+  }
+  .sec--colgada .sec-kicker{margin:0; text-align:right; line-height:1.5}
+  /* El texto de apoyo se alinea con el titulo, no con la etiqueta colgada. */
+  .sec--colgada > .wrap > .lede{margin-left:222px}
+}
+
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
   html{scroll-behavior:auto}
@@ -571,4 +916,9 @@ ul.clean li::before{content:""; position:absolute; left:0; top:10px; width:9px; 
   .wm-stroke{opacity:1}
   .wm-stars circle{opacity:.8}
   .wm-n1,.wm-n2,.wm-n3{transform:none}
+  .carril{scroll-behavior:auto; scroll-snap-type:none}
+  .riel-fijo{position:static}
+  .fases-cuerpo .fase-bloque{opacity:1}
+  .vena .flow,.vena .flow2{display:none}
+  .vena-nodo{animation:none}
 }
