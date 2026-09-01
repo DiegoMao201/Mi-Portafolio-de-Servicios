@@ -10,6 +10,51 @@ export type Nota = {
 
 export const NOTAS: Nota[] = [
   {
+    slug: 'automatizar-compras-no-reemplaza-al-comprador',
+    titulo: 'Automatizar compras no reemplaza al comprador: lo asciende',
+    tituloSeo: 'Automatizar el proceso de compras',
+    descripcion: 'El día completo de un coordinador de compras, tarea por tarea, y qué pasa cuando el flujo se automatiza: no sobra la persona, sobra el trabajo mecánico.',
+    fecha: '2026-09-01',
+    parrafos: [
+      { t: 'La objeción que más escucho no es el precio. Es "¿y entonces qué hace la persona que lo hacía?". Es una pregunta legítima y merece una respuesta concreta, así que voy a usar el proceso de compras, que existe igual en casi cualquier empresa y que conozco desde adentro porque lo lideré durante años antes de automatizarlo.' },
+      { h: 'El día de un coordinador de compras, sin tecnología', t: 'Pide cotizaciones. Evalúa cuál es la mejor propuesta. Saca sus análisis manuales de qué necesita comprar: compara las ventas, que están en un informe, con el inventario, que está en otro. Si sabe manejar Excel bien, eso le ayuda, porque sabe cruzar datos. Después genera las órdenes de compra, las envía por correo, confirma. Y así se le va el día. Ojo con esto: lo hace bien. No estamos hablando de alguien que hace mal su trabajo — estamos hablando de alguien bueno gastando su día en tareas que no requieren su criterio.' },
+      { h: 'Qué parte de eso es realmente su trabajo', t: 'Separemos. Cruzar el informe de ventas con el de inventario no requiere criterio: requiere paciencia y no equivocarse. Generar la orden y mandarla por correo tampoco. Confirmar recepción tampoco. Lo que sí requiere criterio es decidir a quién comprarle, negociar el precio, evaluar si un proveedor nuevo vale la pena, entender por qué un producto se está quedando quieto. Esa segunda lista es su trabajo. La primera es lo que le impide llegar a la segunda.' },
+      { h: 'Qué se libera cuando el flujo corre solo', t: 'Cuando la sugerencia de compra se calcula sola, la orden se genera sola y el correo sale solo, esa persona recupera el día. Y ahí es donde empieza a aportar lo que ningún sistema puede: socializar más con el proveedor, revisar devoluciones, mirar fechas de vencimiento, atacar el inventario muerto, desarrollar habilidades de negociación cara a cara. Tomarse un tinto con el gerente hablando de resultados, no de operaciones diarias — no de qué se le compró a quién y cuánto, sino de conseguir proveedores nuevos y mejores condiciones.' },
+      { h: 'El argumento incómodo, dicho completo', t: 'Aunque la persona sea buena en lo que hace, la automatización lo hace igual o mejor, y sin errores. Eso hay que decirlo sin adornos. Pero la conclusión que la gente saca de ahí suele ser la equivocada. El punto no es que sobre la persona: es que sobra el trabajo mecánico. Un sistema cruza dos archivos sin cansarse un martes a las seis de la tarde; lo que no hace es negociar, ni leer a un proveedor, ni decidir cuándo vale la pena romper una regla. Lo que la automatización libera es tiempo para que esa persona aporte cosas distintas al proceso, en vez de repetir todos los días el mismo proceso.' },
+      { h: 'Cómo se ve en la práctica', t: 'El sistema lee ventas e inventario, calcula qué hay que comprar y lo propone. Una persona aprueba — esa decisión sigue siendo humana, y así debe quedar. El sistema genera la orden, la envía y registra todo lo que pasó. El coordinador deja de ser el que cruza archivos y pasa a ser el que decide y negocia. Mismo cargo, mismo sueldo, trabajo distinto. Y una operación que no se cae cuando esa persona se enferma o sale a vacaciones.' },
+    ],
+  },
+  {
+    slug: 'que-indicadores-deberia-medir-mi-empresa',
+    titulo: 'Qué indicadores debería medir mi empresa (y con qué datos empezar)',
+    tituloSeo: 'Qué indicadores debería medir',
+    descripcion: 'El inventario es el indicador que paga por los dos lados: es capital y es ingreso. Y con solo tres campos —ventas, clientes y productos— ya se hace muchísimo.',
+    fecha: '2026-09-01',
+    parrafos: [
+      { t: 'La pregunta suele venir al revés: "quiero un tablero, ¿qué le pongo?". Y así se llega a la pantalla bonita que nadie abre después de la segunda semana. La pregunta correcta es cuál indicador cambia una decisión, porque un indicador que no cambia ninguna decisión es decoración cara.' },
+      { h: 'Empieza por inventario, y hay una razón', t: 'Si tienes que escoger uno solo, es inventario. Y no por costumbre: es el único que te da beneficio por los dos lados al tiempo. Es capital —plata tuya que ya pagaste y está quieta en una estantería— y es ingreso —porque lo que no tienes cuando el cliente lo pide es una venta que se fue a otro lado. Cualquier otro indicador te dice cómo te fue. Este te dice dónde tienes plata dormida y dónde la estás dejando de ganar, al mismo tiempo.' },
+      { h: 'Tres campos y ya puedes empezar', t: 'No hace falta un proyecto de datos para arrancar. Con tres cosas que tu operación ya genera —ventas, clientes y productos— se hace muchísimo. Con esos tres campos cruzados aparecen: qué rota y qué no, quién compra qué, cuándo compra, cuánto compra en promedio y cada cuánto vuelve. De ahí sale casi todo lo demás.' },
+      { h: 'Lo que se desbloquea con esos tres', t: 'Mejoras el inventario, porque sabes qué comprar y qué dejar de comprar. Mejoras la rotación, porque el capital deja de estar donde no se mueve. Mejoras la postventa, porque sabes quién compró qué y cuándo toca volver a hablarle. Mejoras la relación con el cliente, porque dejas de tratarlos a todos igual. Mejoras la fidelización, porque puedes premiar al que vuelve. Y mejoras los ingresos, que es la consecuencia de las cinco anteriores. Todo eso sale de tres columnas.' },
+      { h: 'El indicador que casi nadie mide', t: 'La venta perdida. El pedido que no pudiste despachar porque no tenías el producto. No aparece en ningún informe, porque los sistemas registran lo que pasó, no lo que no pudo pasar. Ese cliente no reclama: compra en otro lado y muchas veces no vuelve. Es una fuga de ingresos importante y completamente invisible, y sale del mismo cruce de ventas contra inventario que ya estás haciendo para otra cosa.' },
+      { h: 'La regla para no llenarse de tableros', t: 'Antes de agregar un indicador, pregúntate qué decisión vas a tomar distinto según lo que muestre. Si no hay respuesta, no lo midas todavía. Un tablero con cuatro indicadores que provocan decisiones vale más que uno con cuarenta que solo confirman lo que ya sabías.' },
+    ],
+  },
+  {
+    slug: 'como-saber-si-un-proceso-vale-la-pena-automatizar',
+    titulo: 'Cómo saber si un proceso vale la pena automatizar',
+    tituloSeo: 'Si vale la pena automatizar',
+    descripcion: 'Dos condiciones y un multiplicador. Y por qué tu ERP, por viejo que sea, ya tiene guardados los datos que hacen falta.',
+    fecha: '2026-09-01',
+    parrafos: [
+      { t: 'No todo proceso se debe automatizar, y decirlo es parte del trabajo. Hay una regla corta para saberlo, y se puede aplicar en una tarde sin contratar a nadie.' },
+      { h: 'Las dos condiciones', t: 'Un proceso se automatiza cuando cumple dos cosas al tiempo: consume tiempo y está hecho de tareas manuales repetitivas. Las dos, no una. Un proceso que consume mucho tiempo pero cada caso es distinto y requiere criterio no es candidato: ahí lo que hace falta es mejor información, no un robot. Y una tarea repetitiva que toma dos minutos al mes tampoco: automatizarla cuesta más de lo que ahorra. El candidato bueno es el que se repite igual, muchas veces, y se lleva horas.' },
+      { h: 'El multiplicador: datos constantes', t: 'Y hay un tercer factor que no es condición sino multiplicador. Un proceso se automatiza mucho mejor cuando hay datos constantes detrás — información que se genera sola, todos los días, sin que nadie tenga que capturarla a propósito. Ventas, clientes, productos. Cuando esos datos existen y fluyen, la automatización deja de ser un script que repite pasos y pasa a ser un sistema que decide con información fresca. Es la diferencia entre ahorrar tiempo y ganar criterio.' },
+      { h: 'Tu ERP ya tiene los datos, aunque no lo parezca', t: 'La objeción más común es "mi sistema es viejo, no tiene por dónde sacar nada". Casi nunca es cierto. Cualquier ERP, por desactualizado que esté, tiene una base de datos por detrás donde almacena todo: cada venta, cada movimiento de inventario, cada cliente. Ahí es donde entramos: a ver dónde están los datos y cómo se pueden extraer. Si hablas de un ERP, estás hablando de información valiosísima ya guardada, que se puede leer sin intervenir el sistema. El problema casi nunca es que el dato no exista — es que nadie lo ha ido a buscar.' },
+      { h: 'La prueba de la servilleta', t: 'Toma el proceso candidato y responde tres preguntas. ¿Cuántas horas al mes consume? ¿Los pasos son los mismos siempre o cambian según el caso? ¿Los datos que necesita ya existen en algún sistema o hay que capturarlos a mano? Muchas horas, pasos iguales y datos existentes: automatízalo, se paga solo. Pocas horas o pasos que cambian todo el tiempo: déjalo como está, por ahora.' },
+      { h: 'La señal que más se ignora', t: 'Hay una cuarta pregunta que no es de eficiencia sino de riesgo: ¿cuántas personas saben hacer este proceso? Si la respuesta es una, ya tienes razón suficiente para automatizarlo aunque no consuma tantas horas. Un proceso que vive en la cabeza de una sola persona es una operación con un punto único de falla, y eso se paga caro el día que esa persona se enferma, sale a vacaciones o se va.' },
+    ],
+  },
+  {
     slug: 'cuanto-cuesta-automatizar-un-proceso-en-colombia',
     titulo: 'Cuánto cuesta automatizar un proceso en una empresa colombiana',
     tituloSeo: 'Cuánto cuesta automatizar un proceso',
