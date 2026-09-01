@@ -26,24 +26,23 @@ export default function DiegoPage() {
             </p>
           </div>
 
-          {/* El retrato con el mismo lenguaje que los diagramas: filo de cian
-              arriba, escuadras técnicas y una luz que responde al cursor. */}
+          {/* Sin recuadro: el sujeto va recortado y la sombra sigue su silueta,
+              que es lo que lo despega de la página. Detrás, el halo de la casa y
+              una línea de horizonte que él tapa — ahí nace la profundidad. */}
           <figure className="retrato">
+            <span className="retrato-halo" aria-hidden="true" />
             <picture>
               <source srcSet="/diego.webp" type="image/webp" />
               <img
-                src="/diego.jpg"
-                width={576}
-                height={768}
+                src="/diego.png"
+                width={644}
+                height={744}
                 alt="Diego Mauricio García R., ingeniero industrial, en Pereira, Colombia"
                 loading="eager"
                 decoding="async"
               />
             </picture>
-            <figcaption>
-              <span>Pereira · Risaralda</span>
-              <span>Colombia</span>
-            </figcaption>
+            <figcaption>Pereira · Risaralda · Colombia</figcaption>
           </figure>
         </div>
       </section>

@@ -908,61 +908,85 @@ a.card--fila:hover .fila-num{-webkit-text-stroke-color:var(--signal)}
 }
 
 /* --- El retrato ---------------------------------------------------------
-   Mismo lenguaje que los diagramas: filo de cian arriba, escuadras técnicas y
-   una luz que responde al cursor. El marco es lo que hace que una foto se vea
-   cuidada; la foto sola, por buena que sea, se lee como un adjunto. */
+   Sin recuadro. El sujeto va recortado contra el fondo y la sombra la calcula
+   el navegador siguiendo el canal alfa: por eso se despega de la pagina en vez
+   de flotar sobre una caja.
+
+   Dos correcciones de la primera version: el halo era un rectangulo con un
+   degradado radial dentro y se le veia el borde — o sea, volvia a dibujar el
+   recuadro; ahora es una elipse de verdad. Y la sombra era tan tenue sobre
+   papel claro que no despegaba nada. */
 .sec--retrato > .wrap{
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,clamp(232px,26vw,330px));
-  gap:clamp(28px,5vw,76px);
-  align-items:start;
+  grid-template-columns:minmax(0,1fr) minmax(0,clamp(240px,27vw,344px));
+  gap:clamp(24px,4.5vw,72px);
+  align-items:center;
 }
 @media(max-width:860px){
-  .sec--retrato > .wrap{grid-template-columns:1fr; gap:34px}
-  .retrato{max-width:340px}
+  .sec--retrato > .wrap{grid-template-columns:1fr; gap:28px}
+  .retrato{max-width:320px; margin-inline:auto}
 }
-.retrato{
-  position:relative; isolation:isolate; margin:0;
-  background:var(--machine);
-  border-top:2px solid var(--cyan);
-  box-shadow:0 1px 1px rgba(14,20,24,.04), 0 34px 64px -34px rgba(14,20,24,.5);
-  transition:transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s ease;
-}
-.retrato picture,.retrato img{display:block; width:100%; height:auto}
-.retrato img{filter:saturate(1.02) contrast(1.02)}
-/* Las escuadras: superior izquierda e inferior derecha, como en las tarjetas. */
-.retrato::before{
-  content:""; position:absolute; inset:-1px; z-index:2; pointer-events:none;
-  --c:var(--cyan);
-  background:
-    linear-gradient(var(--c),var(--c)) top left / 18px 2px no-repeat,
-    linear-gradient(var(--c),var(--c)) top left / 2px 18px no-repeat,
-    linear-gradient(var(--c),var(--c)) bottom right / 18px 2px no-repeat,
-    linear-gradient(var(--c),var(--c)) bottom right / 2px 18px no-repeat;
-  opacity:.85; transition:opacity .3s ease;
-}
-/* La luz de la casa, ahora sobre el retrato. */
+.retrato{position:relative; margin:0; isolation:isolate}
+
+/* El aro: un circulo de trazo que el tapa. Ese solape es lo que produce la
+   profundidad — mas que la sombra, que solo lo levanta. */
 .retrato::after{
-  content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
-  opacity:0; transition:opacity .4s ease;
+  content:""; position:absolute; z-index:0; pointer-events:none;
+  left:50%; top:34%; width:118%; aspect-ratio:1;
+  transform:translate(-50%,-50%);
+  border:1px solid var(--line-bright); border-radius:50%;
+  opacity:.9;
+  transition:transform .6s cubic-bezier(.2,.7,.3,1), border-color .45s ease;
+}
+/* El halo, ahora eliptico de verdad: sin bordes rectos que delaten una caja. */
+.retrato-halo{
+  position:absolute; z-index:0; pointer-events:none;
+  left:50%; top:38%; width:132%; height:96%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
   background:
-    radial-gradient(70% 55% at 50% 22%, rgba(63,216,206,.20), transparent 70%),
-    radial-gradient(50% 40% at 62% 78%, rgba(255,116,64,.16), transparent 72%);
-  mix-blend-mode:screen;
+    radial-gradient(closest-side, rgba(63,216,206,.34), rgba(63,216,206,.10) 62%, transparent 78%);
+  filter:blur(18px);
+  transition:opacity .5s ease, transform .5s ease;
 }
-.retrato:hover{transform:translateY(-4px); box-shadow:0 2px 2px rgba(14,20,24,.05), 0 46px 80px -38px rgba(14,20,24,.55)}
-.retrato:hover::after{opacity:1}
-.retrato:hover::before{--c:var(--signal); opacity:1}
+.retrato-halo::after{
+  content:""; position:absolute; inset:22% -6% -14% 30%;
+  border-radius:50%;
+  background:radial-gradient(closest-side, rgba(255,116,64,.26), transparent 72%);
+  filter:blur(14px);
+}
+
+.retrato picture{display:block; position:relative; z-index:1}
+.retrato img{
+  display:block; width:100%; height:auto;
+  /* drop-shadow sigue la silueta; box-shadow volveria a dibujar la caja.
+     Tres capas: contacto corta, cuerpo media y difusa larga. */
+  filter:
+    drop-shadow(0 6px 8px rgba(14,20,24,.26))
+    drop-shadow(0 22px 26px rgba(14,20,24,.22))
+    drop-shadow(0 54px 68px rgba(14,20,24,.18));
+  transition:transform .55s cubic-bezier(.2,.7,.3,1), filter .55s ease;
+}
+.retrato:hover img{
+  transform:translateY(-12px) scale(1.015);
+  filter:
+    drop-shadow(0 10px 12px rgba(14,20,24,.24))
+    drop-shadow(0 32px 38px rgba(14,20,24,.24))
+    drop-shadow(0 72px 92px rgba(14,20,24,.22))
+    drop-shadow(0 0 30px rgba(63,216,206,.34));
+}
+.retrato:hover::after{transform:translate(-50%,-50%) scale(1.06); border-color:var(--signal)}
+.retrato:hover .retrato-halo{transform:translate(-50%,-50%) scale(1.08)}
+
 .retrato figcaption{
-  display:flex; justify-content:space-between; gap:12px;
-  padding:9px 12px 10px;
-  font-family:var(--font-mono),monospace; font-size:10px; letter-spacing:.16em;
-  text-transform:uppercase; color:var(--machine-dim);
-  border-top:1px solid var(--machine-line);
+  position:relative; z-index:1; margin-top:16px; text-align:center;
+  font-family:var(--font-mono),monospace; font-size:10.5px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--ink-3);
 }
-.retrato figcaption span:first-child{color:var(--glow-b)}
 @media (prefers-reduced-motion: reduce){
-  .retrato,.retrato::after,.retrato::before{transition:none}
+  .retrato img,.retrato-halo,.retrato::after{transition:none}
+  .retrato:hover img{transform:none}
+  .retrato:hover::after,.retrato:hover .retrato-halo{transform:translate(-50%,-50%)}
 }
 
 /* --- Anclaje asimetrico: el bloque se para a la derecha ---------------- */
