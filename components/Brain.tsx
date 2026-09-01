@@ -3,22 +3,35 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * El cerebro de luces: una silueta de cerebro dibujada con nodos y sinapsis,
- * compacta arriba a la derecha del hero. Los pulsos nacen dentro del cerebro,
- * recorren sus circunvoluciones y salen por axones —trazas tipo circuito— que
- * llevan la luz hacia el resto de la página. El cursor excita la zona cercana.
+ * El cerebro. No es un adorno: es la pieza que tiene que dejar sin aire al
+ * visitante en el primer segundo.
+ *
+ * Cómo está hecho:
+ *  · La silueta —lóbulos, circunvoluciones, cerebelo y tronco— se muestrea
+ *    sobre trazados SVG, así que es un cerebro de verdad y no una mancha.
+ *  · Se dibuja con mezcla aditiva sobre una estela: cada cuadro tiñe el lienzo
+ *    en vez de borrarlo, de modo que la luz deja rastro y los cruces de
+ *    sinapsis se suman hasta el blanco. Eso produce el resplandor.
+ *  · No parpadea al azar: PIENSA. Cada cierto tiempo nace un pensamiento en
+ *    una neurona y se propaga por la red respetando la distancia real entre
+ *    nodos, así que se ve viajar la idea.
+ *  · Tiene profundidad: cada nodo se desplaza distinto con el cursor.
+ *  · Baja de intensidad cuando el hero sale de la vista, para no gastar
+ *    batería dibujando algo que nadie está mirando.
  */
 type Kind = 'brain' | 'axon';
-type Node = { x: number; y: number; ox: number; oy: number; r: number; glow: number; hue: 'a' | 'b'; ph: number; kind: Kind };
+type Node = {
+  x: number; y: number; ox: number; oy: number;
+  r: number; glow: number; hue: 'a' | 'b'; ph: number;
+  kind: Kind; z: number;
+};
 type Edge = { i: number; j: number; d: number; kind: Kind };
-type Pulse = { e: number; t: number; v: number; dir: 1 | -1; hue: 'a' | 'b' };
+type Onda = { t: number; vel: number; hue: 'a' | 'b'; alcance: number; dist: Float32Array };
 
-const GLOW_A = { r: 255, g: 116, b: 64 };   // naranja señal
-const GLOW_B = { r: 63, g: 216, b: 206 };   // cian sináptico
+const GLOW_A = { r: 255, g: 116, b: 64 };
+const GLOW_B = { r: 63, g: 216, b: 206 };
+const FONDO = { r: 7, g: 11, b: 14 };
 
-// Silueta del cerebro, en una caja de 100 x 80, mirando a la derecha.
-// El contorno lleva los lóbulos marcados; los pliegues son las circunvoluciones;
-// el cerebelo y el tronco son lo que lo vuelve inconfundible.
 const BRAIN_OUTLINE =
   'M18 44 C10 40 10 30 18 26 C18 17 27 12 35 16 C38 8 48 7 53 13 ' +
   'C58 6 68 7 72 14 C80 12 89 18 88 27 C96 30 96 40 88 44 ' +
@@ -32,7 +45,6 @@ const BRAIN_FOLDS = [
   'M34 55 C42 51 48 58 56 54 C64 50 70 55 76 52',
   'M84 22 C90 26 92 34 86 39',
 ];
-// Cerebelo (abajo a la izquierda) y tronco encefálico
 const BRAIN_STEM = [
   'M22 54 C28 52 33 57 31 62 C28 67 21 65 20 59 Z',
   'M30 63 C31 68 33 72 36 75',
@@ -44,28 +56,44 @@ export default function Brain() {
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let W = 0, H = 0, dpr = 1;
     let nodes: Node[] = [];
     let edges: Edge[] = [];
-    let axonEdges: number[] = [];
-    let pulses: Pulse[] = [];
+    let vecinos: number[][] = [];
+    let ondas: Onda[] = [];
     let raf = 0;
     let running = true;
     let small = false;
-    const mouse = { x: -9999, y: -9999 };
+    let intensidad = 1;
+    const mouse = { x: -9999, y: -9999, px: 0, py: 0 };
 
-    // Muestrea puntos equiespaciados a lo largo de un path SVG.
-    function samplePath(d: string, count: number): { x: number; y: number }[] {
+    /** El halo se pre-dibuja una sola vez por color y después solo se estampa
+     *  escalado. Crear un degradado radial por neurona y por cuadro costaba
+     *  ~200 degradados por fotograma; esto lo baja a dos imágenes. */
+    function haloSprite(c: { r: number; g: number; b: number }) {
+      const S = 128;
+      const off = document.createElement('canvas');
+      off.width = off.height = S;
+      const o = off.getContext('2d')!;
+      const g = o.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+      g.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',1)');
+      g.addColorStop(0.42, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.26)');
+      g.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',0)');
+      o.fillStyle = g;
+      o.fillRect(0, 0, S, S);
+      return off;
+    }
+    const SPRITE_A = haloSprite(GLOW_A);
+    const SPRITE_B = haloSprite(GLOW_B);
+
+    function samplePath(d: string, count: number) {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('width', '0');
-      svg.setAttribute('height', '0');
-      svg.style.position = 'absolute';
-      svg.style.opacity = '0';
-      svg.style.pointerEvents = 'none';
+      svg.setAttribute('width', '0'); svg.setAttribute('height', '0');
+      svg.style.cssText = 'position:absolute;opacity:0;pointer-events:none';
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       path.setAttribute('d', d);
       svg.appendChild(path);
@@ -77,112 +105,106 @@ export default function Brain() {
           const p = path.getPointAtLength((len * i) / count);
           out.push({ x: p.x, y: p.y });
         }
-      } catch {
-        /* navegador sin soporte: el cerebro simplemente queda vacío */
-      }
+      } catch { /* sin soporte: el cerebro queda vacío */ }
       document.body.removeChild(svg);
       return out;
     }
 
     function seed() {
-      nodes = [];
-      edges = [];
-      axonEdges = [];
-      pulses = [];
-
+      nodes = []; edges = []; ondas = [];
       small = W < 760;
-      // El cerebro: pequeño y compacto, arriba a la derecha. Nunca domina el titular.
-      // En móvil se recuesta contra el borde derecho para no montarse sobre el letrero.
-      const bw = Math.min(small ? W * 0.46 : W * 0.25, 330);
+
+      const bw = Math.min(small ? W * 0.58 : W * 0.34, 460);
       const bh = bw * 0.8;
-      const bx = small ? W - bw * 0.88 : W - bw - W * 0.09;
-      const by = small ? H * 0.03 : H * 0.13;
+      const bx = small ? W - bw * 0.9 : W - bw - W * 0.055;
+      const by = small ? H * 0.03 : H * 0.1;
       const toHero = (p: { x: number; y: number }) => ({
         x: bx + (p.x / 100) * bw,
         y: by + (p.y / 80) * bh,
       });
 
-      const density = small ? 0.7 : 1;
+      const dens = small ? 0.72 : 1;
       const push = (p: { x: number; y: number }, kind: Kind, hueBias: number, r: number) => {
         nodes.push({
           x: p.x, y: p.y, ox: p.x, oy: p.y,
-          r, glow: Math.random() * 0.25,
+          r, glow: 0,
           hue: Math.random() < hueBias ? 'a' : 'b',
           ph: Math.random() * Math.PI * 2,
-          kind,
+          kind, z: Math.random(),
         });
       };
 
-      // 1. Contorno del cerebro
-      for (const p of samplePath(BRAIN_OUTLINE, Math.round(58 * density))) {
-        push(toHero(p), 'brain', 0.18, 1.5 + Math.random() * 1.5);
-      }
-      // 2. Circunvoluciones internas
-      for (const d of BRAIN_FOLDS) {
-        for (const p of samplePath(d, Math.round(14 * density))) {
-          push(toHero(p), 'brain', 0.3, 1.1 + Math.random() * 1.3);
-        }
-      }
-      // 3. Cerebelo y tronco: lo que lo vuelve inconfundible
-      for (const d of BRAIN_STEM) {
-        for (const p of samplePath(d, Math.round(10 * density))) {
-          push(toHero(p), 'brain', 0.22, 1.1 + Math.random() * 1.1);
-        }
-      }
-      const brainCount = nodes.length;
+      for (const p of samplePath(BRAIN_OUTLINE, Math.round(70 * dens))) push(toHero(p), 'brain', 0.16, 1.5 + Math.random() * 1.6);
+      for (const d of BRAIN_FOLDS) for (const p of samplePath(d, Math.round(17 * dens))) push(toHero(p), 'brain', 0.3, 1.1 + Math.random() * 1.4);
+      for (const d of BRAIN_STEM) for (const p of samplePath(d, Math.round(12 * dens))) push(toHero(p), 'brain', 0.22, 1.1 + Math.random() * 1.2);
+      const nCerebro = nodes.length;
 
-      // Sinapsis del cerebro: k vecinos más cercanos, para que sigan los pliegues
-      const seen = new Set<string>();
-      const maxLink = bw * 0.105;
-      for (let i = 0; i < brainCount; i++) {
-        const near = nodes
-          .slice(0, brainCount)
+      const vistos = new Set<string>();
+      const maxLink = bw * 0.1;
+      for (let i = 0; i < nCerebro; i++) {
+        const cerca = nodes.slice(0, nCerebro)
           .map((m, j) => ({ j, d: Math.hypot(m.x - nodes[i].x, m.y - nodes[i].y) }))
-          .filter((o) => o.j !== i)
-          .sort((a, b) => a.d - b.d)
-          .slice(0, 3);
-        for (const { j, d } of near) {
-          const key = i < j ? `${i}-${j}` : `${j}-${i}`;
-          if (!seen.has(key) && d < maxLink) {
-            seen.add(key);
-            edges.push({ i: Math.min(i, j), j: Math.max(i, j), d, kind: 'brain' });
-          }
+          .filter((o) => o.j !== i).sort((a, b) => a.d - b.d).slice(0, 3);
+        for (const { j, d } of cerca) {
+          const k = i < j ? i + '-' + j : j + '-' + i;
+          if (!vistos.has(k) && d < maxLink) { vistos.add(k); edges.push({ i: Math.min(i, j), j: Math.max(i, j), d, kind: 'brain' }); }
         }
       }
 
-      // 3. Axones: trazas tipo circuito que salen del cerebro hacia la página.
-      //    Nacen en los nodos más a la izquierda/abajo y avanzan en ángulo recto.
-      const anchors = nodes
-        .slice(0, brainCount)
-        .map((n, i) => ({ i, score: n.x - n.y * 0.55 }))
-        .sort((a, b) => a.score - b.score)
-        .slice(0, small ? 3 : 5);
-
-      for (const a of anchors) {
-        let from = a.i;
-        let { x, y } = nodes[from];
-        const legs = 2 + Math.floor(Math.random() * 2);
-        let horizontal = true;
-        for (let l = 0; l < legs; l++) {
-          const reach = (horizontal ? W : H) * (0.09 + Math.random() * 0.13);
-          const tx = horizontal ? x - reach : x;
-          const ty = horizontal ? y : y + reach * 0.7;
-          if (tx < W * 0.04 || ty > H * 0.94) break;
-          // nodos intermedios cada ~46px para que el pulso tenga por dónde viajar
-          const steps = Math.max(1, Math.round(Math.hypot(tx - x, ty - y) / 46));
-          for (let s = 1; s <= steps; s++) {
-            const px = x + ((tx - x) * s) / steps;
-            const py = y + ((ty - y) * s) / steps;
-            push({ x: px, y: py }, 'axon', 0.35, s === steps && l === legs - 1 ? 2.4 : 1.1);
+      const anclas = nodes.slice(0, nCerebro)
+        .map((n, i) => ({ i, s: n.x - n.y * 0.55 }))
+        .sort((a, b) => a.s - b.s).slice(0, small ? 3 : 6);
+      for (const a of anclas) {
+        let from = a.i; let x = nodes[from].x, y = nodes[from].y;
+        let horiz = true;
+        const tramos = 2 + Math.floor(Math.random() * 2);
+        for (let l = 0; l < tramos; l++) {
+          const largo = (horiz ? W : H) * (0.09 + Math.random() * 0.14);
+          const tx = horiz ? x - largo : x;
+          const ty = horiz ? y : y + largo * 0.7;
+          if (tx < W * 0.03 || ty > H * 0.95) break;
+          const pasos = Math.max(1, Math.round(Math.hypot(tx - x, ty - y) / 42));
+          for (let s = 1; s <= pasos; s++) {
+            const px = x + ((tx - x) * s) / pasos, py = y + ((ty - y) * s) / pasos;
+            push({ x: px, y: py }, 'axon', 0.35, s === pasos && l === tramos - 1 ? 2.6 : 1.1);
             const to = nodes.length - 1;
-            axonEdges.push(edges.length);
-            edges.push({ i: from, j: to, d: Math.hypot(px - x, py - y) / steps, kind: 'axon' });
+            edges.push({ i: from, j: to, d: Math.hypot(px - x, py - y) / pasos, kind: 'axon' });
             from = to;
           }
-          x = tx; y = ty;
-          horizontal = !horizontal;
+          x = tx; y = ty; horiz = !horiz;
         }
       }
+
+      vecinos = nodes.map(() => [] as number[]);
+      for (const e of edges) { vecinos[e.i].push(e.j); vecinos[e.j].push(e.i); }
+    }
+
+    /** Nace un pensamiento: recorrido por anchura desde una neurona, guardando
+     *  la distancia real a cada una. Después la onda avanza sobre esa distancia
+     *  y por eso se ve VIAJAR la idea por la red. */
+    function pensar() {
+      if (!nodes.length || ondas.length > 3) return;
+      const origen = Math.floor(Math.random() * nodes.length);
+      const dist = new Float32Array(nodes.length).fill(-1);
+      dist[origen] = 0;
+      const cola = [origen];
+      let max = 0;
+      for (let h = 0; h < cola.length; h++) {
+        const u = cola[h];
+        for (const v of vecinos[u]) {
+          if (dist[v] >= 0) continue;
+          const d = dist[u] + Math.hypot(nodes[v].x - nodes[u].x, nodes[v].y - nodes[u].y);
+          dist[v] = d; if (d > max) max = d;
+          cola.push(v);
+        }
+      }
+      ondas.push({
+        t: 0,
+        vel: 260 + Math.random() * 260,
+        hue: Math.random() < 0.32 ? 'a' : 'b',
+        alcance: max || 1,
+        dist,
+      });
     }
 
     function resize() {
@@ -192,166 +214,121 @@ export default function Brain() {
       canvas!.width = Math.round(W * dpr);
       canvas!.height = Math.round(H * dpr);
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx!.fillStyle = 'rgb(' + FONDO.r + ',' + FONDO.g + ',' + FONDO.b + ')';
+      ctx!.fillRect(0, 0, W, H);
       seed();
-      if (reduced) drawFrame(0); // un solo cuadro estático
-    }
-
-    function spawnPulse() {
-      if (!edges.length) return;
-      // 45% de los pulsos salen por los axones: es la luz que va hacia la página
-      const useAxon = axonEdges.length > 0 && Math.random() < 0.45;
-      const e = useAxon
-        ? axonEdges[Math.floor(Math.random() * axonEdges.length)]
-        : Math.floor(Math.random() * edges.length);
-      pulses.push({
-        e, t: 0,
-        v: 0.008 + Math.random() * 0.016,
-        dir: useAxon ? 1 : (Math.random() < 0.5 ? 1 : -1),
-        hue: Math.random() < 0.3 ? 'a' : 'b',
-      });
-    }
-
-    // Cascada: cuando un pulso llega, la señal se propaga por las otras sinapsis
-    function cascade(fromNode: number, hue: 'a' | 'b') {
-      if (pulses.length > 60) return;
-      for (let k = 0; k < edges.length; k++) {
-        const e = edges[k];
-        if (e.i !== fromNode && e.j !== fromNode) continue;
-        if (Math.random() > 0.45) continue;
-        pulses.push({
-          e: k, t: 0,
-          v: 0.012 + Math.random() * 0.014,
-          dir: e.i === fromNode ? 1 : -1,
-          hue,
-        });
-      }
-    }
-
-    function drawFrame(time: number) {
-      ctx!.clearRect(0, 0, W, H);
-      const t = time * 0.001;
-      ctx!.globalAlpha = small ? 0.55 : 1; // en móvil el cerebro no compite con el texto
-
-      // sinapsis y trazas (se iluminan cuando sus nodos están excitados)
-      for (const e of edges) {
-        const a = nodes[e.i], b = nodes[e.j];
-        const excite = Math.max(a.glow, b.glow);
-        const axon = e.kind === 'axon';
-        const alpha = (axon ? 0.13 : Math.max(0.16, 0.34 - e.d / (W * 0.9))) + excite * 0.34;
-        if (excite > 0.25) {
-          const c = (a.hue === 'a' || b.hue === 'a') ? GLOW_A : GLOW_B;
-          ctx!.strokeStyle = `rgba(${c.r},${c.g},${c.b},${Math.min(0.55, alpha)})`;
-          ctx!.lineWidth = axon ? 1.2 : 1.4;
-        } else {
-          ctx!.strokeStyle = `rgba(135,168,176,${alpha})`;
-          ctx!.lineWidth = 1;
-        }
-        ctx!.beginPath();
-        ctx!.moveTo(a.x, a.y);
-        ctx!.lineTo(b.x, b.y);
-        ctx!.stroke();
-      }
-
-      // pulsos viajando
-      for (let p = pulses.length - 1; p >= 0; p--) {
-        const pu = pulses[p];
-        pu.t += pu.v;
-        if (pu.t >= 1) {
-          const edge = edges[pu.e];
-          const ti = pu.dir === 1 ? edge.j : edge.i;
-          nodes[ti].glow = 1; // el nodo se enciende al recibir el pulso
-          if (Math.random() < 0.5) cascade(ti, pu.hue); // y la señal se propaga
-          pulses.splice(p, 1);
-          continue;
-        }
-        const edge = edges[pu.e];
-        const a = pu.dir === 1 ? nodes[edge.i] : nodes[edge.j];
-        const b = pu.dir === 1 ? nodes[edge.j] : nodes[edge.i];
-        const x = a.x + (b.x - a.x) * pu.t;
-        const y = a.y + (b.y - a.y) * pu.t;
-        const c = pu.hue === 'a' ? GLOW_A : GLOW_B;
-        const g = ctx!.createRadialGradient(x, y, 0, x, y, 7);
-        g.addColorStop(0, `rgba(${c.r},${c.g},${c.b},0.95)`);
-        g.addColorStop(1, `rgba(${c.r},${c.g},${c.b},0)`);
-        ctx!.fillStyle = g;
-        ctx!.beginPath();
-        ctx!.arc(x, y, 7, 0, Math.PI * 2);
-        ctx!.fill();
-        // estela sobre la sinapsis
-        ctx!.strokeStyle = `rgba(${c.r},${c.g},${c.b},0.35)`;
-        ctx!.lineWidth = 1.2;
-        ctx!.beginPath();
-        ctx!.moveTo(a.x + (b.x - a.x) * Math.max(0, pu.t - 0.12), a.y + (b.y - a.y) * Math.max(0, pu.t - 0.12));
-        ctx!.lineTo(x, y);
-        ctx!.stroke();
-      }
-
-      // nodos
-      for (const nd of nodes) {
-        // deriva orgánica: el cerebro respira, los axones casi no se mueven
-        if (!reduced) {
-          const amp = nd.kind === 'brain' ? 2.2 : 0.8;
-          nd.x = nd.ox + Math.sin(t * 0.6 + nd.ph) * amp + Math.sin(t * 0.23 + nd.ph * 2.1) * amp * 0.5;
-          nd.y = nd.oy + Math.cos(t * 0.5 + nd.ph * 1.3) * amp + Math.cos(t * 0.19 + nd.ph) * amp * 0.5;
-        }
-        // excitación por cercanía del cursor
-        const dm = Math.hypot(nd.x - mouse.x, nd.y - mouse.y);
-        if (dm < 130) nd.glow = Math.max(nd.glow, 1 - dm / 130);
-        nd.glow *= 0.965; // decaimiento
-
-        const c = nd.hue === 'a' ? GLOW_A : GLOW_B;
-        const base = (nd.kind === 'brain' ? 0.6 : 0.3) + nd.glow * 0.4;
-        if (nd.glow > 0.06) {
-          const halo = ctx!.createRadialGradient(nd.x, nd.y, 0, nd.x, nd.y, 16 * nd.glow + 4);
-          halo.addColorStop(0, `rgba(${c.r},${c.g},${c.b},${0.5 * nd.glow})`);
-          halo.addColorStop(1, `rgba(${c.r},${c.g},${c.b},0)`);
-          ctx!.fillStyle = halo;
-          ctx!.beginPath();
-          ctx!.arc(nd.x, nd.y, 16 * nd.glow + 4, 0, Math.PI * 2);
-          ctx!.fill();
-        }
-        ctx!.fillStyle = `rgba(${c.r},${c.g},${c.b},${base})`;
-        ctx!.beginPath();
-        ctx!.arc(nd.x, nd.y, nd.r + nd.glow * 1.5, 0, Math.PI * 2);
-        ctx!.fill();
-      }
+      if (reduced) { pensar(); draw(0); draw(16); }
     }
 
     let last = 0;
+    function draw(time: number) {
+      const dt = Math.min(0.05, (time - last) / 1000) || 0.016;
+      last = time;
+      const t = time * 0.001;
+
+      // Estela: teñir en vez de borrar. La luz deja rastro.
+      ctx!.globalCompositeOperation = 'source-over';
+      ctx!.fillStyle = 'rgba(' + FONDO.r + ',' + FONDO.g + ',' + FONDO.b + ',' + (reduced ? 1 : 0.26) + ')';
+      ctx!.fillRect(0, 0, W, H);
+
+      mouse.px += ((mouse.x > -9000 ? (mouse.x - W / 2) * 0.016 : 0) - mouse.px) * 0.05;
+      mouse.py += ((mouse.y > -9000 ? (mouse.y - H / 2) * 0.016 : 0) - mouse.py) * 0.05;
+
+      for (let k = ondas.length - 1; k >= 0; k--) {
+        const o = ondas[k];
+        o.t += o.vel * dt;
+        if (o.t > o.alcance + 220) ondas.splice(k, 1);
+      }
+
+      for (const n of nodes) {
+        const amp = n.kind === 'brain' ? 2.4 : 0.9;
+        const par = 0.4 + n.z * 1.6;
+        n.x = n.ox + (reduced ? 0 : Math.sin(t * 0.55 + n.ph) * amp) + mouse.px * par;
+        n.y = n.oy + (reduced ? 0 : Math.cos(t * 0.47 + n.ph * 1.3) * amp) + mouse.py * par;
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        n.glow *= 0.94;
+        for (const o of ondas) {
+          const d = o.dist[i];
+          if (d < 0) continue;
+          const frente = Math.abs(o.t - d);
+          if (frente < 90) { const v = 1 - frente / 90; if (v * v > n.glow) n.glow = v * v; }
+        }
+        const dm = Math.hypot(n.x - mouse.x, n.y - mouse.y);
+        if (dm < 150) { const v = Math.pow(1 - dm / 150, 1.5); if (v > n.glow) n.glow = v; }
+      }
+
+      // Mezcla aditiva: los cruces se suman y florecen.
+      ctx!.globalCompositeOperation = 'lighter';
+      const I = intensidad;
+
+      for (const e of edges) {
+        const a = nodes[e.i], b = nodes[e.j];
+        const ex = Math.max(a.glow, b.glow);
+        if (ex < 0.02 && e.kind === 'axon') continue;
+        const c = (a.hue === 'a' || b.hue === 'a') ? GLOW_A : GLOW_B;
+        const base = e.kind === 'axon' ? 0.05 : 0.1;
+        const al = (base + ex * 0.62) * I;
+        ctx!.strokeStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + al + ')';
+        ctx!.lineWidth = 0.9 + ex * 1.9;
+        ctx!.beginPath(); ctx!.moveTo(a.x, a.y); ctx!.lineTo(b.x, b.y); ctx!.stroke();
+      }
+
+      for (const n of nodes) {
+        const c = n.hue === 'a' ? GLOW_A : GLOW_B;
+        const g = n.glow;
+        if (g > 0.04) {
+          const R = 8 + g * 36;
+          ctx!.globalAlpha = 0.55 * g * I;
+          ctx!.drawImage(n.hue === 'a' ? SPRITE_A : SPRITE_B, n.x - R, n.y - R, R * 2, R * 2);
+          ctx!.globalAlpha = 1;
+        }
+        const nuc = (n.kind === 'brain' ? 0.3 : 0.16) + g * 0.7;
+        const rr = Math.min(255, c.r + g * 120), gg = Math.min(255, c.g + g * 90), bb = Math.min(255, c.b + g * 90);
+        ctx!.fillStyle = 'rgba(' + rr + ',' + gg + ',' + bb + ',' + (nuc * I) + ')';
+        ctx!.beginPath(); ctx!.arc(n.x, n.y, n.r + g * 2.2, 0, Math.PI * 2); ctx!.fill();
+      }
+      ctx!.globalCompositeOperation = 'source-over';
+    }
+
+    let acumulado = 0;
     function loop(time: number) {
       if (!running) return;
-      if (time - last > 1000 / 60) {
-        last = time;
-        if (Math.random() < 0.5) spawnPulse();
-        if (pulses.length > 70) pulses.splice(0, pulses.length - 70);
-        drawFrame(time);
-      }
+      draw(time);
+      acumulado += 16;
+      if (acumulado > (small ? 1500 : 950)) { acumulado = 0; pensar(); }
       raf = requestAnimationFrame(loop);
     }
 
     function onMove(ev: PointerEvent) {
       const r = canvas!.getBoundingClientRect();
-      mouse.x = ev.clientX - r.left;
-      mouse.y = ev.clientY - r.top;
+      mouse.x = ev.clientX - r.left; mouse.y = ev.clientY - r.top;
     }
     function onLeave() { mouse.x = -9999; mouse.y = -9999; }
     function onVis() {
       running = document.visibilityState === 'visible';
-      if (running && !reduced) raf = requestAnimationFrame(loop);
+      if (running && !reduced) { last = performance.now(); raf = requestAnimationFrame(loop); }
     }
 
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(canvas.parentElement!);
+    const io = new IntersectionObserver(
+      function (entries) { intensidad = entries[0].isIntersecting ? 1 : 0.35; },
+      { threshold: 0.05 }
+    );
+    io.observe(canvas.parentElement!);
     canvas.parentElement!.addEventListener('pointermove', onMove);
     canvas.parentElement!.addEventListener('pointerleave', onLeave);
     document.addEventListener('visibilitychange', onVis);
-    if (!reduced) raf = requestAnimationFrame(loop);
+    if (!reduced) { pensar(); raf = requestAnimationFrame(loop); }
 
     return () => {
       running = false;
       cancelAnimationFrame(raf);
-      ro.disconnect();
+      ro.disconnect(); io.disconnect();
       canvas.parentElement?.removeEventListener('pointermove', onMove);
       canvas.parentElement?.removeEventListener('pointerleave', onLeave);
       document.removeEventListener('visibilitychange', onVis);

@@ -140,9 +140,14 @@ strong{font-weight:600; color:var(--ink)}
 .machine{position:relative; background:var(--machine); overflow:hidden; border-bottom:1px solid var(--line-soft)}
 .machine .wrap{position:relative; z-index:2; padding-top:88px; padding-bottom:46px}
 .machine canvas{position:absolute; inset:0; width:100%; height:100%; z-index:0}
+/* Velo del hero: oscurece SOLO la franja donde vive el texto, para que se lea
+   sobre el lienzo. Antes era un viñeteado radial que apagaba al 92% todo lo
+   alejado del centro izquierdo — es decir, apagaba el cerebro. */
 .machine::after{
   content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
-  background:radial-gradient(ellipse 85% 75% at 28% 42%, transparent 35%, rgba(7,11,14,.92) 100%);
+  background:
+    linear-gradient(100deg, rgba(7,11,14,.94) 0%, rgba(7,11,14,.86) 26%, rgba(7,11,14,.45) 48%, rgba(7,11,14,0) 66%),
+    linear-gradient(rgba(7,11,14,.55) 0%, transparent 22%, transparent 78%, rgba(7,11,14,.65) 100%);
 }
 .machine::before{
   content:""; position:absolute; left:0; right:0; bottom:0; height:2px; z-index:3;
