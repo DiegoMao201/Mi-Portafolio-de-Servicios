@@ -18,16 +18,23 @@ export default function Home() {
         <div className="wrap">
           <Wordmark />
           <p className="hero-eyebrow">Pereira, Colombia · Sistemas en operación continua</p>
+          {/* La frase se queda por su fuerza, pero no puede ser TODO el h1: no
+              lleva un solo término por el que alguien busque. La línea
+              descriptiva —que ya existía debajo— pasa a vivir dentro del h1.
+              Se ve exactamente igual; lo que cambia es qué entiende un
+              buscador o un asistente al leer el encabezado de la página. */}
           <h1>
-            No vendo software.
-            <br />
-            <em>Opero con él.</em>
+            <span className="h1-frase">
+              No vendo software.
+              <br />
+              <em>Opero con él.</em>
+            </span>
+            <span className="hero-sub h1-clave">
+              Automatización de procesos, integración de sistemas y análisis de datos con IA
+              para empresas colombianas. Los mismos sistemas que construyo llevan años
+              operando mi propia compañía, todos los días, sin interrupciones.
+            </span>
           </h1>
-          <p className="hero-sub">
-            Automatizo tesorería, inventario y ventas para empresas colombianas. Los mismos
-            sistemas que construyo llevan años operando mi propia compañía, todos los días,
-            sin interrupciones.
-          </p>
           <div className="hero-actions">
             <a className="btn btn-signal" href="#diagnosticador">Diagnostica tu proceso con IA</a>
             <Link className="btn btn-ghost" href="/casos">Ver los sistemas en operación</Link>

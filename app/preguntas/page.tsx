@@ -4,12 +4,12 @@ import { SERVICIOS } from '@/content/servicios';
 import { SITE, waLink } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Preguntas frecuentes sobre automatización e IA',
+  title: 'Preguntas sobre automatización e IA',
   description:
     'Respuestas directas: si hay que cambiar el ERP, qué pasa con los datos, cuánto cuesta, cuánto se demora, si el código queda tuyo y si la IA puede inventar. Colombia.',
   alternates: { canonical: '/preguntas' },
   // Sin esto, al compartir cualquier página salía el título de la portada.
-  openGraph: { title: 'Preguntas frecuentes sobre automatización e IA', description: 'Respuestas directas: si hay que cambiar el ERP, qué pasa con los datos, cuánto cuesta, cuánto se demora, si el código queda tuyo y si la IA puede inventar. Colombia.' },
+  openGraph: { title: 'Preguntas sobre automatización e IA', description: 'Respuestas directas: si hay que cambiar el ERP, qué pasa con los datos, cuánto cuesta, cuánto se demora, si el código queda tuyo y si la IA puede inventar. Colombia.' },
 };
 
 /**
@@ -63,7 +63,10 @@ export default function PreguntasPage() {
       <section className="sec sec--air">
         <div className="wrap">
           <p className="label sec-kicker">Preguntas frecuentes</p>
-          <h1>Lo que me preguntan<br />antes de contratar</h1>
+          <h1>
+            <span className="h1-frase">Lo que me preguntan<br />antes de contratar</span>
+            <span className="h1-clave">Preguntas frecuentes sobre automatización de procesos, integración de ERP, análisis de datos e IA</span>
+          </h1>
           <p className="lede bloque--angosto">
             {todas.length} preguntas reales, respondidas sin rodeos: si hay que cambiar el ERP,
             qué pasa con los datos, cuánto cuesta mantenerlo, de quién es el código y qué

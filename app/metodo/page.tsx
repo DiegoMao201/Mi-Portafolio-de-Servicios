@@ -4,12 +4,12 @@ import ArchGraph from '@/components/ArchGraph';
 import FasesMetodo from '@/components/FasesMetodo';
 
 export const metadata: Metadata = {
-  title: 'Método de trabajo',
+  title: 'Método: automatizar un proceso por fases',
   description:
     'Cómo trabajo: diagnóstico con datos reales, arquitectura antes que código, construcción por fases verificables y operación continua.',
   alternates: { canonical: '/metodo' },
   // Sin esto, al compartir cualquier página salía el título de la portada.
-  openGraph: { title: 'Método de trabajo', description: 'Cómo trabajo: diagnóstico con datos reales, arquitectura antes que código, construcción por fases verificables y operación continua.' },
+  openGraph: { title: 'Método: automatizar un proceso por fases', description: 'Cómo trabajo: diagnóstico con datos reales, arquitectura antes que código, construcción por fases verificables y operación continua.' },
 };
 
 const FASES = [
@@ -67,7 +67,10 @@ export default function MetodoPage() {
       <section className="sec sec--air">
         <div className="wrap">
           <p className="label sec-kicker">Método</p>
-          <h1>Empírico, por fases,<br />sin humo</h1>
+          <h1>
+            <span className="h1-frase">Empírico, por fases,<br />sin humo</span>
+            <span className="h1-clave">Cómo automatizo un proceso: diagnóstico con datos reales, arquitectura y construcción por fases verificables</span>
+          </h1>
           <p className="lede bloque--angosto">
             Mi método viene de operar sistemas donde equivocarse cuesta dinero propio en minutos.
             De ahí sale una regla que aplico a todo: <strong>nada se afirma sin verificarse contra

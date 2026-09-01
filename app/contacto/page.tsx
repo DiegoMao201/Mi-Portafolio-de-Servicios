@@ -3,12 +3,12 @@ import LeadForm from '@/components/LeadForm';
 import { SITE, waLink } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Contacto',
+  title: 'Hablemos de automatizar tu operación',
   description:
     'Hablemos de tu operación: WhatsApp +57 320 504 6277, diegomao.201@gmail.com o el formulario. Llamada de 30 minutos gratis, sin libreto de ventas.',
   alternates: { canonical: '/contacto' },
   // Sin esto, al compartir cualquier página salía el título de la portada.
-  openGraph: { title: 'Contacto', description: 'Hablemos de tu operación: WhatsApp +57 320 504 6277, diegomao.201@gmail.com o el formulario. Llamada de 30 minutos gratis, sin libreto de ventas.' },
+  openGraph: { title: 'Hablemos de automatizar tu operación', description: 'Hablemos de tu operación: WhatsApp +57 320 504 6277, diegomao.201@gmail.com o el formulario. Llamada de 30 minutos gratis, sin libreto de ventas.' },
 };
 
 export default function ContactoPage() {
@@ -17,7 +17,10 @@ export default function ContactoPage() {
       <section className="sec sec--air">
         <div className="wrap">
           <p className="label sec-kicker">Contacto</p>
-          <h1>Cuéntame<br />qué te duele</h1>
+          <h1>
+            <span className="h1-frase">Cuéntame<br />qué te duele</span>
+            <span className="h1-clave">Hablemos de automatizar tu operación: procesos, inventario, tesorería y análisis de datos</span>
+          </h1>
           <p className="lede bloque--angosto">
             Empezamos con una llamada de 30 minutos, gratis y sin libreto de ventas: tú me cuentas
             tu operación, yo te digo con franqueza qué se puede resolver y qué no vale la pena.

@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { NOTAS } from '@/content/notas';
 
 export const metadata: Metadata = {
-  title: 'Notas técnicas',
+  title: 'Notas técnicas de automatización y datos',
   description:
     'Notas de ingeniería desde la trinchera: migrar Streamlit a producción, conectar SQL Server con PostgreSQL, agentes de IA que no tumban la operación.',
   alternates: { canonical: '/notas' },
   // Sin esto, al compartir cualquier página salía el título de la portada.
-  openGraph: { title: 'Notas técnicas', description: 'Notas de ingeniería desde la trinchera: migrar Streamlit a producción, conectar SQL Server con PostgreSQL, agentes de IA que no tumban la operación.' },
+  openGraph: { title: 'Notas técnicas de automatización y datos', description: 'Notas de ingeniería desde la trinchera: migrar Streamlit a producción, conectar SQL Server con PostgreSQL, agentes de IA que no tumban la operación.' },
 };
 
 export default function NotasPage() {
@@ -16,7 +16,10 @@ export default function NotasPage() {
     <main className="sec">
       <div className="wrap">
         <p className="label sec-kicker">Notas</p>
-        <h1 style={{ fontSize: 'clamp(30px,4.4vw,48px)' }}>Ingeniería desde la trinchera</h1>
+        <h1 style={{ fontSize: 'clamp(30px,4.4vw,48px)' }}>
+          <span className="h1-frase">Ingeniería desde la trinchera</span>
+          <span className="h1-clave">Notas técnicas sobre automatización de procesos, integración de sistemas, bases de datos y agentes de IA</span>
+        </h1>
         <p className="lede">
           Lo que aprendo construyendo y operando sistemas reales, escrito para que te sirva
           aunque nunca me contrates.

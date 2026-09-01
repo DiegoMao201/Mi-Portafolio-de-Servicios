@@ -913,6 +913,29 @@ a.card--fila:hover .fila-num{-webkit-text-stroke-color:var(--signal)}
   .pregunta h2{margin-bottom:0}
 }
 
+/* --- El h1 lleva la frase Y los terminos --------------------------------
+   Las frases del sitio ("No vendo software. Opero con el.", "Empirico, por
+   fases, sin humo") tienen fuerza pero no llevan un solo termino por el que
+   alguien busque. La solucion no es cambiarlas: es que dejen de ser TODO el
+   h1. La frase conserva su tamano y su peso; la linea de terminos va debajo
+   con el aspecto del texto de apoyo que ya existia. Visualmente no cambia
+   nada — cambia lo que entiende un buscador al leer el encabezado. */
+h1 .h1-frase{display:block}
+h1 .h1-clave{
+  display:block;
+  font-family:var(--font-serif), Georgia, serif;
+  font-size:19px; font-weight:400; line-height:1.55;
+  letter-spacing:normal; color:var(--ink-2);
+  max-width:56ch; margin-top:18px; text-wrap:pretty;
+}
+/* En el hero conserva los margenes que tenia el parrafo original (24 arriba,
+   34 abajo): al moverlo dentro del h1 se perdio el de abajo y el texto quedaba
+   pegado a los botones. */
+.machine h1 .h1-clave{margin:24px 0 34px}
+.machine h1{max-width:none}
+.machine h1 .h1-frase{max-width:14ch}
+@media(max-width:760px){ h1 .h1-clave{font-size:17px; margin-top:14px} }
+
 /* --- El retrato ---------------------------------------------------------
    Sin recuadro. El sujeto va recortado contra el fondo y la sombra la calcula
    el navegador siguiendo el canal alfa: por eso se despega de la pagina en vez

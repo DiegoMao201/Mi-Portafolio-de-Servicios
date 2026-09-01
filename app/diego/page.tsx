@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { waLink } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Diego Mauricio García R.',
+  title: 'Ingeniero industrial en automatización e IA',
   description:
     'Ingeniero industrial de la Universidad Tecnológica de Pereira. Inteligencia de negocios, automatización e IA aplicada a operaciones reales.',
   alternates: { canonical: '/diego' },
   // Sin esto, al compartir cualquier página salía el título de la portada.
-  openGraph: { title: 'Diego Mauricio García R.', description: 'Ingeniero industrial de la Universidad Tecnológica de Pereira. Inteligencia de negocios, automatización e IA aplicada a operaciones reales.' },
+  openGraph: { title: 'Ingeniero industrial en automatización e IA', description: 'Ingeniero industrial de la Universidad Tecnológica de Pereira. Inteligencia de negocios, automatización e IA aplicada a operaciones reales.' },
 };
 
 export default function DiegoPage() {
@@ -18,7 +18,10 @@ export default function DiegoPage() {
         <div className="wrap">
           <div>
             <p className="label sec-kicker">Quién está detrás</p>
-            <h1 style={{ maxWidth: '13ch' }}>Diego Mauricio García R.</h1>
+            <h1>
+              <span className="h1-frase" style={{ maxWidth: '13ch' }}>Diego Mauricio García R.</span>
+              <span className="h1-clave">Ingeniero industrial de la UTP. Automatización de procesos, inteligencia de negocios e IA aplicada en Pereira, Colombia</span>
+            </h1>
             <p className="lede">
               Ingeniero industrial de la Universidad Tecnológica de Pereira y desarrollador de
               software. Vengo del liderazgo de compras y la gestión comercial en el sector de

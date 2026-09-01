@@ -17,7 +17,10 @@ export default function CasosPage() {
       <section className="sec sec--air">
         <div className="wrap">
           <p className="label sec-kicker">Casos</p>
-          <h1>Expedientes<br />técnicos</h1>
+          <h1>
+            <span className="h1-frase">Expedientes<br />técnicos</span>
+            <span className="h1-clave">Casos reales de automatización, control de inventarios y sistemas de decisión en empresas colombianas</span>
+          </h1>
           <p className="lede bloque--angosto">
             Aquí no hay testimonios con foto de banco de imágenes. Hay cinco sistemas reales,
             contados como se diseñaron: el problema, la restricción que lo hacía difícil,

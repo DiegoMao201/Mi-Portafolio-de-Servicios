@@ -17,7 +17,10 @@ export default function ServiciosPage() {
       <section className="sec sec--air">
         <div className="wrap">
           <p className="label sec-kicker">Servicios</p>
-          <h1>Ocho frentes,<br />una sola disciplina</h1>
+          <h1>
+            <span className="h1-frase">Ocho frentes,<br />una sola disciplina</span>
+            <span className="h1-clave">Servicios de automatización de procesos, integración de sistemas, análisis de datos e inteligencia artificial en Colombia</span>
+          </h1>
           <p className="lede bloque--angosto">
             Todo lo que construyo comparte el mismo estándar: datos ordenados en PostgreSQL,
             sistemas que no tocan tu operación crítica, y registro auditable de cada cosa que pasa.
