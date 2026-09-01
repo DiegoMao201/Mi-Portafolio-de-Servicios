@@ -75,7 +75,9 @@ export const JSONLD_BASE = {
         'y aplicaciones a la medida para empresas colombianas. Opera desde Pereira para ' +
         'todo el país, de forma remota.',
       knowsLanguage: 'es-CO',
-      priceRange: 'COP $690.000 – $3.900.000+',
+      // El rango arranca en el plan mensual, que es la puerta de entrada real
+      // para una pyme, no en el diagnóstico.
+      priceRange: 'COP $150.000 – $3.900.000+',
       currenciesAccepted: 'COP',
       areaServed: { '@type': 'Country', name: 'Colombia' },
       serviceArea: { '@type': 'Country', name: 'Colombia' },
