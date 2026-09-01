@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description:
     'Respuestas directas: si hay que cambiar el ERP, qué pasa con los datos, cuánto cuesta, cuánto se demora, si el código queda tuyo y si la IA puede inventar. Colombia.',
   alternates: { canonical: '/preguntas' },
+  // Sin esto, al compartir cualquier página salía el título de la portada.
+  openGraph: { title: 'Preguntas frecuentes sobre automatización e IA', description: 'Respuestas directas: si hay que cambiar el ERP, qué pasa con los datos, cuánto cuesta, cuánto se demora, si el código queda tuyo y si la IA puede inventar. Colombia.' },
 };
 
 /**
@@ -18,6 +20,16 @@ export const metadata: Metadata = {
  *
  * Ni una palabra nueva: son las mismas respuestas de content/servicios.ts.
  */
+/** Ancla estable y legible por persona: /preguntas#cambiar-mi-erp-o-software.
+ *  Sin ancla, lo único citable es la página entera; con ancla, la respuesta. */
+function ancla(q: string): string {
+  return q
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[¿?¡!.,:;""'()]/g, '')
+    .trim().split(/\s+/).slice(0, 7).join('-');
+}
+
 export default function PreguntasPage() {
   const grupos = SERVICIOS.filter((s) => s.faq.length > 0);
   const todas = grupos.flatMap((s) => s.faq);
@@ -30,8 +42,17 @@ export default function PreguntasPage() {
     about: { '@id': `${SITE.url}/#diego` },
     mainEntity: todas.map((f) => ({
       '@type': 'Question',
+      '@id': `${SITE.url}/preguntas#${ancla(f.q)}`,
+      url: `${SITE.url}/preguntas#${ancla(f.q)}`,
       name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: f.a },
+      inLanguage: 'es-CO',
+      answerCount: 1,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: f.a,
+        url: `${SITE.url}/preguntas#${ancla(f.q)}`,
+        author: { '@id': `${SITE.url}/#diego` },
+      },
     })),
   };
 
@@ -61,8 +82,10 @@ export default function PreguntasPage() {
             </div>
             <div className="preguntas">
               {s.faq.map((f) => (
-                <article key={f.q} className="pregunta">
-                  <h2>{f.q}</h2>
+                <article key={f.q} id={ancla(f.q)} className="pregunta">
+                  <h2>
+                    <a href={`#${ancla(f.q)}`} className="pregunta-enlace">{f.q}</a>
+                  </h2>
                   <p>{f.a}</p>
                 </article>
               ))}

@@ -25,6 +25,17 @@ export const JSONLD_BASE = {
   '@context': 'https://schema.org',
   '@graph': [
     {
+      /* El nodo del sitio: da un ancla al grafo entero y deja explicito quien
+         publica y en que idioma. Sin el, cada pagina es un grafo suelto. */
+      '@type': 'WebSite',
+      '@id': `${SITE.url}/#sitio`,
+      url: SITE.url,
+      name: 'Datovate Nexus Pro — Diego Mauricio García R.',
+      inLanguage: 'es-CO',
+      publisher: { '@id': `${SITE.url}/#org` },
+      about: { '@id': `${SITE.url}/#diego` },
+    },
+    {
       '@type': 'Person',
       '@id': `${SITE.url}/#diego`,
       name: 'Diego Mauricio García R.',
@@ -39,14 +50,46 @@ export const JSONLD_BASE = {
       alumniOf: {
         '@type': 'CollegeOrUniversity',
         name: 'Universidad Tecnológica de Pereira',
-        sameAs: 'https://es.wikipedia.org/wiki/Universidad_Tecnológica_de_Pereira',
+        sameAs: [
+          'https://es.wikipedia.org/wiki/Universidad_Tecnológica_de_Pereira',
+          'https://www.wikidata.org/wiki/Q2441962',
+        ],
       },
+      workLocation: {
+        '@type': 'City',
+        name: 'Pereira',
+        sameAs: 'https://www.wikidata.org/wiki/Q51111',
+        containedInPlace: {
+          '@type': 'AdministrativeArea',
+          name: 'Risaralda',
+          sameAs: 'https://www.wikidata.org/wiki/Q13993',
+        },
+      },
+      nationality: { '@type': 'Country', name: 'Colombia', sameAs: 'https://www.wikidata.org/wiki/Q739' },
       worksFor: { '@id': `${SITE.url}/#org` },
+      /* knowsAbout con entidades, no con cadenas de texto.
+         Una lista de strings obliga a la maquina a adivinar: buscando "Python"
+         en Wikidata el primer resultado es un genero de reptiles, "Pereira" es
+         un apellido y "Risaralda" es un municipio de Caldas. Enlazando a la
+         entidad canonica no queda nada que adivinar — es lo que permite que un
+         buscador o un asistente resuelvan de que hablamos. */
       knowsAbout: [
-        'Ingeniería industrial', 'Inteligencia de negocios', 'Business Intelligence',
-        'Automatización de procesos', 'Integración de sistemas y APIs', 'Analítica de datos',
-        'PostgreSQL', 'SQL Server', 'Python', 'FastAPI', 'Next.js', 'Streamlit',
-        'Agentes conversacionales', 'Retrieval-Augmented Generation', 'WhatsApp Cloud API',
+        { '@type': 'Thing', name: 'Ingeniería industrial', sameAs: 'https://www.wikidata.org/wiki/Q4489420' },
+        { '@type': 'Thing', name: 'Automatización de procesos de negocio', sameAs: 'https://www.wikidata.org/wiki/Q5001911' },
+        { '@type': 'Thing', name: 'Inteligencia empresarial', sameAs: 'https://www.wikidata.org/wiki/Q3353185' },
+        { '@type': 'Thing', name: 'Análisis de datos', sameAs: 'https://www.wikidata.org/wiki/Q1988917' },
+        { '@type': 'Thing', name: 'Ciencia de datos', sameAs: 'https://www.wikidata.org/wiki/Q2374463' },
+        { '@type': 'Thing', name: 'Inteligencia artificial', sameAs: 'https://www.wikidata.org/wiki/Q11660' },
+        { '@type': 'Thing', name: 'Aprendizaje automático', sameAs: 'https://www.wikidata.org/wiki/Q2539' },
+        { '@type': 'Thing', name: 'Generación aumentada por recuperación (RAG)', sameAs: 'https://www.wikidata.org/wiki/Q121362277' },
+        { '@type': 'Thing', name: 'Integración de sistemas', sameAs: 'https://www.wikidata.org/wiki/Q1665453' },
+        { '@type': 'Thing', name: 'Planificación de recursos empresariales (ERP)', sameAs: 'https://www.wikidata.org/wiki/Q131508' },
+        { '@type': 'Thing', name: 'Agentes conversacionales', sameAs: 'https://www.wikidata.org/wiki/Q870780' },
+        { '@type': 'Thing', name: 'PostgreSQL', sameAs: 'https://www.wikidata.org/wiki/Q192490' },
+        { '@type': 'Thing', name: 'Python', sameAs: 'https://www.wikidata.org/wiki/Q28865' },
+        { '@type': 'Thing', name: 'TypeScript', sameAs: 'https://www.wikidata.org/wiki/Q978185' },
+        { '@type': 'Thing', name: 'Next.js', sameAs: 'https://www.wikidata.org/wiki/Q56062435' },
+        { '@type': 'Thing', name: 'FastAPI', sameAs: 'https://www.wikidata.org/wiki/Q101119404' },
         'Control de inventarios', 'Optimización de compras', 'Análisis financiero',
       ],
       description:
@@ -82,8 +125,8 @@ export const JSONLD_BASE = {
       // para una pyme, no en el diagnóstico.
       priceRange: 'COP $150.000 – $3.900.000+',
       currenciesAccepted: 'COP',
-      areaServed: { '@type': 'Country', name: 'Colombia' },
-      serviceArea: { '@type': 'Country', name: 'Colombia' },
+      areaServed: { '@type': 'Country', name: 'Colombia', sameAs: 'https://www.wikidata.org/wiki/Q739' },
+      serviceArea: { '@type': 'Country', name: 'Colombia', sameAs: 'https://www.wikidata.org/wiki/Q739' },
       hasOfferCatalog: {
         '@type': 'OfferCatalog',
         name: 'Servicios de automatización e IA aplicada',

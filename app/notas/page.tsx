@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description:
     'Notas de ingeniería desde la trinchera: migrar Streamlit a producción, conectar SQL Server con PostgreSQL, agentes de IA que no tumban la operación.',
   alternates: { canonical: '/notas' },
+  // Sin esto, al compartir cualquier página salía el título de la portada.
+  openGraph: { title: 'Notas técnicas', description: 'Notas de ingeniería desde la trinchera: migrar Streamlit a producción, conectar SQL Server con PostgreSQL, agentes de IA que no tumban la operación.' },
 };
 
 export default function NotasPage() {

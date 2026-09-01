@@ -902,6 +902,12 @@ a.card--fila:hover .fila-num{-webkit-text-stroke-color:var(--signal)}
   margin-bottom:8px; max-width:52ch;
 }
 .pregunta p{margin:0; color:var(--ink-2); max-width:70ch; font-size:16.5px}
+/* La pregunta es un enlace a si misma: asi cualquiera —persona o IA— puede
+   citar la respuesta exacta, no la pagina entera. */
+.pregunta-enlace{color:inherit; text-decoration:none}
+.pregunta-enlace:hover{color:var(--signal-ink)}
+.pregunta:target h2{color:var(--signal-ink)}
+.pregunta:target{scroll-margin-top:90px}
 @media(min-width:1000px){
   .pregunta{display:grid; grid-template-columns:minmax(0,38%) minmax(0,1fr); gap:clamp(20px,3vw,48px); align-items:start}
   .pregunta h2{margin-bottom:0}

@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description:
     'Ingeniero industrial de la Universidad Tecnológica de Pereira. Inteligencia de negocios, automatización e IA aplicada a operaciones reales.',
   alternates: { canonical: '/diego' },
+  // Sin esto, al compartir cualquier página salía el título de la portada.
+  openGraph: { title: 'Diego Mauricio García R.', description: 'Ingeniero industrial de la Universidad Tecnológica de Pereira. Inteligencia de negocios, automatización e IA aplicada a operaciones reales.' },
 };
 
 export default function DiegoPage() {

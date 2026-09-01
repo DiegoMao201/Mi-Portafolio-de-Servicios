@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description:
     'Expedientes técnicos de sistemas en operación: tesorería automatizada, recaudo digital, e-commerce, motores de decisión y agentes de IA.',
   alternates: { canonical: '/casos' },
+  // Sin esto, al compartir cualquier página salía el título de la portada.
+  openGraph: { title: 'Casos reales: sistemas en operación', description: 'Expedientes técnicos de sistemas en operación: tesorería automatizada, recaudo digital, e-commerce, motores de decisión y agentes de IA.' },
 };
 
 export default function CasosPage() {

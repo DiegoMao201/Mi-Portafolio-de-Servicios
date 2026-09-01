@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description:
     'Automatización de procesos, integración de sistemas y APIs, apps web y móviles, bases de datos, agentes de IA y dashboards. Pereira, todo el país.',
   alternates: { canonical: '/servicios' },
+  // Sin esto, al compartir cualquier página salía el título de la portada.
+  openGraph: { title: 'Servicios de automatización e IA', description: 'Automatización de procesos, integración de sistemas y APIs, apps web y móviles, bases de datos, agentes de IA y dashboards. Pereira, todo el país.' },
 };
 
 export default function ServiciosPage() {

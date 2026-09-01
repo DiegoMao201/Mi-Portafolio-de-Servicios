@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description:
     'Cómo trabajo: diagnóstico con datos reales, arquitectura antes que código, construcción por fases verificables y operación continua.',
   alternates: { canonical: '/metodo' },
+  // Sin esto, al compartir cualquier página salía el título de la portada.
+  openGraph: { title: 'Método de trabajo', description: 'Cómo trabajo: diagnóstico con datos reales, arquitectura antes que código, construcción por fases verificables y operación continua.' },
 };
 
 const FASES = [
