@@ -12,17 +12,39 @@ export const metadata: Metadata = {
 export default function DiegoPage() {
   return (
     <main>
-      <section className="sec sec--air">
+      <section className="sec sec--air sec--retrato">
         <div className="wrap">
-          <p className="label sec-kicker">Quién está detrás</p>
-          <h1 style={{ maxWidth: '13ch' }}>Diego Mauricio García R.</h1>
-          <p className="lede bloque--angosto">
-            Ingeniero industrial de la Universidad Tecnológica de Pereira y desarrollador de
-            software. Vengo del liderazgo de compras y la gestión comercial en el sector de
-            recubrimientos, adhesivos y suministros industriales — es decir, conozco por dentro
-            la operación que hoy automatizo. Esa combinación, entender el negocio y además
-            construir el sistema, define cómo trabajo.
-          </p>
+          <div>
+            <p className="label sec-kicker">Quién está detrás</p>
+            <h1 style={{ maxWidth: '13ch' }}>Diego Mauricio García R.</h1>
+            <p className="lede">
+              Ingeniero industrial de la Universidad Tecnológica de Pereira y desarrollador de
+              software. Vengo del liderazgo de compras y la gestión comercial en el sector de
+              recubrimientos, adhesivos y suministros industriales — es decir, conozco por dentro
+              la operación que hoy automatizo. Esa combinación, entender el negocio y además
+              construir el sistema, define cómo trabajo.
+            </p>
+          </div>
+
+          {/* El retrato con el mismo lenguaje que los diagramas: filo de cian
+              arriba, escuadras técnicas y una luz que responde al cursor. */}
+          <figure className="retrato">
+            <picture>
+              <source srcSet="/diego.webp" type="image/webp" />
+              <img
+                src="/diego.jpg"
+                width={576}
+                height={768}
+                alt="Diego Mauricio García R., ingeniero industrial, en Pereira, Colombia"
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
+            <figcaption>
+              <span>Pereira · Risaralda</span>
+              <span>Colombia</span>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
