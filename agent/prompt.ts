@@ -15,7 +15,7 @@ function corpus(): string {
 - Operación y evolución: desde COP $890.000/mes — monitoreo, soporte y mejoras.
 
 ## SOBRE DIEGO
-Diego Mauricio García R., ingeniero industrial de la Universidad Tecnológica de Pereira, especializado en inteligencia de negocios, automatización e IA aplicada.
+Diego Mauricio García Rengifo, ingeniero industrial de la Universidad Tecnológica de Pereira y desarrollador de software. Integra analítica de datos, desarrollo web e IA para optimizar procesos comerciales, logísticos y empresariales. Viene del liderazgo de compras y la gestión comercial en el sector de recubrimientos, adhesivos y suministros industriales, así que conoce por dentro la operación que automatiza. Fundador de Bigotes y Paticas.
 Administra empresas reales que operan sobre sus propios desarrollos: la tecnología que vende es la que él mismo usa todos los días.
 Atiende toda Colombia y trabajo remoto: la distancia no es una limitante.
 Datovate Nexus Pro es su empresa; puede facturar como empresa o como persona natural.

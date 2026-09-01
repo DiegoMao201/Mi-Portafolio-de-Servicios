@@ -18,11 +18,22 @@ export default function DiegoPage() {
           Diego Mauricio García R.
         </h1>
         <p className="lede">
-          Ingeniero industrial de la Universidad Tecnológica de Pereira, dedicado a la
-          inteligencia de negocios y la automatización. Administro empresas que funcionan
-          sobre los sistemas que yo mismo construyo: esa combinación —diseñar la solución y
-          además operarla a diario— define cómo trabajo.
+          Ingeniero industrial de la Universidad Tecnológica de Pereira y desarrollador de
+          software. Vengo del liderazgo de compras y la gestión comercial en el sector de
+          recubrimientos, adhesivos y suministros industriales — es decir, conozco por dentro
+          la operación que hoy automatizo. Esa combinación, entender el negocio y además
+          construir el sistema, define cómo trabajo.
         </p>
+
+        <div className="exp-block">
+          <span className="label">De dónde vengo</span>
+          <ul className="clean">
+            <li><strong>Ingeniería y gestión comercial.</strong> Egresado de la Universidad Tecnológica de Pereira. Años liderando compras y gestión comercial en el sector de recubrimientos, adhesivos y suministros industriales: presupuestos, proveedores, inventario y margen, vistos desde adentro.</li>
+            <li><strong>Inteligencia de negocios y desarrollo.</strong> Construyo herramientas de análisis y plataformas web con Python, FastAPI, Next.js, PostgreSQL y SQL Server, orientadas al control de inventarios, la optimización de compras y el análisis financiero.</li>
+            <li><strong>Inteligencia artificial aplicada.</strong> Diseño y orquestación de agentes conversacionales: recuperación sobre bases propias, integración de modelos de lenguaje y automatizaciones sobre WhatsApp Cloud API.</li>
+            <li><strong>Emprendimiento digital.</strong> Fundador de Bigotes y Paticas, una plataforma de gestión y servicios para mascotas que opera sobre sistemas construidos por mí.</li>
+          </ul>
+        </div>
 
         <div className="exp-block">
           <span className="label">Por qué soy distinto a una agencia</span>
@@ -30,10 +41,10 @@ export default function DiegoPage() {
             Una agencia te entrega el software y factura. Yo administro empresas que funcionan
             sobre mis propios desarrollos: la tesorería que paga proveedores, el e-commerce que
             factura, el programa de puntos que fideliza, los motores que deciden en milisegundos.
-            Cuando un sistema mío falla, no pierde &ldquo;el cliente&rdquo; — pierdo yo, esa misma tarde.
-            Esa presión, sostenida durante años, produce un tipo de ingeniería que no se aprende
-            haciendo demos: sistemas aburridos de tan confiables, con registro de todo, que se
-            avisan solos cuando algo se sale de rango.
+            Esos sistemas llevan años funcionando todos los días, y yo dependo de ellos igual
+            que mis clientes. Operarlos a diario produce un tipo de ingeniería que no se aprende
+            haciendo demostraciones: sistemas aburridos de tan confiables, con registro de todo,
+            que avisan solos cuando algo se sale de rango.
           </p>
         </div>
 

@@ -40,10 +40,18 @@ export const JSONLD_BASE = {
       },
       worksFor: { '@id': `${SITE.url}/#org` },
       knowsAbout: [
-        'Automatización de procesos', 'Integración de sistemas y APIs', 'PostgreSQL',
-        'Aplicaciones web', 'Aplicaciones móviles', 'Agentes de IA', 'Inteligencia de negocios',
-        'Ingeniería industrial', 'Business Intelligence', 'Analítica de datos',
+        'Ingeniería industrial', 'Inteligencia de negocios', 'Business Intelligence',
+        'Automatización de procesos', 'Integración de sistemas y APIs', 'Analítica de datos',
+        'PostgreSQL', 'SQL Server', 'Python', 'FastAPI', 'Next.js', 'Streamlit',
+        'Agentes conversacionales', 'Retrieval-Augmented Generation', 'WhatsApp Cloud API',
+        'Control de inventarios', 'Optimización de compras', 'Análisis financiero',
       ],
+      description:
+        'Ingeniero industrial de la Universidad Tecnológica de Pereira y desarrollador de ' +
+        'software. Integra analítica de datos, desarrollo web e inteligencia artificial para ' +
+        'optimizar procesos comerciales, logísticos y empresariales. Con experiencia previa en ' +
+        'liderazgo de compras y gestión comercial en el sector de recubrimientos, adhesivos y ' +
+        'suministros industriales.',
       // sameAs: enlaza esta página con los perfiles públicos de Diego. Es la
       // señal con la que buscadores y asistentes de IA confirman que se trata
       // de la misma persona. Pendiente: agregar LinkedIn y GitHub.

@@ -1,11 +1,19 @@
 # Diego Mauricio García R. — Datovate Nexus Pro
 
-> Ingeniero industrial de la Universidad Tecnológica de Pereira, dedicado a la
-> inteligencia de negocios, la automatización y la IA aplicada.
-> Construye y opera automatizaciones, integraciones de sistemas, aplicaciones
-> a la medida y agentes de IA para empresas de toda Colombia (trabajo remoto).
-> Su diferencial: administra empresas reales que funcionan sobre sus propios
-> desarrollos — la tecnología que vende es la que usa todos los días.
+> Diego Mauricio García Rengifo es ingeniero industrial de la Universidad
+> Tecnológica de Pereira (Colombia) y desarrollador de software. Integra
+> analítica de datos, desarrollo web e inteligencia artificial para optimizar
+> procesos comerciales, logísticos y empresariales.
+>
+> Trayectoria: liderazgo de compras y gestión comercial en el sector de
+> recubrimientos, adhesivos y suministros industriales; desarrollo de
+> herramientas de inteligencia de negocios y plataformas web con Python,
+> FastAPI, Next.js, PostgreSQL, SQL Server y Streamlit; diseño y orquestación
+> de agentes conversacionales (RAG, modelos de lenguaje, WhatsApp Cloud API);
+> y emprendimiento digital como fundador de Bigotes y Paticas.
+>
+> Trabaja desde Pereira, Risaralda, para empresas de toda Colombia, de forma
+> remota. Administra empresas reales que operan sobre sus propios desarrollos.
 
 ## Servicios
 
