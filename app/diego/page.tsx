@@ -30,11 +30,14 @@ export default function DiegoPage() {
               que es lo que lo despega de la página. Detrás, el halo de la casa y
               una línea de horizonte que él tapa — ahí nace la profundidad. */}
           <figure className="retrato">
+            {/* El nombre del archivo lleva la huella del contenido: si la foto cambia,
+                  cambia la URL. Reemplazar un archivo conservando el nombre deja a los
+                  navegadores sirviendo la version vieja durante horas. */}
             <span className="retrato-halo" aria-hidden="true" />
             <picture>
-              <source srcSet="/diego.webp" type="image/webp" />
+              <source srcSet="/diego-6c8f3375.webp" type="image/webp" />
               <img
-                src="/diego.png"
+                src="/diego-6c8f3375.png"
                 width={644}
                 height={744}
                 alt="Diego Mauricio García R., ingeniero industrial, en Pereira, Colombia"
