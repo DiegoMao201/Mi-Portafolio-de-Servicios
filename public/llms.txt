@@ -1,6 +1,7 @@
 # Diego Mauricio García R. — Datovate Nexus Pro
 
-> Ingeniero de software y arquitecto de sistemas en Pereira, Colombia.
+> Ingeniero industrial de la Universidad Tecnológica de Pereira, dedicado a la
+> inteligencia de negocios, la automatización y la IA aplicada.
 > Construye y opera automatizaciones, integraciones de sistemas, aplicaciones
 > a la medida y agentes de IA para empresas de toda Colombia (trabajo remoto).
 > Su diferencial: administra empresas reales que funcionan sobre sus propios
@@ -24,7 +25,7 @@
 ## Cómo trabaja
 
 - [Método de trabajo](https://www.datovatenexuspro.com/metodo): diagnóstico con datos reales, arquitectura antes que código, construcción por fases verificables y operación continua.
-- [Quién está detrás](https://www.datovatenexuspro.com/diego): ingeniero autodidacta y administrador de empresas reales en Pereira.
+- [Quién está detrás](https://www.datovatenexuspro.com/diego): ingeniero industrial y administrador de empresas reales en Pereira.
 - [Notas técnicas](https://www.datovatenexuspro.com/notas): apuntes de ingeniería desde la operación.
 
 ## Cómo se empieza

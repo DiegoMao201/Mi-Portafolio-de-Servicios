@@ -1,11 +1,15 @@
 export const SITE = {
   url: process.env.SITE_URL || 'https://www.datovatenexuspro.com',
-  name: 'Diego Mauricio García R. · Datovate Nexus Pro',
-  shortName: 'Datovate Nexus Pro',
+  name: 'Diego Mauricio García R.',
+  shortName: 'Diego García',
+  /* Datovate Nexus Pro sigue siendo la firma comercial, pero en segundo plano:
+     en consultoría se contrata a una persona, y una persona también es una
+     entidad mucho más fácil de reconocer para los buscadores y las IA. */
+  firma: 'Datovate Nexus Pro',
   person: 'Diego Mauricio García R.',
   title: 'Automatización, sistemas e IA que operan empresas reales',
   description:
-    'Ingeniero de software en Pereira. Construyo automatizaciones, integraciones, apps a la medida y agentes de IA que ya operan empresas reales.',
+    'Ingeniero industrial en Pereira. Automatización, integración de sistemas, inteligencia de negocios e IA aplicada para empresas colombianas.',
   email: 'diegomao.201@gmail.com',
   whatsapp: process.env.WHATSAPP_NUMBER || '573205046277',
   city: 'Pereira',
@@ -24,15 +28,26 @@ export const JSONLD_BASE = {
       '@type': 'Person',
       '@id': `${SITE.url}/#diego`,
       name: 'Diego Mauricio García R.',
-      jobTitle: 'Ingeniero de software y arquitecto de sistemas',
+      jobTitle: 'Ingeniero industrial · Inteligencia de negocios y automatización',
       email: SITE.email,
       telephone: '+57 320 504 6277',
       url: `${SITE.url}/diego`,
       address: { '@type': 'PostalAddress', addressLocality: 'Pereira', addressRegion: 'Risaralda', addressCountry: 'CO' },
+      alumniOf: {
+        '@type': 'CollegeOrUniversity',
+        name: 'Universidad Tecnológica de Pereira',
+        sameAs: 'https://es.wikipedia.org/wiki/Universidad_Tecnológica_de_Pereira',
+      },
+      worksFor: { '@id': `${SITE.url}/#org` },
       knowsAbout: [
         'Automatización de procesos', 'Integración de sistemas y APIs', 'PostgreSQL',
         'Aplicaciones web', 'Aplicaciones móviles', 'Agentes de IA', 'Inteligencia de negocios',
+        'Ingeniería industrial', 'Business Intelligence', 'Analítica de datos',
       ],
+      // sameAs: enlaza esta página con los perfiles públicos de Diego. Es la
+      // señal con la que buscadores y asistentes de IA confirman que se trata
+      // de la misma persona. Pendiente: agregar LinkedIn y GitHub.
+      sameAs: [] as string[],
     },
     {
       '@type': 'Organization',

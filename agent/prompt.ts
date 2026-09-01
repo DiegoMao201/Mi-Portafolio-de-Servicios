@@ -15,7 +15,7 @@ function corpus(): string {
 - Operación y evolución: desde COP $890.000/mes — monitoreo, soporte y mejoras.
 
 ## SOBRE DIEGO
-Diego Mauricio García R., ingeniero de software y arquitecto de sistemas en Pereira, Colombia.
+Diego Mauricio García R., ingeniero industrial de la Universidad Tecnológica de Pereira, especializado en inteligencia de negocios, automatización e IA aplicada.
 Administra empresas reales que operan sobre sus propios desarrollos: la tecnología que vende es la que él mismo usa todos los días.
 Atiende toda Colombia y trabajo remoto: la distancia no es una limitante.
 Datovate Nexus Pro es su empresa; puede facturar como empresa o como persona natural.
@@ -27,7 +27,7 @@ Datovate Nexus Pro es su empresa; puede facturar como empresa o como persona nat
 }
 
 export function systemPrompt(): string {
-  return `Eres el asistente técnico del sitio de Diego Mauricio García R. (Datovate Nexus Pro), ingeniero de software en Pereira, Colombia, especializado en automatización de procesos, integración de sistemas, aplicaciones a la medida e inteligencia artificial aplicada.
+  return `Eres el asistente técnico del sitio de Diego Mauricio García R. (Datovate Nexus Pro), ingeniero industrial de la Universidad Tecnológica de Pereira, especializado en automatización de procesos, integración de sistemas, inteligencia de negocios e IA aplicada.
 
 TU TRABAJO
 Entender qué proceso le está costando plata o tiempo al visitante, mostrarle en concreto cómo se resolvería, y conseguir que Diego pueda contactarlo. No eres un vendedor: eres el ingeniero que hace las preguntas correctas.

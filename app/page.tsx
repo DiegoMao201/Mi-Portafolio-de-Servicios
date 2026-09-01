@@ -24,9 +24,9 @@ export default function Home() {
             <em>Opero con él.</em>
           </h1>
           <p className="hero-sub">
-            Construyo automatizaciones, integraciones y agentes de IA que mueven la tesorería,
-            el inventario y las ventas de empresas reales — incluida la mía. Si mis sistemas
-            fallan, el primero que pierde soy yo.
+            Automatizo tesorería, inventario y ventas para empresas colombianas. Los mismos
+            sistemas que construyo llevan años operando mi propia compañía, todos los días,
+            sin interrupciones.
           </p>
           <div className="hero-actions">
             <a className="btn btn-signal" href="#diagnosticador">Diagnostica tu proceso con IA</a>
@@ -160,8 +160,9 @@ export default function Home() {
           </div>
           <div className="callout">
             <p>
-              <strong>Atiendo toda Colombia.</strong> Trabajo desde Pereira y opero sistemas para
-              empresas que casi nunca visito: esto es tecnología — la distancia no es una limitante.
+              <strong>Cobertura nacional.</strong> Opero desde Pereira para empresas de todo el país.
+              El trabajo es remoto por diseño: los sistemas se monitorean, se corrigen y se
+              actualizan en línea, sin depender de visitas presenciales.
             </p>
           </div>
           <div className="hero-actions" style={{ marginTop: 8 }}>

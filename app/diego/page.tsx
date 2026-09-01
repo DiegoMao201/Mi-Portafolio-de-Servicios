@@ -5,7 +5,7 @@ import { waLink } from '@/lib/site';
 export const metadata: Metadata = {
   title: 'Diego Mauricio García R.',
   description:
-    'Ingeniero de software autodidacta y administrador de empresas reales en Pereira. Construyo y opero los sistemas que uso todos los días.',
+    'Ingeniero industrial de la Universidad Tecnológica de Pereira. Inteligencia de negocios, automatización e IA aplicada a operaciones reales.',
   alternates: { canonical: '/diego' },
 };
 
@@ -18,9 +18,10 @@ export default function DiegoPage() {
           Diego Mauricio García R.
         </h1>
         <p className="lede">
-          Soy ingeniero de software autodidacta y administrador de empresas en Pereira, Colombia.
-          Esa combinación —construir sistemas y vivir de operarlos— es todo lo que necesitas
-          saber sobre cómo trabajo.
+          Ingeniero industrial de la Universidad Tecnológica de Pereira, dedicado a la
+          inteligencia de negocios y la automatización. Administro empresas que funcionan
+          sobre los sistemas que yo mismo construyo: esa combinación —diseñar la solución y
+          además operarla a diario— define cómo trabajo.
         </p>
 
         <div className="exp-block">
