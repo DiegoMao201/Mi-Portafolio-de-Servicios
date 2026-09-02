@@ -58,6 +58,19 @@ export const JSONLD_BASE = {
       jobTitle: 'Ingeniero industrial · Inteligencia de negocios y automatización',
       email: SITE.email,
       telephone: '+57 320 504 6277',
+      /* El identificador va en la persona, que es quien esta registrada.
+         Datovate Nexus Pro es la marca comercial bajo la que opera; la empresa
+         como tal todavia no esta matriculada, asi que declararla como entidad
+         legal seria exactamente la afirmacion no comprobable que se busca
+         eliminar. Este NIT si es publico y consultable en el registro
+         mercantil colombiano. */
+      taxID: '1088266407',
+      identifier: {
+        '@type': 'PropertyValue',
+        propertyID: 'NIT',
+        value: '1088266407',
+        description: 'Registro mercantil de Colombia (persona natural)',
+      },
       url: `${SITE.url}/diego`,
       // Una entidad con rostro es mucho más fácil de reconciliar: Google y los
       // asistentes usan la imagen para confirmar que es la misma persona.
@@ -135,6 +148,9 @@ export const JSONLD_BASE = {
       '@type': ['Organization', 'ProfessionalService'],
       '@id': `${SITE.url}/#org`,
       name: 'Datovate Nexus Pro',
+      /* Marca comercial bajo la que opera Diego como persona natural. Cuando la
+         empresa quede matriculada, aqui entran legalName y su propio NIT. */
+      brand: { '@type': 'Brand', name: 'Datovate Nexus Pro' },
       url: SITE.url,
       email: SITE.email,
       telephone: '+57 320 504 6277',

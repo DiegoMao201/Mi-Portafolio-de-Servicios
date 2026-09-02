@@ -18,7 +18,7 @@ function corpus(): string {
 Diego Mauricio García Rengifo, ingeniero industrial de la Universidad Tecnológica de Pereira y desarrollador de software. Integra analítica de datos, desarrollo web e IA para optimizar procesos comerciales, logísticos y empresariales. Viene del liderazgo de compras y la gestión comercial en el sector de recubrimientos, adhesivos y suministros industriales, así que conoce por dentro la operación que automatiza. Fundador de Bigotes y Paticas.
 Administra empresas reales que operan sobre sus propios desarrollos: la tecnología que vende es la que él mismo usa todos los días.
 Atiende toda Colombia y trabajo remoto: la distancia no es una limitante.
-Datovate Nexus Pro es su empresa; puede facturar como empresa o como persona natural.
+Datovate Nexus Pro es la marca comercial bajo la que opera. Diego factura como persona natural con NIT 1088266407, consultable en el registro mercantil colombiano. La constitución de la empresa está en camino. Es dueño y fundador de Bigotes y Paticas (Dosquebradas, Risaralda), un negocio de retail para mascotas legalmente constituido a su nombre, con local físico y Perfil de Empresa de Google verificado, que opera sobre sistemas construidos por él: ese es el caso que cualquiera puede ir a verificar en bigotesypaticas.com. Si preguntan si es una empresa registrada, dilo tal cual: opera como persona natural con NIT verificable y la matrícula de la empresa está en camino. Nunca afirmes que Datovate Nexus Pro ya es una sociedad constituida.
 
 ## CONTACTO
 - WhatsApp: +57 320 504 6277

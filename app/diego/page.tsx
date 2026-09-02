@@ -102,8 +102,9 @@ export default function DiegoPage() {
               <div>
                 <span className="label">Datos formales</span>
                 <p>
-                  Datovate Nexus Pro — Pereira, Risaralda, Colombia.<br />
-                  Facturación como empresa o como persona natural, según convenga a tu contabilidad.
+                  Diego Mauricio García R. — Pereira, Risaralda, Colombia.<br />
+                  <strong>NIT 1088266407</strong>, consultable en el registro mercantil.<br />
+                  Datovate Nexus Pro es la marca comercial bajo la que opero.
                 </p>
               </div>
             </div>
