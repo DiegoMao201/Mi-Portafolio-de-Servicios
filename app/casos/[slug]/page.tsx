@@ -49,7 +49,7 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
         </div>
 
         <div className="exp-block">
-          <span className="label">Contexto</span>
+          <h2 className="label">Contexto</h2>
           {c.contexto.map((p, i) => <p key={i}>{p}</p>)}
         </div>
 
@@ -58,7 +58,7 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
         </div>
 
         <div className="exp-block">
-          <span className="label">Arquitectura</span>
+          <h2 className="label">Arquitectura</h2>
           <ul className="clean">
             {c.arquitectura.map((a, i) => <li key={i}>{a}</li>)}
           </ul>
@@ -70,14 +70,14 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
         </div>
 
         <div className="exp-block">
-          <span className="label">Resultado</span>
+          <h2 className="label">Resultado</h2>
           <ul className="clean">
             {c.resultado.map((r, i) => <li key={i}><strong>{r}</strong></li>)}
           </ul>
         </div>
 
         <div className="exp-block">
-          <span className="label">Stack</span>
+          <h2 className="label">Stack</h2>
           <p className="mono" style={{ fontSize: 14, color: 'var(--ink-2)' }}>{c.stack.join(' · ')}</p>
         </div>
 
@@ -86,7 +86,7 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
             que corrobora lo que aquí se cuenta. */}
         {c.enVivo ? (
           <div className="exp-block">
-            <span className="label">Se puede visitar</span>
+            <h2 className="label">Se puede visitar</h2>
             <p>
               Este sistema está operando ahora mismo:{' '}
               <a href={c.enVivo.url} target="_blank" rel="noopener">{c.enVivo.etiqueta}</a>.

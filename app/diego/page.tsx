@@ -60,7 +60,7 @@ export default function DiegoPage() {
         <div className="wrap">
           <div>
             <div className="exp-block">
-              <span className="label">De dónde vengo</span>
+              <h2 className="label">De dónde vengo</h2>
               <ul className="clean">
                 <li><strong>Ingeniería y gestión comercial.</strong> Egresado de la Universidad Tecnológica de Pereira. Años liderando compras y gestión comercial en el sector de recubrimientos, adhesivos y suministros industriales: presupuestos, proveedores, inventario y margen, vistos desde adentro.</li>
                 <li><strong>Inteligencia de negocios y desarrollo.</strong> Construyo herramientas de análisis y plataformas web con Python, FastAPI, Next.js, PostgreSQL y SQL Server, orientadas al control de inventarios, la optimización de compras y el análisis financiero.</li>
@@ -70,7 +70,7 @@ export default function DiegoPage() {
             </div>
 
             <div className="exp-block">
-              <span className="label">Por qué soy distinto a una agencia</span>
+              <h2 className="label">Por qué soy distinto a una agencia</h2>
               <p>
                 Una agencia te entrega el software y factura. Yo administro empresas que funcionan
                 sobre mis propios desarrollos: la tesorería que paga proveedores, el e-commerce que
@@ -83,7 +83,7 @@ export default function DiegoPage() {
             </div>
 
             <div className="exp-block">
-              <span className="label">Cómo pienso</span>
+              <h2 className="label">Cómo pienso</h2>
               <ul className="clean">
                 <li><strong>Empírico primero.</strong> Ninguna hipótesis sobrevive sin datos. Si un número no se puede verificar, no se afirma — ni en un diagnóstico, ni en este sitio.</li>
                 <li><strong>Lo crítico se aísla.</strong> Ningún experimento, ninguna IA, ningún proceso nuevo puede poner en riesgo la operación que factura. Es la regla número uno de todas mis arquitecturas.</li>
@@ -96,11 +96,11 @@ export default function DiegoPage() {
           <aside className="riel-fijo">
             <div className="ficha">
               <div>
-                <span className="label">Stack de todos los días</span>
+                <h2 className="label">Stack de todos los días</h2>
                 <p>Python · PostgreSQL · Next.js · TypeScript · FastAPI · Docker · IA aplicada (Claude, GPT, modelos abiertos) · despliegue propio en la nube</p>
               </div>
               <div>
-                <span className="label">Datos formales</span>
+                <h2 className="label">Datos formales</h2>
                 <p>
                   Diego Mauricio García R. — Pereira, Risaralda, Colombia.<br />
                   <strong>NIT 1088266407</strong>, consultable en el registro mercantil.<br />

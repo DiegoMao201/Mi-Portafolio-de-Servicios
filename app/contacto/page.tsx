@@ -32,7 +32,7 @@ export default function ContactoPage() {
       <section className="sec sec--tight sec--split">
         <div className="wrap">
           <div className="riel-fijo">
-            <p className="label sec-kicker">Por dónde prefieras</p>
+            <h2 className="label sec-kicker">Por dónde prefieras</h2>
             <div className="lista" style={{ marginTop: 14 }}>
               <a className="card card--fila card--via" href={waLink('Hola Diego, quiero agendar la llamada de 30 minutos.')} target="_blank" rel="noopener">
                 <span>

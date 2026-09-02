@@ -31,7 +31,7 @@ export default function Footer() {
           </p>
         </div>
         <div>
-          <h4>Servicios</h4>
+          <h2 className="f-titulo">Servicios</h2>
           <Link href="/servicios/automatizacion-de-procesos">Automatización</Link>
           <Link href="/servicios/integracion-de-sistemas-y-apis">Integraciones y APIs</Link>
           <Link href="/servicios/aplicaciones-web-a-la-medida">Apps web a la medida</Link>
@@ -39,7 +39,7 @@ export default function Footer() {
           <Link href="/servicios">Todos los servicios</Link>
         </div>
         <div>
-          <h4>Sitio</h4>
+          <h2 className="f-titulo">Sitio</h2>
           <Link href="/casos">Casos reales</Link>
           <Link href="/preguntas">Preguntas frecuentes</Link>
           <Link href="/metodo">Método de trabajo</Link>

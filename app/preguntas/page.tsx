@@ -6,10 +6,10 @@ import { SITE, waLink } from '@/lib/site';
 export const metadata: Metadata = {
   title: 'Preguntas sobre automatización e IA',
   description:
-    'Respuestas directas: si hay que cambiar el ERP, qué pasa con los datos, cuánto cuesta, cuánto se demora, si el código queda tuyo y si la IA puede inventar. Colombia.',
+    'Respuestas directas: si hay que cambiar el ERP, qué pasa con tus datos, cuánto cuesta, de quién es el código y qué ocurre si algo se cae.',
   alternates: { canonical: '/preguntas' },
   // Sin esto, al compartir cualquier página salía el título de la portada.
-  openGraph: { title: 'Preguntas sobre automatización e IA', description: 'Respuestas directas: si hay que cambiar el ERP, qué pasa con los datos, cuánto cuesta, cuánto se demora, si el código queda tuyo y si la IA puede inventar. Colombia.' },
+  openGraph: { title: 'Preguntas sobre automatización e IA', description: 'Respuestas directas: si hay que cambiar el ERP, qué pasa con tus datos, cuánto cuesta, de quién es el código y qué ocurre si algo se cae.' },
 };
 
 /**

@@ -24,6 +24,7 @@ export default function NotasPage() {
           Lo que aprendo construyendo y operando sistemas reales, escrito para que te sirva
           aunque nunca me contrates.
         </p>
+        <h2 className="lista-titulo">Todas las notas</h2>
         <div className="grid" style={{ marginTop: 26, maxWidth: 760 }}>
           {NOTAS.map((n) => (
             <Link key={n.slug} href={`/notas/${n.slug}`} className="card">

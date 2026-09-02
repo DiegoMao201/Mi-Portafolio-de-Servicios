@@ -66,12 +66,12 @@ export default async function ServicioPage({ params }: { params: Promise<{ slug:
         <p className="lede"><strong>{s.respuesta}</strong></p>
 
         <div className="exp-block">
-          <span className="label">El problema</span>
+          <h2 className="label">El problema</h2>
           {s.problema.map((p, i) => <p key={i}>{p}</p>)}
         </div>
 
         <div className="exp-block">
-          <span className="label">Cómo lo abordo</span>
+          <h2 className="label">Cómo lo abordo</h2>
           <ul className="clean">
             {s.metodo.map((m, i) => <li key={i}>{m}</li>)}
           </ul>
@@ -79,13 +79,13 @@ export default async function ServicioPage({ params }: { params: Promise<{ slug:
 
         <div className="grid g2" style={{ margin: '26px 0' }}>
           <div className="card">
-            <span className="label">Qué recibes</span>
+            <h2 className="label">Qué recibes</h2>
             <ul className="clean" style={{ margin: 0 }}>
               {s.entregables.map((e, i) => <li key={i} style={{ fontSize: 15 }}>{e}</li>)}
             </ul>
           </div>
           <div className="card">
-            <span className="label">Tecnologías</span>
+            <h2 className="label">Tecnologías</h2>
             <p>{s.tecnologias.join(' · ')}</p>
             <span className="label" style={{ marginTop: 14 }}>Cómo se empieza</span>
             <p>
@@ -107,7 +107,7 @@ export default async function ServicioPage({ params }: { params: Promise<{ slug:
         ) : null}
 
         <div className="exp-block">
-          <span className="label">Preguntas frecuentes</span>
+          <h2 className="label">Preguntas frecuentes</h2>
           {s.faq.map((f, i) => (
             <div key={i} style={{ marginBottom: 18, maxWidth: '70ch' }}>
               <h3 style={{ fontSize: 16.5, marginBottom: 6 }}>{f.q}</h3>

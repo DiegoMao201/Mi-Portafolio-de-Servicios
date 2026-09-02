@@ -35,6 +35,7 @@ export default function CasosPage() {
 
       <section className="sec sec--tight">
         <div className="wrap">
+          <h2 className="lista-titulo">Los cinco expedientes</h2>
           <div className="grid expedientes">
             {CASOS.map((c) => (
               <Link key={c.slug} href={`/casos/${c.slug}`} className="card card--exp">

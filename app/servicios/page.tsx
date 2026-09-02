@@ -31,6 +31,7 @@ export default function ServiciosPage() {
 
       <section className="sec sec--tight">
         <div className="wrap">
+          <h2 className="lista-titulo">Los ocho servicios</h2>
           <div className="lista">
             {SERVICIOS.map((s, i) => (
               <Link key={s.slug} href={`/servicios/${s.slug}`} className="card card--fila">
