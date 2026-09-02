@@ -103,7 +103,7 @@ export const JSONLD_BASE = {
       // de la misma persona en todas partes.
       sameAs: [
         'https://github.com/DiegoMao201',
-        'https://www.linkedin.com/in/diego-garcia-946610242',
+        'https://www.linkedin.com/in/diegomauriciogarcia',
       ] as string[],
     },
     {
@@ -117,7 +117,7 @@ export const JSONLD_BASE = {
       email: SITE.email,
       telephone: '+57 320 504 6277',
       founder: { '@id': `${SITE.url}/#diego` },
-      sameAs: ['https://github.com/DiegoMao201', 'https://www.linkedin.com/in/diego-garcia-946610242'],
+      sameAs: ['https://github.com/DiegoMao201', 'https://www.linkedin.com/in/diegomauriciogarcia'],
       description:
         'Automatización de procesos operativos, integración de sistemas y APIs, análisis ' +
         'de datos e inteligencia de negocios, bases de datos, agentes de IA conversacional ' +
