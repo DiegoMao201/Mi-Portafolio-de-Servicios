@@ -27,7 +27,9 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'es_CO',
     url: SITE.url,
-    siteName: SITE.shortName,
+    // Tiene que decir exactamente lo mismo que WebSite.name, o Google
+    // descarta las dos señales y muestra el dominio.
+    siteName: SITE.person,
     title: `${SITE.person} — ${SITE.title}`,
     description: SITE.description,
   },

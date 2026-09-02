@@ -30,7 +30,15 @@ export const JSONLD_BASE = {
       '@type': 'WebSite',
       '@id': `${SITE.url}/#sitio`,
       url: SITE.url,
-      name: 'Datovate Nexus Pro — Diego Mauricio García R.',
+      /* El nombre del sitio que Google muestra encima de la URL en los
+         resultados. Antes decia una cosa aqui y otra en og:site_name, y ante
+         señales contradictorias Google se queda con el dominio pelado.
+         Va la persona por delante: "Nexus Pro" colisiona con productos
+         establecidos —Sonatype, Nexus Data— y el nombre propio no colisiona
+         con nada. alternateName deja las otras formas por si Google prefiere
+         alguna. */
+      name: 'Diego Mauricio García R.',
+      alternateName: ['Datovate Nexus Pro', 'Diego García', 'Datovate'],
       inLanguage: 'es-CO',
       publisher: { '@id': `${SITE.url}/#org` },
       about: { '@id': `${SITE.url}/#diego` },
