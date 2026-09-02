@@ -36,6 +36,22 @@ export const JSONLD_BASE = {
       about: { '@id': `${SITE.url}/#diego` },
     },
     {
+      '@type': ['Organization', 'PetStore'],
+      '@id': 'https://bigotesypaticas.com/#organization',
+      name: 'Bigotes y Paticas',
+      legalName: 'Diego Mauricio García — Bigotes y Paticas',
+      url: 'https://bigotesypaticas.com',
+      founder: { '@id': `${SITE.url}/#diego` },
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Mall Zamara Plaza, Cl. 15 #3A-07 Local 2',
+        addressLocality: 'Dosquebradas',
+        addressRegion: 'Risaralda',
+        addressCountry: 'CO',
+      },
+      sameAs: ['https://www.instagram.com/bigotesypaticas/'],
+    },
+    {
       '@type': 'Person',
       '@id': `${SITE.url}/#diego`,
       name: 'Diego Mauricio García R.',
@@ -67,6 +83,12 @@ export const JSONLD_BASE = {
       },
       nationality: { '@type': 'Country', name: 'Colombia', sameAs: 'https://www.wikidata.org/wiki/Q739' },
       worksFor: { '@id': `${SITE.url}/#org` },
+      /* El vinculo con la otra empresa, declarado en las dos direcciones.
+         Bigotes y Paticas es un negocio real, con local fisico, NIT publico y
+         Perfil de Empresa de Google verificado, y esta legalmente a su nombre.
+         Es la corroboracion externa que le faltaba a esta identidad: hasta
+         ahora todo lo que se afirmaba aqui solo se podia comprobar aqui. */
+      affiliation: { '@id': 'https://bigotesypaticas.com/#organization' },
       /* knowsAbout con entidades, no con cadenas de texto.
          Una lista de strings obliga a la maquina a adivinar: buscando "Python"
          en Wikidata el primer resultado es un genero de reptiles, "Pereira" es

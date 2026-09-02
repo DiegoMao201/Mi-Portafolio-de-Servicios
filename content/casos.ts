@@ -15,6 +15,9 @@ export type Caso = {
   resultado: string[];
   stack: string[];
   diagrama: CasoDiagrama;
+  /** Solo para los casos que se pueden visitar. Un caso verificable vale
+   *  mucho mas que uno que solo se cuenta: el lector comprueba en vez de creer. */
+  enVivo?: { url: string; etiqueta: string };
 };
 
 export const CASOS: Caso[] = [
@@ -98,6 +101,7 @@ export const CASOS: Caso[] = [
   },
   {
     slug: 'bigotes-y-paticas',
+    enVivo: { url: 'https://bigotesypaticas.com', etiqueta: 'bigotesypaticas.com' },
     codigo: 'E-03',
     titulo: 'Bigotes y Paticas: retail completo',
     cliente: 'Bigotes y Paticas · Dosquebradas — empresa propia',

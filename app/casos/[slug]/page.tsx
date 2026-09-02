@@ -32,6 +32,7 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
       { '@type': 'ListItem', position: 1, name: 'Casos', item: `${SITE.url}/casos` },
       { '@type': 'ListItem', position: 2, name: c.titulo, item: `${SITE.url}/casos/${c.slug}` },
     ],
+      ...(c.enVivo ? { about: { '@type': 'Organization', name: c.cliente.split('·')[0].trim(), url: c.enVivo.url } } : {}),
   };
 
   return (
@@ -79,6 +80,20 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
           <span className="label">Stack</span>
           <p className="mono" style={{ fontSize: 14, color: 'var(--ink-2)' }}>{c.stack.join(' · ')}</p>
         </div>
+
+        {/* Un caso que se puede visitar deja de ser una afirmación. El lector
+            comprueba en vez de creer, y un buscador tiene una fuente externa
+            que corrobora lo que aquí se cuenta. */}
+        {c.enVivo ? (
+          <div className="exp-block">
+            <span className="label">Se puede visitar</span>
+            <p>
+              Este sistema está operando ahora mismo:{' '}
+              <a href={c.enVivo.url} target="_blank" rel="noopener">{c.enVivo.etiqueta}</a>.
+              No hay que creerme: entra y míralo funcionando.
+            </p>
+          </div>
+        ) : null}
 
         <div className="hero-actions">
           <Link className="btn btn-signal" href="/contacto">Mi operación tiene algo parecido</Link>
