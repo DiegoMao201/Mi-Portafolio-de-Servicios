@@ -155,7 +155,20 @@ export const JSONLD_BASE = {
       email: SITE.email,
       telephone: '+57 320 504 6277',
       founder: { '@id': `${SITE.url}/#diego` },
-      sameAs: ['https://github.com/DiegoMao201', 'https://www.linkedin.com/in/diegomauriciogarcia'],
+      sameAs: [
+        'https://github.com/DiegoMao201',
+        'https://www.linkedin.com/in/diegomauriciogarcia',
+        'https://www.google.com/search?kgmid=/g/11zxd85728',
+      ],
+      /* KGMID: el identificador que Google asigno a esta entidad en su
+         Knowledge Graph. Declararlo cierra el circulo — el sitio afirma ser la
+         misma entidad que Google ya reconocio, y deja de depender de que Google
+         lo deduzca solo. */
+      identifier: {
+        '@type': 'PropertyValue',
+        propertyID: 'Google Knowledge Graph',
+        value: '/g/11zxd85728',
+      },
       description:
         'Automatización de procesos operativos, integración de sistemas y APIs, análisis ' +
         'de datos e inteligencia de negocios, bases de datos, agentes de IA conversacional ' +
