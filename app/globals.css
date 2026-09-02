@@ -157,6 +157,11 @@ strong{font-weight:600; color:var(--ink)}
 .diag h1, .diag h2, .diag h3, .diag h4,
 .arch h1, .arch h2, .arch h3, .arch h4{ color:var(--machine-ink) }
 .machine p, .machine li, .machine span:not([class]){ color:var(--machine-dim) }
+/* Un span DENTRO de un titular hereda la tinta del titular, no la del cuerpo.
+   Aqui me pase de ancho una vez: puse `.machine span` a tinta apagada y el
+   titular "No vendo software." salio gris, porque la frase vive en un span.
+   La regla correcta es esta: el cuerpo se apaga, los titulares no. */
+.machine h1 span, .machine h2 span, .machine h3 span{ color:inherit }
 .machine strong, .diag strong{ color:var(--machine-ink) }
 .arch-cap{ color:var(--machine-dim) }
 /* El texto SVG no hereda de `color`: `fill` es una propiedad aparte y por eso
@@ -930,8 +935,10 @@ h1 .h1-clave{
 }
 /* En el hero conserva los margenes que tenia el parrafo original (24 arriba,
    34 abajo): al moverlo dentro del h1 se perdio el de abajo y el texto quedaba
-   pegado a los botones. */
-.machine h1 .h1-clave{margin:24px 0 34px}
+   pegado a los botones. Y la tinta vuelve a ser la de zona oscura: `h1 .h1-clave`
+   tiene mas especificidad que `.hero-sub`, asi que le estaba imponiendo --ink-2
+   —tinta de modo claro— sobre fondo casi negro: 2.57:1, por debajo de AA. */
+.machine h1 .h1-clave{margin:24px 0 34px; color:var(--machine-dim)}
 .machine h1{max-width:none}
 .machine h1 .h1-frase{max-width:14ch}
 @media(max-width:760px){ h1 .h1-clave{font-size:17px; margin-top:14px} }
