@@ -101,7 +101,10 @@ export const JSONLD_BASE = {
       // sameAs: enlaza esta página con los perfiles públicos de Diego. Es la
       // señal con la que buscadores y asistentes de IA confirman que se trata
       // de la misma persona en todas partes.
-      sameAs: ['https://github.com/DiegoMao201'] as string[],
+      sameAs: [
+        'https://github.com/DiegoMao201',
+        'https://www.linkedin.com/in/diego-garcia-946610242',
+      ] as string[],
     },
     {
       /* ProfessionalService en vez de solo Organization: le dice a un buscador
@@ -114,7 +117,7 @@ export const JSONLD_BASE = {
       email: SITE.email,
       telephone: '+57 320 504 6277',
       founder: { '@id': `${SITE.url}/#diego` },
-      sameAs: ['https://github.com/DiegoMao201'],
+      sameAs: ['https://github.com/DiegoMao201', 'https://www.linkedin.com/in/diego-garcia-946610242'],
       description:
         'Automatización de procesos operativos, integración de sistemas y APIs, análisis ' +
         'de datos e inteligencia de negocios, bases de datos, agentes de IA conversacional ' +

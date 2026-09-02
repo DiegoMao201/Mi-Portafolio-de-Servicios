@@ -25,6 +25,9 @@ export default function Footer() {
             <a href="https://github.com/DiegoMao201" target="_blank" rel="noopener me">
               github.com/DiegoMao201
             </a>
+            <a href="https://www.linkedin.com/in/diego-garcia-946610242" target="_blank" rel="noopener me">
+              LinkedIn
+            </a>
           </p>
         </div>
         <div>
