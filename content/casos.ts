@@ -226,6 +226,54 @@ export const CASOS: Caso[] = [
       ],
     },
   },
+  {
+    slug: 'coreprop-conjuntos-residenciales',
+    enVivo: { url: 'https://coreprop.datovatenexuspro.com', etiqueta: 'coreprop.datovatenexuspro.com' },
+    codigo: 'E-06',
+    titulo: 'CoreProp: el conjunto residencial en una app',
+    cliente: 'CoreProp · producto propio, por suscripción',
+    resumen: 'Cartera, pagos, presupuesto, portería, minuta, solicitudes, comunicados y asambleas de un conjunto residencial en una sola aplicación instalable, que cualquier administrador contrata y configura solo.',
+    contexto: [
+      'CoreProp nació resolviendo la administración de un conjunto residencial del Eje Cafetero: la cartera vivía en un programa, la portería en un cuaderno, los avisos en grupos de WhatsApp y cada informe para el consejo se armaba a mano.',
+      'Lo que funcionó ahí se convirtió en producto. Hoy un administrador se registra con su correo, paga el mes en línea, carga su conjunto con una plantilla de Excel y crea a su equipo, sin que yo intervenga. Puedes recorrerlo en vivo: hay una demostración con datos de ejemplo que no pide registro.',
+    ],
+    restriccion: 'Lo usan personas muy distintas en un mismo día: una contadora en su computador, un vigilante con un celular sencillo en la portería y cientos de residentes que nunca van a leer un manual. Cada uno tiene que ver solo lo suyo y entenderlo sin capacitación.',
+    arquitectura: [
+      'Una sola aplicación multiconjunto sobre PostgreSQL: cada conjunto tiene sus módulos encendidos o apagados y una matriz de permisos por rol que la administración ajusta.',
+      'Aplicación web instalable con notificaciones al celular: el aviso del paquete, la respuesta a una solicitud o el comunicado llegan aunque la app esté cerrada, en Android y en iPhone.',
+      'Suscripción de 30 días con cobro en línea: el pago confirma, el conjunto nace con su administrador, y el sistema recuerda el vencimiento y pausa el acceso si no se renueva, sin borrar nada.',
+      'Entrada y salida por Excel: unidades, propietarios, cartera, pagos, presupuesto y cronograma de vigilancia se cargan con plantillas, y todo se puede descargar.',
+      'Lo que exige acceso a cuentas del conjunto, como leer su correo o sus informes contables, queda por fuera del plan y se construye a la medida.',
+    ],
+    resultado: [
+      'En producción, con un conjunto residencial del Eje Cafetero operando sobre él todos los días.',
+      'Alta de un conjunto nuevo sin intervención: registro, pago, carga de datos y creación del equipo los hace el propio administrador.',
+      'Soporte dentro del producto: tiquetes en un hilo y sesiones por videollamada agendadas sobre mi calendario.',
+      'Precio público por tamaño del conjunto, desde $200.000 cada 30 días, sin contrato de permanencia.',
+    ],
+    stack: ['Next.js 16', 'React 19', 'PostgreSQL', 'PWA + Web Push', 'Bold', 'Google Calendar API', 'Coolify'],
+    diagrama: {
+      nodos: [
+        { id: 'adm', label: 'Administración y contadora', capa: 0 },
+        { id: 'eq', label: 'Portería, aseo y zonas', capa: 0 },
+        { id: 'res', label: 'Residentes y consejo', capa: 0 },
+        { id: 'app', label: 'CoreProp', sub: 'app instalable · permisos por rol', capa: 1, acento: true },
+        { id: 'db', label: 'PostgreSQL', sub: 'un espacio por conjunto', capa: 2 },
+        { id: 'push', label: 'Avisos al celular', capa: 2 },
+        { id: 'pago', label: 'Suscripción', sub: 'cobro en línea · 30 días', capa: 2 },
+        { id: 'xls', label: 'Plantillas de Excel', sub: 'carga y descarga', capa: 3 },
+      ],
+      conexiones: [
+        { de: 'adm', a: 'app', dato: 'cartera · presupuesto' },
+        { de: 'eq', a: 'app', dato: 'paquetes · rondas' },
+        { de: 'res', a: 'app', dato: 'cuenta · solicitudes' },
+        { de: 'app', a: 'db' },
+        { de: 'app', a: 'push' },
+        { de: 'app', a: 'pago' },
+        { de: 'db', a: 'xls' },
+      ],
+    },
+  },
 ];
 
 export function getCaso(slug: string): Caso | undefined {
