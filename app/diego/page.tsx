@@ -40,11 +40,11 @@ export default function DiegoPage() {
                   navegadores sirviendo la version vieja durante horas. */}
             <span className="retrato-halo" aria-hidden="true" />
             <picture>
-              <source srcSet="/diego-6c8f3375.webp" type="image/webp" />
+              <source srcSet="/diego-f3a4768e.webp" type="image/webp" />
               <img
-                src="/diego-6c8f3375.png"
-                width={644}
-                height={744}
+                src="/diego-f3a4768e.png"
+                width={708}
+                height={800}
                 alt="Diego Mauricio García R., ingeniero industrial, en Pereira, Colombia"
                 loading="eager"
                 decoding="async"

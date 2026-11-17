@@ -82,7 +82,7 @@ export const JSONLD_BASE = {
       url: `${SITE.url}/diego`,
       // Una entidad con rostro es mucho más fácil de reconciliar: Google y los
       // asistentes usan la imagen para confirmar que es la misma persona.
-      image: `${SITE.url}/diego-6c8f3375.png`,
+      image: `${SITE.url}/diego-f3a4768e.png`,
       address: { '@type': 'PostalAddress', addressLocality: 'Pereira', addressRegion: 'Risaralda', addressCountry: 'CO' },
       alumniOf: {
         '@type': 'CollegeOrUniversity',
