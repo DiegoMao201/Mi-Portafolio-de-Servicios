@@ -6,7 +6,7 @@ import Ticker from '@/components/Ticker';
 import Diagnosticador from '@/components/Diagnosticador';
 import Vena from '@/components/Vena';
 import { SERVICIOS } from '@/content/servicios';
-import { CASOS } from '@/content/casos';
+import { CASOS, CUANTOS_CASOS } from '@/content/casos';
 import { waLink } from '@/lib/site';
 
 export default function Home() {
@@ -104,7 +104,7 @@ export default function Home() {
 
       <Vena de={26} a={12} />
 
-      {/* 03 · Casos — mucho aire, y el carril se sale por la derecha */}
+      {/* 03 · Casos — todos a la vista: nada queda escondido detrás de un deslizamiento */}
       <section className="sec sec--air sec--colgada">
         <span className="sec-num" aria-hidden="true">03</span>
         <div className="wrap">
@@ -117,18 +117,18 @@ export default function Home() {
             Sin capturas de clientes y sin revelar cómo funciona nada por dentro.
           </p>
         </div>
-        <div className="carril">
-          {CASOS.map((c) => (
-            <Link key={c.slug} href={`/casos/${c.slug}`} className="card">
-              <span className="label">{c.codigo} · {c.cliente.split('·')[0].split('—')[0]}</span>
-              <h3>{c.titulo}</h3>
-              <p>{c.resumen}</p>
-              <span className="go">Abrir expediente →</span>
-            </Link>
-          ))}
-        </div>
         <div className="wrap">
-          <p className="carril-pie">Los cinco expedientes · desliza →</p>
+          <div className="grid rejilla-casos">
+            {CASOS.map((c) => (
+              <Link key={c.slug} href={`/casos/${c.slug}`} className="card">
+                <span className="label">{c.codigo} · {c.cliente.split('·')[0].split('—')[0]}</span>
+                <h3>{c.titulo}</h3>
+                <p>{c.resumen}</p>
+                <span className="go">Abrir expediente →</span>
+              </Link>
+            ))}
+          </div>
+          <p className="carril-pie"><Link href="/casos">Los {CUANTOS_CASOS} expedientes, completos →</Link></p>
         </div>
       </section>
 

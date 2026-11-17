@@ -40,7 +40,10 @@ export default function ArchGraph({
   for (const n of nodos) if (!layers.has(n.id)) layers.set(n.id, 0);
 
   const horiz = eje === 'horizontal';
-  const BW = 182, BH = 54, PADX = 24, PADY = 26;
+  // La caja se ensancha con el texto mas largo: con 182 fijos, un subtitulo
+  // como 'app instalable · permisos por rol' se salia por el borde.
+  const largo = nodos.reduce((m, n) => Math.max(m, n.label.length * 7.1, (n.sub ?? '').length * 5.9), 0);
+  const BW = Math.min(264, Math.max(182, Math.ceil(largo) + 28)), BH = 54, PADX = 24, PADY = 26;
   const ROW = 118;          // separacion entre capas en vertical
   // El hueco entre columnas lo manda la etiqueta de cable mas larga: con un
   // valor fijo, 'sistema en produccion' se montaba encima de las cajas.
@@ -54,6 +57,7 @@ export default function ArchGraph({
     byLayer.get(l)!.push(n);
   }
   const maxLayer = Math.max(...Array.from(byLayer.keys()));
+  const capas = Array.from(byLayer.keys()).sort((x, y) => x - y);
   const anchoGrupo = Math.max(...Array.from(byLayer.values()).map((g) => g.length));
 
   const W = horiz ? PADX * 2 + (maxLayer + 1) * BW + maxLayer * (COL - BW) : 900;
@@ -163,6 +167,28 @@ export default function ArchGraph({
         })}
       </svg>
       </div>
+      {/* En una pantalla angosta el dibujo, encogido, dejaba la letra en 5px.
+          Ahi se muestra lo mismo como una columna: capa por capa, con lo que
+          viaja entre ellas, a tamaño de lectura y sin deslizar nada. */}
+      <ol className="arch-movil">
+        {capas.map((l, i) => {
+          const suyos = byLayer.get(l)!;
+          const datos = Array.from(new Set(conexiones.filter((e) => e.dato && suyos.some((n) => n.id === e.a)).map((e) => e.dato!)));
+          return (
+            <li key={l}>
+              {i > 0 && <div className="am-cable">{datos.map((d) => <span key={d}>{d}</span>)}</div>}
+              <div className="am-capa">
+                {suyos.map((n) => (
+                  <div key={n.id} className={n.acento ? 'am-nodo acc' : 'am-nodo'}>
+                    <b>{n.label}</b>
+                    {n.sub ? <span>{n.sub}</span> : null}
+                  </div>
+                ))}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
       {caption ? <div className="arch-cap">{caption}</div> : null}
     </div>
   );

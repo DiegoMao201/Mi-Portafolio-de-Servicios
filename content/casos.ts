@@ -280,3 +280,6 @@ export const CASOS: Caso[] = [
 export function getCaso(slug: string): Caso | undefined {
   return CASOS.find((c) => c.slug === slug);
 }
+
+/** Cuántos expedientes hay, en letras. Sale de la lista: nunca se escribe a mano. */
+export const CUANTOS_CASOS = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce'][CASOS.length] ?? String(CASOS.length);

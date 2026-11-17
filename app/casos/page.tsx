@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CASOS } from '@/content/casos';
+import { CASOS, CUANTOS_CASOS } from '@/content/casos';
 
 export const metadata: Metadata = {
   title: 'Casos reales: sistemas en operación',
@@ -22,7 +22,7 @@ export default function CasosPage() {
             <span className="h1-clave">Casos reales de automatización, control de inventarios y sistemas de decisión en empresas colombianas</span>
           </h1>
           <p className="lede bloque--angosto">
-            Aquí no hay testimonios con foto de banco de imágenes. Hay cinco sistemas reales,
+            Aquí no hay testimonios con foto de banco de imágenes. Hay {CUANTOS_CASOS} sistemas reales,
             contados como se diseñaron: el problema, la restricción que lo hacía difícil,
             la arquitectura que lo resolvió y el resultado que se puede medir.
           </p>
@@ -35,7 +35,7 @@ export default function CasosPage() {
 
       <section className="sec sec--tight">
         <div className="wrap">
-          <h2 className="lista-titulo">Los cinco expedientes</h2>
+          <h2 className="lista-titulo">Los {CUANTOS_CASOS} expedientes</h2>
           <div className="grid expedientes">
             {CASOS.map((c) => (
               <Link key={c.slug} href={`/casos/${c.slug}`} className="card card--exp">
