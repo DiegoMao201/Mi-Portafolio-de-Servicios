@@ -16,7 +16,7 @@ export default function HabeasDataPage() {
 
         <h2>Responsable del tratamiento</h2>
         <p>
-          Datovate Nexus Pro (Diego Mauricio García R.), con domicilio en Pereira, Risaralda,
+          Datovate Nexus Pro (Diego Mauricio García Rengifo), con domicilio en Pereira, Risaralda,
           Colombia. Correo: diegomao.201@gmail.com. Teléfono: +57 320 504 6277.
         </p>
 

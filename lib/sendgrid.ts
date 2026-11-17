@@ -44,8 +44,8 @@ export async function notifyLead(lead: Record<string, unknown>, transcript?: str
   if (email && email.includes('@')) {
     await sendMail({
       to: email,
-      subject: 'Recibí tu mensaje — Diego Mauricio García R.',
-      text: `Hola${lead.nombre ? ` ${lead.nombre}` : ''},\n\nRecibí tu mensaje y lo voy a leer personalmente. Te escribo en el transcurso del día.\n\nSi es urgente: WhatsApp +57 320 504 6277.\n\nDiego Mauricio García R.\nDatovate Nexus Pro · datovatenexuspro.com`,
+      subject: 'Recibí tu mensaje — Diego Mauricio García Rengifo',
+      text: `Hola${lead.nombre ? ` ${lead.nombre}` : ''},\n\nRecibí tu mensaje y lo voy a leer personalmente. Te escribo en el transcurso del día.\n\nSi es urgente: WhatsApp +57 320 504 6277.\n\nDiego Mauricio García Rengifo\nDatovate Nexus Pro · datovatenexuspro.com`,
     });
   }
 }

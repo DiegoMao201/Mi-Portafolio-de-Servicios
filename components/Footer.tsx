@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="wrap">
         <div>
-          <div className="f-sign">Diego Mauricio García R.</div>
+          <div className="f-sign">Diego Mauricio García Rengifo</div>
           <div className="f-sub">DATOVATE NEXUS PRO</div>
           {/* --machine-dim es tinta de zona oscura. Aqui el fondo es claro (--void):
               daba 2.47:1, muy por debajo de AA. */}

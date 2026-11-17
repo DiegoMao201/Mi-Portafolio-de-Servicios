@@ -14,8 +14,7 @@ export default function TerminosPage() {
         <h1 style={{ fontSize: 'clamp(26px,3.6vw,38px)' }}>Términos de uso</h1>
         <h2>El sitio y su contenido</h2>
         <p>
-          Este sitio presenta los servicios profesionales de Datovate Nexus Pro (Diego Mauricio
-          García R.). Los contenidos —textos, casos, diagramas y cifras— son informativos y de
+          Este sitio presenta los servicios profesionales de Datovate Nexus Pro (Diego Mauricio García Rengifo). Los contenidos —textos, casos, diagramas y cifras— son informativos y de
           propiedad de su autor; puedes citarlos con enlace a la fuente.
         </p>
         <h2>El asistente conversacional</h2>

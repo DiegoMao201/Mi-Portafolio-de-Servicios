@@ -19,7 +19,7 @@ export default function PrivacidadPage() {
         </p>
         <h2>Lo esencial</h2>
         <p>
-          El responsable del tratamiento es Datovate Nexus Pro (Diego Mauricio García R.),
+          El responsable del tratamiento es Datovate Nexus Pro (Diego Mauricio García Rengifo),
           Pereira, Colombia. Los datos se usan para responder tu solicitud y mantener
           comunicación comercial contigo; no se venden ni se comparten con terceros con fines
           comerciales. Puedes conocer, actualizar, rectificar o suprimir tus datos escribiendo a

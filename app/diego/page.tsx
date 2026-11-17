@@ -19,7 +19,7 @@ export default function DiegoPage() {
           <div>
             <p className="label sec-kicker">Quién está detrás</p>
             <h1>
-              <span className="h1-frase" style={{ maxWidth: '13ch' }}>Diego Mauricio García R.</span>
+              <span className="h1-frase" style={{ maxWidth: '13ch' }}>Diego Mauricio García Rengifo</span>
               <span className="h1-clave">Ingeniero industrial de la UTP. Automatización de procesos, inteligencia de negocios e IA aplicada en Pereira, Colombia</span>
             </h1>
             <p className="lede">
@@ -28,6 +28,10 @@ export default function DiegoPage() {
               recubrimientos, adhesivos y suministros industriales — es decir, conozco por dentro
               la operación que hoy automatizo. Esa combinación, entender el negocio y además
               construir el sistema, define cómo trabajo.
+            </p>
+            <p className="lede">
+              Soy el creador de <a href="https://coreprop.datovatenexuspro.com">CoreProp</a>, la app inteligente para
+              administrar copropiedades en Colombia, y el propietario de Bigotes y Paticas, en Dosquebradas.
             </p>
           </div>
 
@@ -45,7 +49,7 @@ export default function DiegoPage() {
                 src="/diego-f3a4768e.png"
                 width={708}
                 height={800}
-                alt="Diego Mauricio García R., ingeniero industrial, en Pereira, Colombia"
+                alt="Diego Mauricio García Rengifo, ingeniero industrial, en Pereira, Colombia"
                 loading="eager"
                 decoding="async"
               />
@@ -102,7 +106,7 @@ export default function DiegoPage() {
               <div>
                 <h2 className="label">Datos formales</h2>
                 <p>
-                  Diego Mauricio García R. — Pereira, Risaralda, Colombia.<br />
+                  Diego Mauricio García Rengifo — Pereira, Risaralda, Colombia.<br />
                   <strong>NIT 1088266407</strong>, consultable en el registro mercantil.<br />
                   Datovate Nexus Pro es la marca comercial bajo la que opero.
                 </p>

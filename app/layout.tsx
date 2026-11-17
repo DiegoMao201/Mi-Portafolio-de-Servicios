@@ -18,7 +18,7 @@ import Corriente from '@/components/Corriente';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: 'Diego Mauricio García R. — Automatización, sistemas e IA',
+    default: 'Diego Mauricio García Rengifo — Automatización, sistemas e IA',
     template: `%s · ${SITE.shortName}`,
   },
   description: SITE.description,

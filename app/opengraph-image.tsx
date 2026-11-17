@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'nodejs';
-export const alt = 'Diego Mauricio García R. — Datovate Nexus Pro';
+export const alt = 'Diego Mauricio García Rengifo — Datovate Nexus Pro';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -61,7 +61,7 @@ export default function OgImage() {
           <Mark s={82} />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: 30, fontWeight: 700, letterSpacing: -0.5 }}>
-              Diego Mauricio García R.
+              Diego Mauricio García Rengifo
             </span>
             <span style={{ fontSize: 17, color: '#FF7440', letterSpacing: 7 }}>DATOVATE NEXUS PRO</span>
           </div>

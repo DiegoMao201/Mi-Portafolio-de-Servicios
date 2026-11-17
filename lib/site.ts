@@ -1,12 +1,12 @@
 export const SITE = {
   url: process.env.SITE_URL || 'https://www.datovatenexuspro.com',
-  name: 'Diego Mauricio García R.',
+  name: 'Diego Mauricio García Rengifo',
   shortName: 'Diego García',
   /* Datovate Nexus Pro sigue siendo la firma comercial, pero en segundo plano:
      en consultoría se contrata a una persona, y una persona también es una
      entidad mucho más fácil de reconocer para los buscadores y las IA. */
   firma: 'Datovate Nexus Pro',
-  person: 'Diego Mauricio García R.',
+  person: 'Diego Mauricio García Rengifo',
   title: 'Automatización, sistemas e IA que operan empresas reales',
   description:
     'Ingeniero industrial en Pereira. Automatización, integración de sistemas, inteligencia de negocios e IA aplicada para empresas colombianas.',
@@ -37,8 +37,8 @@ export const JSONLD_BASE = {
          establecidos —Sonatype, Nexus Data— y el nombre propio no colisiona
          con nada. alternateName deja las otras formas por si Google prefiere
          alguna. */
-      name: 'Diego Mauricio García R.',
-      alternateName: ['Datovate Nexus Pro', 'Diego García', 'Datovate'],
+      name: 'Diego Mauricio García Rengifo',
+      alternateName: ['Diego Mauricio García R.', 'Datovate Nexus Pro', 'Diego García', 'Datovate'],
       inLanguage: 'es-CO',
       publisher: { '@id': `${SITE.url}/#org` },
       about: { '@id': `${SITE.url}/#diego` },
@@ -62,7 +62,12 @@ export const JSONLD_BASE = {
     {
       '@type': 'Person',
       '@id': `${SITE.url}/#diego`,
-      name: 'Diego Mauricio García R.',
+      /* El nombre completo, como figura en el registro mercantil y en los textos legales de Bigotes y Paticas.
+         Con solo «García R.» quien buscaba el nombre completo no llegaba a este sitio. */
+      name: 'Diego Mauricio García Rengifo',
+      alternateName: ['Diego Mauricio García R.', 'Diego García', 'Diego Mauricio García'],
+      givenName: 'Diego Mauricio',
+      familyName: 'García Rengifo',
       jobTitle: 'Ingeniero industrial · Inteligencia de negocios y automatización',
       email: SITE.email,
       telephone: '+57 320 504 6277',
@@ -147,7 +152,22 @@ export const JSONLD_BASE = {
       sameAs: [
         'https://github.com/DiegoMao201',
         'https://www.linkedin.com/in/diegomauriciogarcia',
+        'https://coreprop.datovatenexuspro.com/prensa',
       ] as string[],
+    },
+    {
+      /* CoreProp, el producto propio por suscripción: declarado aquí para que buscadores y asistentes
+         vean en un solo lugar a la persona, su firma y lo que construyó. */
+      '@type': 'SoftwareApplication',
+      '@id': 'https://coreprop.datovatenexuspro.com/#app',
+      name: 'CoreProp',
+      url: 'https://coreprop.datovatenexuspro.com',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web, Android, iOS',
+      description: 'App inteligente para administrar copropiedades (conjuntos, edificios y unidades residenciales) en un solo canal.',
+      author: { '@id': `${SITE.url}/#diego` },
+      publisher: { '@id': `${SITE.url}/#org` },
+      offers: { '@type': 'Offer', price: '59000', priceCurrency: 'COP', description: 'Desde $59.000 cada 30 días; 30 días gratis.' },
     },
     {
       /* ProfessionalService en vez de solo Organization: le dice a un buscador
