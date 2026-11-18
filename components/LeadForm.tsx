@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { evento } from './Medicion';
 
 export default function LeadForm() {
   const [state, setState] = useState<'idle' | 'busy' | 'ok' | 'err'>('idle');
@@ -16,7 +17,7 @@ export default function LeadForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, origen: window.location.href }),
       });
-      if (res.ok) { setState('ok'); form.reset(); }
+      if (res.ok) { setState('ok'); form.reset(); evento('lead_datovate', { ubicacion: window.location.pathname }); }
       else setState('err');
     } catch {
       setState('err');

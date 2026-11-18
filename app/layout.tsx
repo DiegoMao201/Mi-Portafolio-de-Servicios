@@ -1,3 +1,4 @@
+import Medicion from '@/components/Medicion';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import '@fontsource/archivo/latin-500.css';
@@ -41,7 +42,8 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const ga = process.env.NEXT_PUBLIC_GA_ID;
+  // El identificador de medición es público por diseño: va en cada página que se mide.
+  const ga = process.env.NEXT_PUBLIC_GA_ID || 'G-G2NQJ9FBDR';
   return (
     <html lang="es-CO">
       <body>
@@ -52,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <Fx />
         <Spotlight />
+        <Medicion />
         <a
           className="wa-float"
           href={waLink('Hola Diego, vengo de datovatenexuspro.com y quiero hablar sobre un proyecto.')}
@@ -70,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${ga}`} strategy="afterInteractive" />
             <Script id="ga4" strategy="afterInteractive">
-              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga}');`}
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${ga}');`}
             </Script>
           </>
         ) : null}

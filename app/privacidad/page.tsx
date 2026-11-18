@@ -27,9 +27,13 @@ export default function PrivacidadPage() {
         </p>
         <h2>Medición del sitio</h2>
         <p>
-          Este sitio puede usar Google Analytics para medir visitas de forma agregada. Puedes
-          bloquear estas mediciones con las herramientas de tu navegador sin que el sitio deje de
-          funcionar.
+          Este sitio usa Google Analytics, de Google LLC, para medir visitas de forma agregada:
+          páginas vistas, tipo de dispositivo, ciudad aproximada y si alguien escribe por el
+          formulario o por WhatsApp. Para eso Google instala cookies en tu navegador. No se le envían
+          tu nombre, tu correo ni lo que escribas en el formulario, y las funciones de publicidad y de
+          Google Signals están desactivadas. Puedes bloquear estas mediciones con tu navegador o con el
+          complemento de inhabilitación de Google Analytics
+          (https://tools.google.com/dlpage/gaoptout) sin que el sitio deje de funcionar.
         </p>
         <p>
           El detalle completo está en la <Link href="/habeas-data">política de tratamiento de
